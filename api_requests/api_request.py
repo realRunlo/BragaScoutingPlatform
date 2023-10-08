@@ -3,13 +3,17 @@ import json
 import os
 import base64
 import argparse
+import time
+from threading import Thread
+from threading import Semaphore
+
 
 current_folder = os.path.dirname(__file__)
 
 api_url = 'https://apirest.wyscout.com/v3/'
 
 # Preparing authentication
-authentication = json.load(open('authentication.json'))
+authentication = json.load(open(f'{current_folder}/authentication.json'))
 encoded_authentication = base64.b64encode(f'{authentication["username"]}:{authentication["password"]}'.encode('ascii'))
 encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 
@@ -17,8 +21,9 @@ encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--areas','-a',action='store_true', help='Request areas from API')
-    parser.add_argument('--area_competitions','-ac',type=str, nargs='+' , help="Request area's competitions from API")
+    parser.add_argument('--areas','-a'                  ,action='store_true'                         , help='Request areas from API')
+    parser.add_argument('--area_competitions','-ac'     ,type=str, nargs='+'                         , help="Request area's competitions from API")
+    parser.add_argument('--competition_info','-ci'      ,type=str, nargs='*'                         , help="Request all info from competition from API")
     return parser.parse_args()
 
 
@@ -31,35 +36,149 @@ def get_areas():
     return response.json()
 
 
-def get_area_competitions(areas=None):
-    '''Requests competitions from API'''
+def get_area_competitions(area=None):
+    '''Requests area's competitions from API'''
     result = []
-    if areas:
+    if area:
         url = api_url + 'competitions'
         headers = {'Authorization': encoded_authentication}
-        for area in areas:
-            response = requests.get(url, headers=headers,params={'areaId':area})
-            result.append(response.json())
+        response = requests.get(url, headers=headers,params={'areaId':area})
+        result = response.json()['competitions']
     return result
 
 
+def get_competition_teams(competition):
+    '''Requests teams from API'''
+    url = f'{api_url}competitions/{competition}/teams'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
 
-if __name__ == '__main__':
+def get_competition_players(competition):
+    '''Requests players from API'''
+    url = f'{api_url}competitions/{competition}/players'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+def get_competition_matches(competition):
+    '''Requests matches from API'''
+    url = f'{api_url}competitions/{competition}/matches'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+def get_team_info(team):
+    '''Requests team info from API'''
+    url = f'{api_url}teams/{team}'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+
+def get_match_events(match):
+    '''Requests match events from API'''
+    url = f'{api_url}matches/{match}/events'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+
+
+def get_player_info(player):
+    '''Requests player info from API'''
+    url = f'{api_url}players/{player}'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+
+def get_and_save_match_events(match_id,file,log=None,lock=None,sleep_time=0):
+    '''Requests match events from API and saves them to file'''
+    if lock:
+        with lock:
+            print('in lock')
+            match_events = get_match_events(match_id)
+            time.sleep(sleep_time)
+    else:
+        match_events = get_match_events(match_id)
+    if file:
+        json.dump(match_events, open(file, 'w'), indent=4)
+    if log:
+        print(log)
+    return match_events
+
+
+def get_competition_events(matches, area, competition):
+    '''Requests all competition matches events from API'''
+    semaphore = Semaphore(6)
+    workers = []
+    j = 0
+    for match in matches:
+        log = f'Requested matches: {j}/{len(matches)}'
+        file = f'{current_folder}/data/{area}/{competition["wyId"]}/matches/{match["matchId"]}_{match["label"]}.json'
+        worker = Thread(target=get_and_save_match_events, args=(match['matchId'],file,log,semaphore,0.5),daemon=True)
+        workers.append(worker)
+        worker.start()
+        j += 1 
+
+    for worker in workers:
+        worker.join()
+
+
+def main():
     args = parse_arguments()
 
+    # get areas
     if args.areas:
         areas = get_areas()
         print(areas)
         json.dump(areas, open(f'{current_folder}/data/areas.json', 'w'), indent=4)
 
+    # get areas' competitions
     if args.area_competitions:
-        competitions = get_area_competitions(args.area_competitions)
-        print(competitions)
-        json.dump(competitions, open(f'{current_folder}/data/competitions.json', 'w'), indent=4)
+        for area in args.area_competitions:
+            competitions = get_area_competitions(area)
+            print(competitions)
+            if competitions:
+                if not os.path.isdir(f'{current_folder}/data/{area}'):
+                    os.mkdir(f'{current_folder}/data/{area}')
+                
+                json.dump(competitions, open(f'{current_folder}/data/{area}/competitions.json', 'w'), indent=4)
 
-    match = json.load(open(f'{current_folder}/data/matches.json'))
-    print(len(match['events']))
+    # get competitions info
+    if args.competition_info:
+        if competitions or args.competitions_info:
+            if args.competitions_info:
+                competitions = args.competitions_info
+        i = 0
+        for competition in competitions:
+            print(f'Requested competitions: {i}/{len(competitions)}')
+            if not os.path.isdir(f'{current_folder}/data/{area}/{competition["wyId"]}'):
+                os.mkdir(f'{current_folder}/data/{area}/{competition["wyId"]}')
+            competition_players = get_competition_players(competition['wyId'])
+            competition_teams = get_competition_teams(competition['wyId'])
+            competition_matches = get_competition_matches(competition['wyId'])
+            json.dump(competition_players, open(f'{current_folder}/data/{area}/{competition["wyId"]}/players.json', 'w'), indent=4)
+            json.dump(competition_teams, open(f'{current_folder}/data/{area}/{competition["wyId"]}/teams.json', 'w'), indent=4)
+            json.dump(competition_matches, open(f'{current_folder}/data/{area}/{competition["wyId"]}/matches.json', 'w'), indent=4)
+
+            # get matches events
+            if not os.path.isdir(f'{current_folder}/data/{area}/{competition["wyId"]}/matches'):
+                os.mkdir(f'{current_folder}/data/{area}/{competition["wyId"]}/matches')
+            competition_matches = competition_matches['matches']
+
+            get_competition_events(competition_matches, area, competition)
+            i += 1
 
 
 
+if __name__ == '__main__':
+    main()
 
+
+                        
