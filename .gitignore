@@ -1,2 +1,3 @@
 api_requests/data/*
 authentication.json
+db_config.json

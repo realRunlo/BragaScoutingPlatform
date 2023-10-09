@@ -24,6 +24,7 @@ def parse_arguments():
     parser.add_argument('--areas','-a'                  ,action='store_true'                         , help='Request areas from API')
     parser.add_argument('--area_competitions','-ac'     ,type=str, nargs='+'                         , help="Request area's competitions from API")
     parser.add_argument('--competition_info','-ci'      ,type=str, nargs='*'                         , help="Request all info from competition from API")
+    parser.add_argument('--competition_players','-cp'   ,type=str, nargs='+'                           , help="Request competition's players from API")
     return parser.parse_args()
 
 
@@ -47,6 +48,14 @@ def get_area_competitions(area=None):
     return result
 
 
+def get_competition_info(competition):
+    '''Requests competition info from API'''
+    url = f'{api_url}competitions/{competition}'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
 def get_competition_teams(competition):
     '''Requests teams from API'''
     url = f'{api_url}competitions/{competition}/teams'
@@ -55,11 +64,24 @@ def get_competition_teams(competition):
     return response.json()
 
 def get_competition_players(competition):
-    '''Requests players from API'''
+    '''Requests players from API\n
+    Paged response, so multiple requests are made to get all players'''
+    players = []
     url = f'{api_url}competitions/{competition}/players'
     headers = {'Authorization': encoded_authentication}
+    params = {'count':0,'limit':100}
     response = requests.get(url, headers=headers)
-    return response.json()
+    if response.status_code == 200:
+        result = response.json()
+        meta = result['meta']
+        players = result['players']
+        # get all players (paged response)
+        while len(players) < meta['total_items']:
+            params['count'] = len(players)
+            response = requests.get(url, headers=headers,params=params)
+            result = response.json()
+            players += result['players']
+    return players
 
 def get_competition_matches(competition):
     '''Requests matches from API'''
@@ -158,6 +180,8 @@ def main():
         i = 0
         for competition in competitions:
             print(f'Requested competitions: {i}/{len(competitions)}')
+            competition_info = get_competition_info(competition)
+            area = competition_info['area']['alpha3code']
             if not os.path.isdir(f'{current_folder}/data/{area}/{competition["wyId"]}'):
                 os.mkdir(f'{current_folder}/data/{area}/{competition["wyId"]}')
             competition_players = get_competition_players(competition['wyId'])
@@ -174,6 +198,17 @@ def main():
 
             get_competition_events(competition_matches, area, competition)
             i += 1
+
+    # get competitions players
+    if args.competition_players:
+        competitions = args.competition_players
+        for competition in competitions:
+            competition_info = get_competition_info(competition)
+            area = competition_info['area']['alpha3code']
+            if not os.path.isdir(f'{current_folder}/data/{area}/{competition}'):
+                os.mkdir(f'{current_folder}/data/{area}/{competition}')
+            competition_players = get_competition_players(competition)
+            json.dump(competition_players, open(f'{current_folder}/data/{area}/{competition}/players.json', 'w'), indent=4)
 
 
 
