@@ -1,5 +1,5 @@
 env:
-  IMAGE_NAME: repo/script-app  #repo/image
+  IMAGE_NAME: uniprojsminho/etl  #repo/image
   IMAGE_TAG: latest
 
 
@@ -7,11 +7,6 @@ name: Build and Push Docker Image
 
 on:
   workflow_dispatch:
-  # Execuções autmomáticas da pipeline desabilidadas
-  #push:
-    #branches: [master]
- # pull_request:
-   # branches: [master]
 
 jobs:
   
