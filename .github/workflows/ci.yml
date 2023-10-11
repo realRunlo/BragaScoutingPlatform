@@ -1,0 +1,32 @@
+env:
+  IMAGE_NAME: repo/script-app  #repo/image
+  IMAGE_TAG: latest
+
+
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:
+  # Execuções autmomáticas da pipeline desabilidadas
+  #push:
+    #branches: [master]
+ # pull_request:
+   # branches: [master]
+
+jobs:
+  
+  build_image:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+    - name: Push Docker image
+      run: docker push $IMAGE_NAME:$IMAGE_TAG
