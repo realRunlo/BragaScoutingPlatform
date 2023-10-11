@@ -1,6 +1,6 @@
 env:
   IMAGE_NAME: uniprojsminho/etl  #repo/image
-  IMAGE_TAG: latest
+  IMAGE_TAG: test
 
 
 name: Build and Push Docker Image
