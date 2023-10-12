@@ -1,12 +1,13 @@
 import requests
 import json
 import os
+import sys
 import base64
 import argparse
 import time
 from threading import Thread
 from threading import Semaphore
-
+from db import Db_handler
 
 current_folder = os.path.dirname(__file__)
 
@@ -21,20 +22,25 @@ encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True             , help='Db config json file path')
     parser.add_argument('--areas','-a'                  ,action='store_true'                         , help='Request areas from API')
     parser.add_argument('--area_competitions','-ac'     ,type=str, nargs='+'                         , help="Request area's competitions from API")
     parser.add_argument('--competition_info','-ci'      ,type=str, nargs='*'                         , help="Request all info from competition from API")
-    parser.add_argument('--competition_players','-cp'   ,type=str, nargs='+'                           , help="Request competition's players from API")
+    parser.add_argument('--competition_players','-cp'   ,type=str, nargs='+'                         , help="Request competition's players from API")
+    parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                           , help="Request all info from API, according to json file provided")
     return parser.parse_args()
 
 
 
 def get_areas():
     '''Requests areas from API'''
+    areas = []
     url = api_url + 'areas'
     headers = {'Authorization': encoded_authentication}
     response = requests.get(url, headers=headers)
-    return response.json()
+    if response.status_code == 200:
+        areas = response.json()['areas']
+    return areas
 
 
 def get_area_competitions(area=None):
@@ -50,11 +56,13 @@ def get_area_competitions(area=None):
 
 def get_competition_info(competition):
     '''Requests competition info from API'''
+    competition_info = None
     url = f'{api_url}competitions/{competition}'
     headers = {'Authorization': encoded_authentication}
     response = requests.get(url, headers=headers)
-    return response.json()
-
+    if response.status_code == 200:
+        competition_info = response.json()
+    return competition_info
 
 def get_competition_teams(competition):
     '''Requests teams from API'''
@@ -152,9 +160,111 @@ def get_competition_events(matches, area, competition):
         worker.join()
 
 
-def main():
-    args = parse_arguments()
+def get_season_info(season):
+    '''Requests season info from API'''
+    season_info = None
+    url = f'{api_url}seasons/{season}'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        season_info = response.json()
+    return season_info
 
+def get_season_teams(season):
+    '''Requests teams from API'''
+    teams = []
+    url = f'{api_url}seasons/{season}/teams'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        teams = response.json()['teams']
+    return teams
+
+
+def extract_competitions_info(competitions:list):
+    '''Extracts competitions metadata (id, seasons)'''
+    competitions_info = []
+    # get competitions metadata (id, seasons)
+    for competition in competitions:
+        c_i = {
+            'wyId':None,
+            'seasons':[]
+        }
+        if 'wyId' in competition:
+            c_i['wyId'] = competition['wyId']
+        else:
+            #TODO
+            print('WORK IN PROGRESS. GET COMPETITION ID FROM NAME AND AREA CODE')
+            continue
+        for season in competition['seasons']:
+            if 'wyId' in season:
+                c_i['seasons'].append(season['wyId'])
+            else:
+                #TODO
+                print('WORK IN PROGRESS. GET SEASON ID FROM DATE')
+        competitions_info.append(c_i)
+    return competitions_info
+
+
+def populate_areas(db_handler:Db_handler):
+    '''Populates areas table in db'''
+    areas = get_areas()
+    for area in areas:
+        values = f'''({area['id']}, "{area['name']}", "{area['alpha3code']}")'''
+        on_update = f'''name="{area['name']}", alpha3code="{area['alpha3code']}"'''
+        db_handler.insert_or_update('area',values,on_update)
+
+
+
+def populate_competitions(db_handler:Db_handler,competitions_id:list):
+    '''Populates competitions table in db'''
+    for competition_id in competitions_id:
+        competition_info = get_competition_info(competition_id)
+        if competition_info:
+            values = f'''({competition_info['wyId']}, "{competition_info['name']}", "{competition_info['area']['id']}", "{competition_info['gender']}"\
+                , "{competition_info['type']}", "{competition_info['format']}", "{competition_info['divisionLevel']}", "{competition_info['category']}")'''
+            
+            on_update = f'''name="{competition_info['name']}", area="{competition_info['area']['id']}", gender="{competition_info['gender']}",\
+                type="{competition_info['type']}", format="{competition_info['format']}", divisionLevel="{competition_info['divisionLevel']}", category="{competition_info['category']}"'''
+
+            db_handler.insert_or_update('competition',values,on_update)
+
+
+def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
+    '''Populates seasons table in db'''
+    for season_id in seasons_id:
+        season_info = get_season_info(season_id)
+        if season_info:
+            values = f'''({season_info['wyId']}, "{season_info['startDate']}", "{season_info['endDate']}", "{season_info['name']}", "{season_info['competitionId']}")'''
+            on_update = f'''startDate="{season_info['startDate']}", endDate="{season_info['endDate']}", name="{season_info['name']}", competition="{season_info['competitionId']}"'''
+            parameters = f'''(idcompetition_season, startDate, endDate, name, competition)'''
+            db_handler.insert_or_update('competition_season',values,on_update,parameters)
+
+
+def populate_teams(db_handler:Db_handler,season_id):
+    '''Populates teams table in db, as well as team_competition_season table'''
+    season_info = get_season_info(season_id)
+    if season_info:
+        teams = get_season_teams(season_id)
+        for team in teams:
+            team_info = get_team_info(team['wyId'])
+            if team_info:
+                values = f'''({team_info['wyId']}, "{team_info['name']}", "{team_info['officialName']}", "{team_info['imageDataURL']}", "{team_info['gender']}", "{team_info['type']}",\
+                    "{team_info['city']}", "{team_info['category']}", "{team_info['area']['id']}")'''
+                
+                on_update = f'''name="{team_info['name']}", official_name="{team_info['officialName']}", icon="{team_info['imageDataURL']}", gender="{team_info['gender']}", type="{team_info['type']}",\
+                    city="{team_info['city']}", category="{team_info['category']}", area="{team_info['area']['id']}"'''
+                
+                db_handler.insert_or_update('team',values,on_update)
+
+                values = f'''("{season_id}", "{team_info['wyId']}")'''
+                on_update = f'''competition_season="{season_id}", team="{team_info['wyId']}"'''
+                parameters = f'''(competition_season, team)'''
+                db_handler.insert_or_update('team_competition_season',values,on_update,parameters)
+
+
+def main(args,db_handler:Db_handler):
+    
     # get areas
     if args.areas:
         areas = get_areas()
@@ -211,9 +321,53 @@ def main():
             json.dump(competition_players, open(f'{current_folder}/data/{area}/{competition}/players.json', 'w'), indent=4)
 
 
+    # get full info
+    if args.full_info:
+        request_file_path = f'{current_folder}/{args.full_info[0]}'
+        if request_file_path.endswith('json') and os.path.exists(request_file_path):
+            request_file = json.load(open(request_file_path))
+            # populate areas
+            populate_areas(db_handler)
+            if 'competitions' in request_file:
+                competitions = request_file['competitions']
+                competitions_info = extract_competitions_info(competitions)
+                competitions_id = [c['wyId'] for c in competitions_info]
+                # populate competitions
+                populate_competitions(db_handler,competitions_id)
+
+                # populate seasons
+                seasons_id = [s for c in competitions_info for s in c['seasons']]
+                populate_competitions_seasons(db_handler,seasons_id)
+
+                # populate teams, players, matches and stats
+                for s_id in seasons_id:
+                    populate_teams(db_handler,s_id)
+                    # populate_players(db_handler,s_id)
+                    # populate_matches(db_handler,s_id)
+                    # populate_player_match_stats(db_handler,s_id)
+
+
+                
+        else:
+            print('Invalid request file. Please provide a valid .json file.')
+
+
+
 
 if __name__ == '__main__':
-    main()
+    args = parse_arguments()
+
+    if args.db_config[0].endswith('.json'):
+        db_config_path = f'{current_folder}/{args.db_config[0]}'
+        db_handler = Db_handler(config_json=db_config_path)
+        db_handler.create_connection()
+        if db_handler.connection:
+            main(args,db_handler)
+        else:
+            print('DB connection failed to be established.')
+    else:
+        print('Invalid db config file. Please provide a .json file.')
+
 
 
                         

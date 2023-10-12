@@ -3,13 +3,13 @@ import os
 from MySQLdb import _mysql
 
 
-class DB:
+class Db_handler:
     '''Class to handle mySql database connections'''
 
     db_config = None
     connection = None
 
-    def __init__(self,config=None,config_json=None) -> None:
+    def __init__(self,config:dict=None,config_json:str=None) -> None:
         if config:
             self.db_config = config
         elif config_json:
@@ -26,16 +26,17 @@ class DB:
             self.connection = None
 
 
-    def insert(self,table, values):
+    def insert(self,table:str, values:str):
         """Inserts values into a table"""
         if self.connection:
             self.connection.query(f"""INSERT INTO scouting.{table} VALUES {values}""")
             self.connection.commit()
 
-    def insert_or_update(self,table, values,on_update):
+    def insert_or_update(self,table:str, values:str,on_update:str,parameters:str=''):
         """Inserts/updates values into a table"""
         if self.connection:
-            self.connection.query(f'''INSERT INTO scouting.{table} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+            #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+            self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             self.connection.commit()
 
 
