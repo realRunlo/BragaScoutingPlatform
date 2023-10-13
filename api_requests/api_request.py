@@ -1,3 +1,4 @@
+import datetime
 import requests
 import json
 import os
@@ -116,14 +117,70 @@ def get_match_events(match):
     return response.json()
 
 
+def get_match_info(match):
+    '''Requests match info from API'''
+    match_info = None
+    url = f'{api_url}matches/{match}'
+    headers = {'Authorization': encoded_authentication}
+    params = {'useSides':'true'}
+    response = requests.get(url, headers=headers,params=params)
+    if response.status_code == 200:
+        match_info = response.json()
+    return match_info 
+
 
 
 def get_player_info(player):
     '''Requests player info from API'''
+    player_info = None
     url = f'{api_url}players/{player}'
     headers = {'Authorization': encoded_authentication}
     response = requests.get(url, headers=headers)
-    return response.json()
+    if response.status_code == 200:
+        player_info = response.json()
+    return player_info
+
+
+def get_player_carrer(player):
+    '''Requests player carrer from API'''
+    player_carrer = None
+    url = f'{api_url}players/{player}/career'
+    headers = {'Authorization': encoded_authentication}
+    params = {'details':'season'}
+    response = requests.get(url, headers=headers,params=params)
+    if response.status_code == 200:
+        player_carrer = response.json()['career']
+    return player_carrer
+
+def get_most_updated_season(carrer):
+    '''Gets most updated season from player carrer'''
+    most_updated_season = None
+    # get most updated season
+    for entry in carrer:
+        if not most_updated_season:
+            most_updated_season = entry['season']
+        else:
+            if entry['season']['active']:
+                most_updated_season = entry['season']
+            else:
+                entry_date = datetime.datetime.strptime(entry['season']['startDate'], '%Y-%m-%d')
+                most_updated_season_date = datetime.datetime.strptime(most_updated_season['startDate'], '%Y-%m-%d')
+                if entry_date > most_updated_season_date:
+                    most_updated_season = entry['season']
+        if most_updated_season['active']:
+            break
+    return most_updated_season
+
+def get_player_advanced_stats(player,competition):
+    '''Requests player advanced stats from API'''
+    player_advanced_stats = None
+    url = f'{api_url}players/{player}/advancedstats'
+    headers = {'Authorization': encoded_authentication}
+    params = {'compId':competition}
+    response = requests.get(url, headers=headers,params=params)
+    if response.status_code == 200:
+        player_advanced_stats = response.json()
+    return player_advanced_stats
 
 
 
@@ -131,7 +188,6 @@ def get_and_save_match_events(match_id,file,log=None,lock=None,sleep_time=0):
     '''Requests match events from API and saves them to file'''
     if lock:
         with lock:
-            print('in lock')
             match_events = get_match_events(match_id)
             time.sleep(sleep_time)
     else:
@@ -179,6 +235,49 @@ def get_season_teams(season):
     if response.status_code == 200:
         teams = response.json()['teams']
     return teams
+
+
+def get_season_players(season):
+    '''Requests players from API\n
+    Paged response, so multiple requests are made to get all players'''
+    players = []
+    url = f'{api_url}seasons/{season}/players'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    params = {'count':0,'limit':100}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        result = response.json()
+        meta = result['meta']
+        players = result['players']
+        # get all players (paged response)
+        while len(players) < meta['total_items']:
+            params['count'] = len(players)
+            response = requests.get(url, headers=headers,params=params)
+            result = response.json()
+            players += result['players']
+    return players
+
+
+def get_season_matches(season):
+    '''Requests matches from API'''
+    matches = []
+    url = f'{api_url}seasons/{season}/matches'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        matches = response.json()['matches']
+    return matches
+
+def get_match_players_stats(match):
+    '''Requests list of all players stats in a match from API'''
+    players_stats = []
+    url = f'{api_url}matches/{match}/advancedstats/players'
+    headers = {'Authorization': encoded_authentication}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        players_stats = response.json()['players']
+    return players_stats
 
 
 def extract_competitions_info(competitions:list):
@@ -241,7 +340,7 @@ def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
             db_handler.insert_or_update('competition_season',values,on_update,parameters)
 
 
-def populate_teams(db_handler:Db_handler,season_id):
+def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates teams table in db, as well as team_competition_season table'''
     season_info = get_season_info(season_id)
     if season_info:
@@ -263,19 +362,105 @@ def populate_teams(db_handler:Db_handler,season_id):
                 db_handler.insert_or_update('team_competition_season',values,on_update,parameters)
 
 
+def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
+    '''Populates players table in db'''
+    players = get_season_players(season_id)
+    for player in players:
+        player_name = player['firstName'] + ' ' + player['middleName'] + ' ' + player['lastName']
+        values = f'''({player['wyId']}, "{player_name}", "{player['shortName']}", "{player['birthArea']['id']}", "{player['birthDate']}", "{player['imageDataURL']}", "{player['foot']}",\
+        "{player['height']}","{player['weight']}","{player['status']}","{player['gender']}","{player['role']['code2']}", "{player['role']['code3']}", "{player['role']['name']}")'''
+
+        on_update = f'''name="{player_name}", short_name="{player['shortName']}", birth_area="{player['birthArea']['id']}", birth_date="{player['birthDate']}", image="{player['imageDataURL']}", foot="{player['foot']}",\
+        height="{player['height']}", weight="{player['weight']}", status="{player['status']}", gender="{player['gender']}", role_code2="{player['role']['code2']}", role_code3="{player['role']['code3']}", role_name="{player['role']['name']}"'''
+        
+        db_handler.insert_or_update('player',values,on_update)
+
+        # get player advanced stats
+        if player_advanced_stats:
+            carrer = get_player_carrer(player['wyId'])
+            most_updated_season = get_most_updated_season(carrer)
+            if most_updated_season:
+                advanced_stats = get_player_advanced_stats(player['wyId'],most_updated_season['competitionId'])
+                if advanced_stats:
+                    # populate positions table
+                    positions = advanced_stats['positions']
+                    for position in positions:
+                        values = f'''("{player['wyId']}", "{position['percent']}","{position['position']['code']}", "{position['position']['name']}")'''
+                        on_update = f'''player="{player['wyId']}", percent="{position['percent']}", code="{position['code']}", name="{position['name']}"'''
+                        parameters = f'''(player, percent, code, name)'''
+                        db_handler.insert_or_update('position',values,on_update,parameters)
+
+def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
+    '''Populates matches table in db, gathering matches from given season\n
+    Can gather advanced stats from players in each match'''
+    matches = get_season_matches(season_id)
+
+    for match in matches:
+        match_info = get_match_info(match['matchId'])
+        if match_info:
+            home_team = match_info['teamsData']['home']['teamId']
+            home_score = match_info['teamsData']['home']['score']
+            away_team = match_info['teamsData']['away']['teamId']
+            away_score = match_info['teamsData']['away']['score']
+            winner = match_info['winner']
+            values = f'''({match_info['wyId']}, "{match_info['seasonId']}", "{home_team}", "{away_team}", "{match_info['dateutc']}",\
+            "{home_score}","{away_score}", "{winner}")'''
+
+            on_update = f'''competition_season="{match_info['seasonId']}", home_team="{home_team}", away_team="{away_team}", date="{match_info['dateutc']}",\
+            home_score="{home_score}", away_score="{away_score}", winner="{winner}"'''
+
+            db_handler.insert_or_update('match',values,on_update)
+            # get match advanced stats for each player
+            if player_advanced_stats:
+                populate_match_players_stats(db_handler,match['matchId'])
+        
+
+def populate_match_players_stats(db_handler:Db_handler,match:int):
+    '''Populates player_match_stats table in db'''
+    match_players_stats = get_match_players_stats(match)
+    for player_stats in match_players_stats:
+        player = player_stats['playerId']
+        offensive_duels = player_stats['total']['offensiveDuels']
+        progressive_passes = player_stats['total']['progressivePasses']
+        forward_passes = player_stats['total']['forwardPasses']
+        crosses = player_stats['total']['crosses']
+        key_passes = player_stats['total']['keyPasses']
+        defensive_duels = player_stats['total']['defensiveDuels']
+        interceptions = player_stats['total']['interceptions']
+        recoveries = player_stats['total']['recoveries']
+        successful_passes = player_stats['percent']['successfulPasses']
+        long_passes = player_stats['total']['longPasses']
+        aerial_duels = player_stats['total']['aerialDuels']
+        losses = player_stats['total']['losses']
+        own_half_losses = player_stats['total']['ownHalfLosses']
+        goal_kicks = player_stats['total']['goalKicks']
+        received_pass = player_stats['total']['receivedPass']
+        dribbles = player_stats['total']['dribbles']
+        touch_in_box = player_stats['total']['touchInBox']
+
+        values = f'''("{match}", "{player}", "{offensive_duels}", "{progressive_passes}", "{forward_passes}", "{crosses}", "{key_passes}", "{defensive_duels}", "{interceptions}", "{recoveries}",\
+        "{successful_passes}", "{long_passes}", "{aerial_duels}", "{losses}", "{own_half_losses}", "{goal_kicks}", "{received_pass}", "{dribbles}", "{touch_in_box}")'''
+
+        on_update = f'''`match`="{match}", player="{player}", offensiveDuels="{offensive_duels}", progressivePasses="{progressive_passes}", forwardPasses="{forward_passes}", crosses="{crosses}", keyPasses="{key_passes}", defensiveDuels="{defensive_duels}", interceptions="{interceptions}", recoveries="{recoveries}",\
+        successfulPasses="{successful_passes}", longPasses="{long_passes}", aerialDuels="{aerial_duels}", losses="{losses}", ownHalfLosses="{own_half_losses}", goalKicks="{goal_kicks}", receivedPass="{received_pass}", dribbles="{dribbles}", touchInBox="{touch_in_box}"'''
+
+        parameters = f'''(`match`, player, offensiveDuels, progressivePasses, forwardPasses, crosses, keyPasses, defensiveDuels, interceptions, recoveries,\
+        successfulPasses, longPasses, aerialDuels, losses, ownHalfLosses, goalKicks, receivedPass, dribbles, touchInBox)'''
+
+        db_handler.insert_or_update('player_match_stats',values,on_update,parameters)
+
+
 def main(args,db_handler:Db_handler):
     
     # get areas
     if args.areas:
         areas = get_areas()
-        print(areas)
         json.dump(areas, open(f'{current_folder}/data/areas.json', 'w'), indent=4)
 
     # get areas' competitions
     if args.area_competitions:
         for area in args.area_competitions:
             competitions = get_area_competitions(area)
-            print(competitions)
             if competitions:
                 if not os.path.isdir(f'{current_folder}/data/{area}'):
                     os.mkdir(f'{current_folder}/data/{area}')
@@ -342,9 +527,8 @@ def main(args,db_handler:Db_handler):
                 # populate teams, players, matches and stats
                 for s_id in seasons_id:
                     populate_teams(db_handler,s_id)
-                    # populate_players(db_handler,s_id)
-                    # populate_matches(db_handler,s_id)
-                    # populate_player_match_stats(db_handler,s_id)
+                    populate_players(db_handler,s_id,player_advanced_stats=True)
+                    populate_matches(db_handler,s_id,player_advanced_stats=True)
 
 
                 

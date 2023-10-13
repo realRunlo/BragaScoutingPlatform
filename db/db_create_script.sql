@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player` (
   `height` INT NULL DEFAULT NULL,
   `weight` INT NULL DEFAULT NULL,
   `status` VARCHAR(45) NULL DEFAULT NULL,
-  `gender` INT NULL DEFAULT NULL,
+  `gender` VARCHAR(45) NULL DEFAULT NULL,
   `role_code2` VARCHAR(45) NULL DEFAULT NULL,
   `role_code3` VARCHAR(45) NULL DEFAULT NULL,
   `role_name` VARCHAR(45) NULL DEFAULT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`team_competition_season` (
   INDEX `team_idx` (`team` ASC) VISIBLE,
   INDEX `competition_season_idx` (`competition_season` ASC) VISIBLE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 19
+AUTO_INCREMENT = 433
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -196,7 +196,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `scouting`.`player_match_stats`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `scouting`.`player_match_stats` (
-  `idplayer_match_stats` INT NOT NULL,
+  `idplayer_match_stats` INT NOT NULL AUTO_INCREMENT,
   `match` INT NULL DEFAULT NULL,
   `player` INT NULL DEFAULT NULL,
   `offensiveDuels` INT NULL DEFAULT NULL,
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player_match_stats` (
   `opponentHalfRecoveries` INT NULL DEFAULT NULL,
   `goalKicks` INT NULL DEFAULT NULL,
   `receivedPass` INT NULL DEFAULT NULL,
-  `drible` INT NULL DEFAULT NULL,
+  `dribbles` INT NULL DEFAULT NULL,
   `touchInBox` INT NULL DEFAULT NULL,
   PRIMARY KEY (`idplayer_match_stats`),
   INDEX `match_idx` (`match` ASC) VISIBLE,
@@ -227,6 +227,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player_match_stats` (
     FOREIGN KEY (`player`)
     REFERENCES `scouting`.`player` (`idplayer`))
 ENGINE = InnoDB
+AUTO_INCREMENT = 8
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -235,7 +236,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `scouting`.`player_positions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `scouting`.`player_positions` (
-  `idpositions` INT NOT NULL,
+  `idpositions` INT NOT NULL AUTO_INCREMENT,
   `player` INT NULL DEFAULT NULL,
   `percent` INT NULL DEFAULT NULL,
   `code` VARCHAR(45) NULL DEFAULT NULL,
