@@ -1,5 +1,7 @@
 import json
 import os
+import logging
+import sys
 from MySQLdb import _mysql
 
 
@@ -8,13 +10,21 @@ class Db_handler:
 
     db_config = None
     connection = None
+    logger = None
 
-    def __init__(self,config:dict=None,config_json:str=None) -> None:
+    def __init__(self,config:dict=None,config_json:str=None,logger:logging.Logger=None) -> None:
+        if logger:
+            self.logger = logger
         if config:
             self.db_config = config
         elif config_json:
             if os.path.exists(config_json):
                 self.db_config = json.load(open(config_json, 'r'))
+                self.log(f'Loaded config file {config_json}')
+            else:
+                self.log(f'Config file {config_json} not found',logging.ERROR)
+        else:
+            self.log('No config provided',logging.ERROR)
 
 
 
@@ -22,28 +32,46 @@ class Db_handler:
         """Creates a connection to the MySQL database"""
         try:
             self.connection = _mysql.connect(**self.db_config)
+            self.log('Connection to the database established')
         except:
             self.connection = None
+            self.log('Error creating connection to the database',logging.ERROR)
 
 
     def insert(self,table:str, values:str):
         """Inserts values into a table"""
         if self.connection:
-            self.connection.query(f"""INSERT INTO scouting.{table} VALUES {values}""")
-            self.connection.commit()
+            self.log(f'''Query: INSERT INTO scouting.{table} VALUES {values}''')
+            try:
+                self.connection.query(f"""INSERT INTO scouting.{table} VALUES {values}""")
+                self.connection.commit()
+                self.log(f'Values {values} inserted into table {table}')
+            except Exception as e:
+                self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
 
     def insert_or_update(self,table:str, values:str,on_update:str,parameters:str=''):
         """Inserts/updates values into a table"""
         if self.connection:
             #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
-            self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
-            self.connection.commit()
+            self.log(f'''Query: INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+            try:
+                self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+                self.connection.commit()
+                self.log(f'Values {values} inserted/updated into table {table}')
+            except Exception as e:
+                self.log(f'Error inserting/updating values {values} into table {table}\n{e}',logging.ERROR)
 
 
     def close_connection(self):
         """Closes the connection to the MySQL database"""
         if self.connection:
             self.connection.close()
+            self.log('Connection to the database closed')
+
+    def log(self, message:str,level=logging.INFO):
+        """Logs a message"""
+        if self.logger:
+            self.logger.log(level,message)
 
 
 

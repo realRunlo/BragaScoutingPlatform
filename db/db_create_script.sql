@@ -5,6 +5,9 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
 -- Schema scouting
 -- -----------------------------------------------------
 
@@ -66,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`team_competition_season` (
   INDEX `team_idx` (`team` ASC) VISIBLE,
   INDEX `competition_season_idx` (`competition_season` ASC) VISIBLE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 433
+AUTO_INCREMENT = 1110
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -174,7 +177,6 @@ CREATE TABLE IF NOT EXISTS `scouting`.`match` (
   INDEX `competition_season_idx` (`competition_season` ASC) VISIBLE,
   INDEX `home_team_idx` (`home_team` ASC) VISIBLE,
   INDEX `away_team_idx` (`away_team` ASC) VISIBLE,
-  INDEX `winner_idx` (`winner` ASC) VISIBLE,
   CONSTRAINT `away_team`
     FOREIGN KEY (`away_team`)
     REFERENCES `scouting`.`team` (`idteam`),
@@ -183,9 +185,6 @@ CREATE TABLE IF NOT EXISTS `scouting`.`match` (
     REFERENCES `scouting`.`competition_season` (`idcompetition_season`),
   CONSTRAINT `home_team`
     FOREIGN KEY (`home_team`)
-    REFERENCES `scouting`.`team` (`idteam`),
-  CONSTRAINT `winner`
-    FOREIGN KEY (`winner`)
     REFERENCES `scouting`.`team` (`idteam`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -227,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player_match_stats` (
     FOREIGN KEY (`player`)
     REFERENCES `scouting`.`player` (`idplayer`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 8
+AUTO_INCREMENT = 24553
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -247,6 +246,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player_positions` (
     FOREIGN KEY (`player`)
     REFERENCES `scouting`.`player` (`idplayer`))
 ENGINE = InnoDB
+AUTO_INCREMENT = 2775
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
