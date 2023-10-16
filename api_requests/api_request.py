@@ -9,6 +9,7 @@ import time
 import logging
 from db import Db_handler
 from multiprocessing.pool import ThreadPool
+from utils import get_similar
 
 current_folder = os.path.dirname(__file__)
 
@@ -98,7 +99,13 @@ def get_competition_info(competition, retry:bool=True):
     competition_info = result if result else None
     return competition_info
 
-
+def get_seasons_competitions(competition,retry:bool=True):
+    '''Requests seasons list of a competition from API'''
+    url = f'{api_url}competitions/{competition}/seasons'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    seasons_list = {season['seasonId']:season['season'] for season in result['seasons']} if 'seasons' in result else {}
+    return seasons_list
 
 def get_team_info(team,retry:bool=True):
     '''Requests team info from API'''
@@ -118,8 +125,6 @@ def get_match_info(match,retry:bool=True):
     result = get_request_api(url,headers=headers,params=params,retry=retry)
     match_info = result if result else None
     return match_info 
-
-
 
 def get_player_carrer(player,retry:bool=True):
     '''Requests player carrer from API'''
@@ -218,6 +223,9 @@ def extract_competitions_info(competitions:list):
     '''Extracts competitions metadata (id, seasons)'''
     competitions_info = []
     # get competitions metadata (id, seasons)
+    area_competitions = []
+    competitions_names = []
+    last_area_code = None
     for competition in competitions:
         c_i = {
             'wyId':None,
@@ -226,15 +234,33 @@ def extract_competitions_info(competitions:list):
         if 'wyId' in competition:
             c_i['wyId'] = competition['wyId']
         else:
-            #TODO
-            print('WORK IN PROGRESS. GET COMPETITION ID FROM NAME AND AREA CODE')
-            continue
+            #print('WORK IN PROGRESS. GET COMPETITION ID FROM NAME AND AREA CODE')
+            if 'area' in competition and 'name' in competition:
+                areaCode = competition['area']
+                competition_name = competition['name']
+                if areaCode != last_area_code: #Como ele recebe uma lista de competiçoes no ficheiro, se estas forem todas da mesma área é escusado estar sempre a ir buscar a informaçao a api para encontrar o id delas
+                    area_competitions = get_area_competitions(area=areaCode)
+                    competitions_names = [c['name'] for c in area_competitions]
+                else:
+                    last_area_code = areaCode
+                true_competition_name = get_similar(competitions_names,competition_name)
+                c_i['wyId'] = [c['wyId'] for c in area_competitions if c['name'] == true_competition_name][0]
+            else:
+                #ERROR
+                continue
         for season in competition['seasons']:
             if 'wyId' in season:
                 c_i['seasons'].append(season['wyId'])
+            elif 'start' in season and 'end' in season:
+                start = season['start']
+                end = season['end']
+                seasons_list = get_seasons_competitions(c_i['wyId'])
+                seasonsId = [k for k,v in seasons_list.items() if v['startDate'][0:4] == start and v['endDate'][0:4] == end] #Neste momento so estamos a comparar os anos, se calhar deviamos ver isto melhor
+                for seasonId in seasonsId:
+                    c_i['seasons'].append(seasonId)
             else:
-                #TODO
-                print('WORK IN PROGRESS. GET SEASON ID FROM DATE')
+                #Error
+                continue
         competitions_info.append(c_i)
     return competitions_info
 
@@ -445,10 +471,11 @@ def main(args,db_handler:Db_handler):
         if request_file_path.endswith('json') and os.path.exists(request_file_path):
             request_file = json.load(open(request_file_path))
             # populate areas
-            populate_areas(db_handler)
+            populate_areas(db_handler) 
             if 'competitions' in request_file:
                 competitions = request_file['competitions']
                 competitions_info = extract_competitions_info(competitions)
+                #print(competitions_info)
                 competitions_id = [c['wyId'] for c in competitions_info]
                 # populate competitions
                 populate_competitions(db_handler,competitions_id)
