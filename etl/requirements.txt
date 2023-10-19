@@ -1,1 +1,3 @@
-#python dependacies, one per line
+base64
+jellyfish
+mysqlclient
