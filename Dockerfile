@@ -9,7 +9,10 @@ WORKDIR /etl
 COPY /etl .
 
 # Runs when image is built
-RUN pip install --no-cache-dir -r requirements.txt
+RUN sudo apt-get install python3-dev default-libmysqlclient-dev build-essential \
+    pkg-config --clfags --ldflags mysqlclient \
+    pip install --no-cache-dir -r requirements.txt  
+
 
 # Runs when image starts
 CMD ["python3","api_requests.py"]
