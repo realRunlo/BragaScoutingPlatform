@@ -80,25 +80,40 @@ resource "azurerm_linux_virtual_machine" "scouting-rg" {
     }
 }
 
-# Azure SQL service
+# mysql server
 
-resource "azurerm_mssql_server" "scouting-rg" {
-    name                         = "scouting-sql-server"
-    resource_group_name          = azurerm_resource_group.scouting-rg.name
-    location                     = azurerm_resource_group.scouting-rg.location
-    version                      = "12.0"
-    administrator_login          = "admin-db"
-    administrator_login_password = "2020-Rockydb2020pw"
-}
-# Missing better configs
-resource "azurerm_mssql_database" "scouting-rg" {
-    name           = "braga-scouting-db"
-    server_id      = azurerm_mssql_server.scouting-rg.id
-    collation      = "SQL_Latin1_General_CP1_CI_AS"
-    license_type   = "LicenseIncluded"
-    max_size_gb    = 2
+resource "azurerm_mysql_server" "scouting-rg" {
+  name                = "braga-data-server"
+  location            = azurerm_resource_group.scouting-rg.location
+  resource_group_name = azurerm_resource_group.scouting-rg.name
 
+  administrator_login          = "dbadmin"
+  administrator_login_password = "2020-Rockydb2020pw"
+
+  sku_name   = "B_Gen5_1"
+  storage_mb = 51200 #50Gb
+  version    = "5.7" #mysql version
+
+  auto_grow_enabled                 = true
+  backup_retention_days             = 7
+  geo_redundant_backup_enabled      = false # not supported in basic tier
+  infrastructure_encryption_enabled = false # not supported in basic tier
+  public_network_access_enabled     = true
+  ssl_enforcement_enabled           = true
+  ssl_minimal_tls_version_enforced  = "TLS1_2"
 }
+
+# mysql database
+
+resource "azurerm_mysql_database" "scouting-rg" {
+  name                = "scouting"
+  resource_group_name = azurerm_resource_group.scouting-rg.name
+  server_name         = azurerm_mysql_server.scouting-rg.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
+
+
 
 
 
