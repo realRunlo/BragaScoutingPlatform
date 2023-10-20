@@ -5,8 +5,13 @@ env:
 
 name: Build and Push Docker Image
 
+# Only builds docker image when etl/ is chnaged
 on:
-  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - etl
 
 jobs:
   
