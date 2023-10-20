@@ -50,20 +50,25 @@ class Db_handler:
             except Exception as e:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
 
-    def insert_or_update(self,table:str, values:str,on_update:str,parameters:str=''):
+    def insert_or_update(self,table:str, values:str,on_update:str='',parameters:str=''):
         """Inserts/updates values into a table"""
         if self.connection:
             #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             self.log(f'''Query: INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             try:
-                self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+                query = f'''INSERT INTO scouting.{table} {parameters} VALUES {values} as new'''
+                if on_update != '':
+                    query += f' ON DUPLICATE KEY UPDATE {on_update}'
+                self.connection.query(query)
                 self.connection.commit()
                 self.log(f'Values {values} inserted/updated into table {table}')
             except Exception as e:
                 self.log(f'Error inserting/updating values {values} into table {table}\n{e}',logging.ERROR)
+                open('error.txt','w').write(query)
+                sys.exit()
 
 
-    def insert_or_update_many(self,table:str, values:list[str],on_update:str,parameters:str='',batch_size:int=500):
+    def insert_or_update_many(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500):
         """Inserts/updates values into a table in batches"""
         if self.connection:
             self.log(f'''Query: Inserting multiple values into scouting.{table}''')
@@ -77,13 +82,44 @@ class Db_handler:
                 i = 0
                 while i < len(values):
                     batch = ','.join(values[i:i+batch_size])
-                    self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {batch} as new ON DUPLICATE KEY UPDATE {on_update}''')
+                    query = f'''INSERT INTO scouting.{table} {parameters} VALUES {batch} as new'''
+                    if on_update != '':
+                        query += f' ON DUPLICATE KEY UPDATE {on_update}'
+                    self.connection.query(query)
                     self.connection.commit()
                     i += batch_size
-                    self.log(f'Values {batch} inserted/updated into table {table}')
+                self.log(f'Values inserted/updated into table {table}')
             except Exception as e:
-                self.log(f'Error inserting/updating values {batch} into table {table}\n',logging.ERROR)
+                self.log(f'Error inserting/updating values into table {table}\n',logging.ERROR)
                 self.log(e,logging.ERROR)
+                open('error.txt','w').write(query)
+                sys.exit()
+    
+    def insert_or_update_many_union(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500):
+        """Inserts/updates values into a table in batches using union all to connect values"""
+        if self.connection:
+            self.log(f'''Query: Inserting multiple values into scouting.{table} (UNION ALL)''')
+            try:
+                batch = ' UNION ALL '.join(values[0:batch_size])
+                # reduce batch_size if query is bigger than 0.7 MB
+                while len(batch.encode('utf-8')) > 700000:
+                    batch_size = int(batch_size/2)
+                    batch = ' UNION ALL '.join(values[0:batch_size])
+                i = 0
+                while i < len(values):
+                    batch = ' UNION ALL '.join(values[i:i+batch_size])
+                    query = f'''INSERT INTO scouting.{table} {parameters} {batch}'''
+                    if on_update != '':
+                        query += f' ON DUPLICATE KEY UPDATE {on_update}'
+                    self.connection.query(query)
+                    self.connection.commit()
+                    i += batch_size
+                self.log(f'Values inserted/updated into table {table}')
+            except Exception as e:
+                self.log(f'Error inserting/updating values into table {table}\n',logging.ERROR)
+                self.log(e,logging.ERROR)
+                open('error.txt','w').write(query)
+                sys.exit()
 
 
     def close_connection(self):
@@ -96,32 +132,3 @@ class Db_handler:
         """Logs a message"""
         if self.logger:
             self.logger.log(level,message)
-
-
-
-############################## Test with players ##############################
-
-# current_folder = os.path.dirname(os.path.abspath(__file__))
-
-# db = DB(config_json=os.path.join(current_folder, 'db_config.json'))
-# db.create_connection()
-# print('Connection established' if db.connection else 'Connection failed')
-
-# players = json.load(open(os.path.join(current_folder, 'players.json'), 'r'))
-
-# for player in players:
-#     values = f'''({player['wyId']}, "{player['shortName']}", "{player['firstName']}", "{player['middleName']}", "{player['lastName']}", "{player['height']}",\
-# "{player['weight']}", "{player['birthDate']}","{player['birthArea']['id']}", "{player['passportArea']['id']}", 0,"{player['foot']}",\
-# "{player['currentTeamId']}","{player['currentNationalTeamId']}","{player['gender']}","{player['status']}","{player['imageDataURL']}")'''
-#     values = values.replace('""', 'null')
-#     values = values.replace('"None"', 'null')
-#     on_update = f'''shortName = "{player['shortName']}", firstName = "{player['firstName']}", middleName = "{player['middleName']}", lastName = "{player['lastName']}", height = "{player['height']}",\
-# weight = "{player['weight']}", birthDate = "{player['birthDate']}",birthArea = "{player['birthArea']['id']}", passportArea = "{player['passportArea']['id']}",\
-# foot = "{player['foot']}", currentTeamId = "{player['currentTeamId']}", currentNationalTeamId = "{player['currentNationalTeamId']}",\
-# gender = "{player['gender']}", status = "{player['status']}", imageDataURL = "{player['imageDataURL']}"'''
-#     on_update = on_update.replace('""', 'null')
-#     on_update = on_update.replace('"None"', 'null')
-
-#     db.insert_or_update('players', values,on_update)
-
-# db.close_connection()

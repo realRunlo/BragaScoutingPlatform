@@ -14,7 +14,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema scouting
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `scouting` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+CREATE SCHEMA IF NOT EXISTS `scouting` DEFAULT CHARACTER SET utf8mb3 ;
 USE `scouting` ;
 
 -- -----------------------------------------------------
@@ -59,43 +59,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `scouting`.`team_competition_season`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `scouting`.`team_competition_season` (
-  `idteam_competition_season` INT NOT NULL AUTO_INCREMENT,
-  `competition_season` INT NULL DEFAULT NULL,
-  `team` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`idteam_competition_season`),
-  INDEX `team_idx` (`team` ASC) VISIBLE,
-  INDEX `competition_season_idx` (`competition_season` ASC) VISIBLE)
-ENGINE = InnoDB
-AUTO_INCREMENT = 1110
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `scouting`.`carrer_entry`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `scouting`.`carrer_entry` (
-  `idplayer_career` INT NOT NULL,
-  `player` INT NULL DEFAULT NULL,
-  `team_competition_season` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`idplayer_career`),
-  INDEX `player_idx` (`player` ASC) VISIBLE,
-  INDEX `team_competition_season_idx` (`team_competition_season` ASC) VISIBLE,
-  CONSTRAINT `player_entry`
-    FOREIGN KEY (`player`)
-    REFERENCES `scouting`.`player` (`idplayer`),
-  CONSTRAINT `team_competition_season`
-    FOREIGN KEY (`team_competition_season`)
-    REFERENCES `scouting`.`team_competition_season` (`idteam_competition_season`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
 -- Table `scouting`.`competition`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `scouting`.`competition` (
@@ -133,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`competition_season` (
     FOREIGN KEY (`competition`)
     REFERENCES `scouting`.`competition` (`idcompetitions`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 181249
+AUTO_INCREMENT = 189054
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -156,6 +119,51 @@ CREATE TABLE IF NOT EXISTS `scouting`.`team` (
   CONSTRAINT `area_team`
     FOREIGN KEY (`area`)
     REFERENCES `scouting`.`area` (`idareas`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `scouting`.`team_competition_season`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scouting`.`team_competition_season` (
+  `idteam_competition_season` INT NOT NULL AUTO_INCREMENT,
+  `competition_season` INT NOT NULL,
+  `team` INT NOT NULL,
+  PRIMARY KEY (`team`, `competition_season`),
+  UNIQUE INDEX `idteam_competition_season_UNIQUE` (`idteam_competition_season` ASC) VISIBLE,
+  INDEX `team_idx` (`team` ASC) VISIBLE,
+  INDEX `competition_season_idx` (`competition_season` ASC) VISIBLE,
+  INDEX `team_idx1` (`idteam_competition_season` ASC) VISIBLE,
+  CONSTRAINT `competition_season`
+    FOREIGN KEY (`competition_season`)
+    REFERENCES `scouting`.`competition_season` (`idcompetition_season`),
+  CONSTRAINT `team`
+    FOREIGN KEY (`team`)
+    REFERENCES `scouting`.`team` (`idteam`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 1748
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `scouting`.`carrer_entry`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `scouting`.`carrer_entry` (
+  `player` INT NOT NULL,
+  `team_competition_season` INT NOT NULL,
+  PRIMARY KEY (`player`, `team_competition_season`),
+  INDEX `team_competition_season_fk_idx` (`team_competition_season` ASC) VISIBLE,
+  INDEX `team_competition_season_2fk_idx` (`team_competition_season` ASC) VISIBLE,
+  INDEX `carrer_team_competition_season_fk_idx` (`team_competition_season` ASC) VISIBLE,
+  CONSTRAINT `carrer_player_fk`
+    FOREIGN KEY (`player`)
+    REFERENCES `scouting`.`player` (`idplayer`),
+  CONSTRAINT `carrer_team_competition_season_fk`
+    FOREIGN KEY (`team_competition_season`)
+    REFERENCES `scouting`.`team_competition_season` (`idteam_competition_season`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -226,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`player_match_stats` (
     FOREIGN KEY (`player`)
     REFERENCES `scouting`.`player` (`idplayer`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 24553
+AUTO_INCREMENT = 54958
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -235,18 +243,21 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `scouting`.`player_positions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `scouting`.`player_positions` (
-  `idpositions` INT NOT NULL AUTO_INCREMENT,
-  `player` INT NULL DEFAULT NULL,
+  `player` INT NOT NULL,
   `percent` INT NULL DEFAULT NULL,
-  `code` VARCHAR(45) NULL DEFAULT NULL,
+  `code` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`idpositions`),
+  `team_competition_season` INT NOT NULL,
+  PRIMARY KEY (`code`, `team_competition_season`, `player`),
   INDEX `player_idx` (`player` ASC) VISIBLE,
+  INDEX `tam_competition_season_fk_idx` (`team_competition_season` ASC) VISIBLE,
   CONSTRAINT `player`
     FOREIGN KEY (`player`)
-    REFERENCES `scouting`.`player` (`idplayer`))
+    REFERENCES `scouting`.`player` (`idplayer`),
+  CONSTRAINT `team_competition_season`
+    FOREIGN KEY (`team_competition_season`)
+    REFERENCES `scouting`.`team_competition_season` (`idteam_competition_season`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 2775
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
