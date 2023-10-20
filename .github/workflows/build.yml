@@ -1,12 +1,17 @@
 env:
-  IMAGE_NAME: uniprojsminho/etl  #repo/image
-  IMAGE_TAG: test
+  IMAGE_NAME: peiscbraga/etl  #repo/image
+  IMAGE_TAG: latest
 
 
 name: Build and Push Docker Image
 
+# Only builds docker image when etl/ is chnaged
 on:
-  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - etl/**
 
 jobs:
   
