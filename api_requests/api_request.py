@@ -189,9 +189,9 @@ def get_season_players(season,retry:bool=True):
     players = []
     url = f'{api_url}seasons/{season}/players'
     headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
+    params = {'page':1,'limit':100}
+    result = get_request_api(url,headers=headers,params=params,retry=retry)
     if result:
-        params = {'page':1,'limit':100}
         meta = result['meta']
         players = result['players']
         # get all players (paged response)
@@ -220,9 +220,8 @@ def get_match_players_stats(match,retry:bool=True):
 
 
 def extract_competitions_info(competitions:list):
-    '''Extracts competitions metadata (id, seasons)'''
+    '''Extracts competitions metadata (id, seasons) from json config file'''
     competitions_info = []
-    # get competitions metadata (id, seasons)
     area_competitions = []
     competitions_names = []
     last_area_code = None
@@ -234,7 +233,6 @@ def extract_competitions_info(competitions:list):
         if 'wyId' in competition:
             c_i['wyId'] = competition['wyId']
         else:
-            #print('WORK IN PROGRESS. GET COMPETITION ID FROM NAME AND AREA CODE')
             if 'area' in competition and 'name' in competition:
                 areaCode = competition['area']
                 competition_name = competition['name']
@@ -269,17 +267,15 @@ def prepare_areas_insert(areas):
     querys = []
     for area in areas:
         values = f'''({area['id']}, "{area['name']}", "{area['alpha3code']}")'''
-        on_update = f'''name="{area['name']}", alpha3code="{area['alpha3code']}"'''
-        querys.append(('area',values,on_update))
+        querys.append(values)
     return querys
 
 def populate_areas(db_handler:Db_handler):
     '''Populates areas table in db'''
     areas = get_areas()
-    result = run_threaded_for(prepare_areas_insert,areas,log=True)
-    querys_list = [query for query_list in result for query in query_list]
-    for query in querys_list:
-        db_handler.insert_or_update(*query)
+    query_values = prepare_areas_insert(areas)
+    on_update = f'''name=new.name, alpha3code=new.alpha3code'''
+    db_handler.insert_or_update_many('area',query_values,on_update=on_update)
 
 
 
@@ -315,7 +311,7 @@ def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
         s_i += 1
 
 
-def insert_team(teams,season_id:int):
+def prepare_teams_insert(teams,season_id:int):
     '''Inserts team into db, as well as team_competition_season table'''
 
     querys = []
@@ -324,16 +320,10 @@ def insert_team(teams,season_id:int):
         if team_info:
             values = f'''({team_info['wyId']}, "{team_info['name']}", "{team_info['officialName']}", "{team_info['imageDataURL']}", "{team_info['gender']}", "{team_info['type']}",\
                 "{team_info['city']}", "{team_info['category']}", "{team_info['area']['id']}")'''
-            
-            on_update = f'''name="{team_info['name']}", official_name="{team_info['officialName']}", icon="{team_info['imageDataURL']}", gender="{team_info['gender']}", type="{team_info['type']}",\
-                city="{team_info['city']}", category="{team_info['category']}", area="{team_info['area']['id']}"'''
-            
-            querys.append(('team',values,on_update))
+            querys.append(('team',values))
 
             values = f'''("{season_id}", "{team_info['wyId']}")'''
-            on_update = f'''competition_season="{season_id}", team="{team_info['wyId']}"'''
-            parameters = f'''(competition_season, team)'''
-            querys.append(('team_competition_season',values,on_update,parameters))
+            querys.append(('team_competition_season',values))
     return querys
 
     
@@ -343,10 +333,15 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     season_info = get_season_info(season_id)
     if season_info:
         teams = get_season_teams(season_id)
-        result = run_threaded_for(insert_team,teams,log=True,args=(season_id))
-        querys_list = [query for query_list in result for query in query_list]
-        for query in querys_list:
-            db_handler.insert_or_update(*query)
+        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=(season_id))
+        team_query_values = [query[1] for query_list in result for query in query_list if query[0] == 'team']
+        team_on_update = f'''name=new.name, official_name=new.official_name, icon=new.icon, gender=new.gender, type=new.type,\
+                city=new.city, category=new.category, area=new.area'''
+        team_competition_season_query_values = [query[1] for query_list in result for query in query_list if query[0] == 'team_competition_season']
+        team_competition_season_on_update = f'''competition_season=new.competition_season, team=new.team'''
+        team_competition_season_parameters = f'''(competition_season, team)'''
+        db_handler.insert_or_update_many('team',team_query_values,on_update=team_on_update)
+        db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,on_update=team_competition_season_on_update,parameters=team_competition_season_parameters)
         
 
 def prepare_players_insert(players,player_advanced_stats:bool=False):
@@ -355,11 +350,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
         player_name = player['firstName'] + ' ' + player['middleName'] + ' ' + player['lastName']
         values = f'''({player['wyId']}, "{player_name}", "{player['shortName']}", "{player['birthArea']['id']}", "{player['birthDate']}", "{player['imageDataURL']}", "{player['foot']}",\
         "{player['height']}","{player['weight']}","{player['status']}","{player['gender']}","{player['role']['code2']}", "{player['role']['code3']}", "{player['role']['name']}")'''
-
-        on_update = f'''name="{player_name}", short_name="{player['shortName']}", birth_area="{player['birthArea']['id']}", birth_date="{player['birthDate']}", image="{player['imageDataURL']}", foot="{player['foot']}",\
-        height="{player['height']}", weight="{player['weight']}", status="{player['status']}", gender="{player['gender']}", role_code2="{player['role']['code2']}", role_code3="{player['role']['code3']}", role_name="{player['role']['name']}"'''
-        
-        querys.append(('player',values,on_update))
+        querys.append(('player',values))
 
         # get player advanced stats
         if player_advanced_stats:
@@ -372,9 +363,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                     positions = advanced_stats['positions']
                     for position in positions:
                         values = f'''("{player['wyId']}", "{position['percent']}","{position['position']['code']}", "{position['position']['name']}")'''
-                        on_update = f'''player="{player['wyId']}", percent="{position['percent']}", code="{position['position']['code']}", name="{position['position']['name']}"'''
-                        parameters = f'''(player, percent, code, name)'''
-                        querys.append(('player_positions',values,on_update,parameters))
+                        querys.append(('player_positions',values))
     return querys
         
     
@@ -383,9 +372,16 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     '''Populates players table in db'''
     players = get_season_players(season_id)
     result = run_threaded_for(prepare_players_insert,players,log=True,args=(player_advanced_stats),threads=10)
-    querys_list = [query for query_list in result for query in query_list]
-    for query in querys_list:
-        db_handler.insert_or_update(*query)
+    player_querys_values = [query[1] for query_list in result for query in query_list if query[0] == 'player']
+    on_update = f'''name=new.name, short_name=new.short_name, birth_area=new.birth_area, birth_date=new.birth_date, image=new.image, foot=new.foot,\
+        height=new.height, weight=new.weight, status=new.status, gender=new.gender, role_code2=new.role_code2, role_code3=new.role_code3, role_name=new.role_name'''
+    db_handler.insert_or_update_many('player',player_querys_values,on_update=on_update)
+
+    if player_advanced_stats:
+        player_positions_querys_values = [query[1] for query_list in result for query in query_list if query[0] == 'player_positions']
+        player_positions_on_update = f'''player=new.player, percent=new.percent, code=new.code, name=new.name'''
+        player_positions_parameters = f'''(player, percent, code, name)'''
+        db_handler.insert_or_update_many('player_positions',player_positions_querys_values,on_update=player_positions_on_update,parameters=player_positions_parameters)
 
 
 def prepare_matches_insert(matches,player_advanced_stats:bool=False):
@@ -401,28 +397,13 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
             values = f'''({match_info['wyId']}, "{match_info['seasonId']}", "{home_team}", "{away_team}", "{match_info['dateutc']}",\
             "{home_score}","{away_score}", "{winner}")'''
 
-            on_update = f'''competition_season="{match_info['seasonId']}", home_team="{home_team}", away_team="{away_team}", date="{match_info['dateutc']}",\
-            home_score="{home_score}", away_score="{away_score}", winner="{winner}"'''
-
-            querys.append(('match',values,on_update))
+            querys.append(('match',values))
             # get match advanced stats for each player
             if player_advanced_stats:
                 query_list = prepare_match_players_stats_insert(match['matchId'])
                 querys += query_list
     return querys
         
-
-
-def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
-    '''Populates matches table in db, gathering matches from given season\n
-    Can gather advanced stats from players in each match'''
-    matches = get_season_matches(season_id)
-    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats))
-    querys_list = [query for query_list in result for query in query_list]
-    for query in querys_list:
-        db_handler.insert_or_update(*query)
-    
-
 def prepare_match_players_stats_insert(match:int):
     '''Populates player_match_stats table in db'''
     querys = []
@@ -458,6 +439,28 @@ def prepare_match_players_stats_insert(match:int):
 
         querys.append(('player_match_stats',values,on_update,parameters))
     return querys
+
+
+def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
+    '''Populates matches table in db, gathering matches from given season\n
+    Can gather advanced stats from players in each match'''
+    matches = get_season_matches(season_id)
+    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats))
+    match_query_values= [query[1] for query_list in result for query in query_list if query[0] == 'match']
+    match_on_update = f'''competition_season=new.competition_season, home_team=new.home_team, away_team=new.away_team, date=new.date,\
+        home_score=new.home_score, away_score=new.away_score, winner=new.winner'''
+    db_handler.insert_or_update_many('match',match_query_values,on_update=match_on_update)
+
+    if player_advanced_stats:
+        player_match_stats_query_values = [query[1] for query_list in result for query in query_list if query[0] == 'player_match_stats']
+        player_match_stats_on_update = f'''`match`=new.match, player=new.player, offensiveDuels=new.offensiveDuels,\
+                progressivePasses=new.progressivePasses, forwardPasses=new.forwardPasses,crosses=new.crosses, keyPasses=new.keyPasses,\
+                defensiveDuels=new.defensiveDuels, interceptions=new.interceptions, recoveries=new.recoveries,\
+                successfulPasses=new.successfulPasses, longPasses=new.longPasses, aerialDuels=new.aerialDuels, \
+                losses=new.losses, ownHalfLosses=new.ownHalfLosses, goalKicks=new.goalKicks, receivedPass=new.receivedPass, dribbles=new.dribbles, touchInBox=new.touchInBox'''
+        db_handler.insert_or_update_many('player_match_stats',player_match_stats_query_values,on_update=player_match_stats_on_update)
+    
+
 
 
 def main(args,db_handler:Db_handler):

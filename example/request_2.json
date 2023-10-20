@@ -1,0 +1,36 @@
+{
+    "competitions":[
+        {
+            "wyId": 707,
+            "name": "Primeira Liga",
+            "area": "PRT",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                }
+            ]
+        },
+        {
+            "name": "Segunda Liga",
+            "area": "PRT",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                }
+            ]
+        },
+        {
+            "wyId": 198,
+            "name": "First Division A",
+            "area": "BEL",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                }
+            ]
+        }
+    ]
+}

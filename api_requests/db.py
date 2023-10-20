@@ -33,9 +33,10 @@ class Db_handler:
         try:
             self.connection = _mysql.connect(**self.db_config)
             self.log('Connection to the database established')
-        except:
+        except Exception as e:
             self.connection = None
             self.log('Error creating connection to the database',logging.ERROR)
+            self.log(e,logging.ERROR)
 
 
     def insert(self,table:str, values:str):
@@ -60,6 +61,29 @@ class Db_handler:
                 self.log(f'Values {values} inserted/updated into table {table}')
             except Exception as e:
                 self.log(f'Error inserting/updating values {values} into table {table}\n{e}',logging.ERROR)
+
+
+    def insert_or_update_many(self,table:str, values:list[str],on_update:str,parameters:str='',batch_size:int=500):
+        """Inserts/updates values into a table in batches"""
+        if self.connection:
+            self.log(f'''Query: Inserting multiple values into scouting.{table}''')
+            try:
+                batch = ','.join(values[0:batch_size])
+                # reduce batch_size if query is bigger than 0.7 MB
+                while len(batch.encode('utf-8')) > 700000:
+                    batch_size = int(batch_size/2)
+                    batch = ','.join(values[0:batch_size])
+                print(f'batch_size: {batch_size}')
+                i = 0
+                while i < len(values):
+                    batch = ','.join(values[i:i+batch_size])
+                    self.connection.query(f'''INSERT INTO scouting.{table} {parameters} VALUES {batch} as new ON DUPLICATE KEY UPDATE {on_update}''')
+                    self.connection.commit()
+                    i += batch_size
+                    self.log(f'Values {batch} inserted/updated into table {table}')
+            except Exception as e:
+                self.log(f'Error inserting/updating values {batch} into table {table}\n',logging.ERROR)
+                self.log(e,logging.ERROR)
 
 
     def close_connection(self):
