@@ -294,7 +294,8 @@ def populate_areas(db_handler:Db_handler):
     areas = get_areas()
     query_values = prepare_areas_insert(areas)
     on_update = f'''name=new.name, alpha3code=new.alpha3code'''
-    db_handler.insert_or_update_many('area',query_values,on_update=on_update)
+    parameters = f'''(idareas, name, alpha3code)'''
+    db_handler.insert_or_update_many('area',query_values,on_update=on_update,parameters=parameters)
 
 
 
@@ -365,10 +366,11 @@ def populate_teams(db_handler:Db_handler,season_id:int):
 
         team_on_update = f'''name=new.name, official_name=new.official_name, icon=new.icon, gender=new.gender, type=new.type,\
                 city=new.city, category=new.category, area=new.area'''
+        team_parameters = f'''(idteam,name,official_name,icon,gender,type,city,category,area)'''
         
         team_competition_season_on_update = f'''competition_season=new.competition_season, team=new.team'''
         team_competition_season_parameters = f'''(competition_season, team)'''
-        db_handler.insert_or_update_many('team',team_query_values,on_update=team_on_update)
+        db_handler.insert_or_update_many('team',team_query_values,on_update=team_on_update,parameters=team_parameters)
         db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,on_update=team_competition_season_on_update,parameters=team_competition_season_parameters)
         
 
@@ -420,12 +422,14 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         elif query[0] == 'carrer_entry':
             carrer_entry_querys_values.append(query[1])
 
-    on_update = f'''name=new.name, short_name=new.short_name, birth_area=new.birth_area, birth_date=new.birth_date, image=new.image, foot=new.foot,\
+    playere_on_update = f'''name=new.name, short_name=new.short_name, birth_area=new.birth_area, birth_date=new.birth_date, image=new.image, foot=new.foot,\
         height=new.height, weight=new.weight, status=new.status, gender=new.gender, role_code2=new.role_code2, role_code3=new.role_code3, role_name=new.role_name'''
-    db_handler.insert_or_update_many('player',player_querys_values,on_update=on_update)
+    player_parameters = f'''(idplayer,name,short_name,birth_area,birth_date,image,foot,height,weight,status,gender,role_code2,role_code3,role_name)'''
+    db_handler.insert_or_update_many('player',player_querys_values,on_update=playere_on_update,parameters=player_parameters)
 
     carrer_entry_on_update = f'''player=VALUES(player), team_competition_season=VALUES(team_competition_season)'''
-    db_handler.insert_or_update_many_union('carrer_entry',carrer_entry_querys_values,on_update=carrer_entry_on_update)
+    carrer_parameters = f'''(player, team_competition_season)'''
+    db_handler.insert_or_update_many_union('carrer_entry',carrer_entry_querys_values,on_update=carrer_entry_on_update,parameters=carrer_parameters)
     
     if player_advanced_stats:
         player_positions_on_update = f'''percent=VALUES(percent), name=VALUES(name)'''
@@ -501,7 +505,8 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     match_on_update = f'''competition_season=new.competition_season, home_team=new.home_team, away_team=new.away_team, date=new.date,\
         home_score=new.home_score, away_score=new.away_score, winner=new.winner'''
-    db_handler.insert_or_update_many('match',match_query_values,on_update=match_on_update)
+    match_parameters = f'''(idmatch, competition_season, home_team, away_team, date, home_score, away_score, winner)'''
+    db_handler.insert_or_update_many('match',match_query_values,on_update=match_on_update,parameters=match_parameters)
 
     if player_advanced_stats:
         player_match_stats_on_update = f'''`match`=new.match, player=new.player, offensiveDuels=new.offensiveDuels,\
