@@ -50,13 +50,13 @@ class Db_handler:
             except Exception as e:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
 
-    def insert_or_update(self,table:str, values:str,on_update:str='',parameters:str=''):
+    def insert_or_update(self,table:str, values:str,on_update:str='',parameters:str='',ignore:bool=True):
         """Inserts/updates values into a table"""
         if self.connection:
             #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             self.log(f'''Query: INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             try:
-                query = f'''INSERT INTO scouting.{table} {parameters} VALUES {values} as new'''
+                query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} VALUES {values} as new'''
                 if on_update != '':
                     query += f' ON DUPLICATE KEY UPDATE {on_update}'
                 self.connection.query(query)
@@ -68,7 +68,7 @@ class Db_handler:
                 sys.exit()
 
 
-    def insert_or_update_many(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500):
+    def insert_or_update_many(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500,ignore:bool=True):
         """Inserts/updates values into a table in batches"""
         if self.connection:
             self.log(f'''Query: Inserting multiple values into scouting.{table}''')
@@ -82,7 +82,7 @@ class Db_handler:
                 i = 0
                 while i < len(values):
                     batch = ','.join(values[i:i+batch_size])
-                    query = f'''INSERT INTO scouting.{table} {parameters} VALUES {batch} as new'''
+                    query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} VALUES {batch} as new'''
                     if on_update != '':
                         query += f' ON DUPLICATE KEY UPDATE {on_update}'
                     self.connection.query(query)
@@ -95,7 +95,7 @@ class Db_handler:
                 open('error.txt','w').write(query)
                 sys.exit()
     
-    def insert_or_update_many_union(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500):
+    def insert_or_update_many_union(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500,ignore:bool=True):
         """Inserts/updates values into a table in batches using union all to connect values"""
         if self.connection:
             self.log(f'''Query: Inserting multiple values into scouting.{table} (UNION ALL)''')
@@ -108,7 +108,7 @@ class Db_handler:
                 i = 0
                 while i < len(values):
                     batch = ' UNION ALL '.join(values[i:i+batch_size])
-                    query = f'''INSERT INTO scouting.{table} {parameters} {batch}'''
+                    query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} {batch}'''
                     if on_update != '':
                         query += f' ON DUPLICATE KEY UPDATE {on_update}'
                     self.connection.query(query)

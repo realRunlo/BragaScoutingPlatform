@@ -67,12 +67,14 @@ def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=
         response = requests.get(url, headers=headers,params=params)
         if response.status_code == 200:
             ok_response = True
-        if not retry:
-            break
+        # if too many requests, wait and retry
+        elif response.status_code == 429 and retry:
+            time.sleep(sleep_time)
         else:
-            if not ok_response:
-                time.sleep(sleep_time)
+            break
         tries += 1
+    if not ok_response:
+        print(f'Error requesting {url}, status code: {response.status_code}, message: {response.text}')
     return response.json() if ok_response else None
 
 
@@ -407,6 +409,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
 
 def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
     '''Populates players table in db'''
+    print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
     result = run_threaded_for(prepare_players_insert,players,log=True,args=(player_advanced_stats),threads=12)
     querys = [query for query_list in result for query in query_list]
@@ -491,6 +494,7 @@ def prepare_match_players_stats_insert(match:int):
 def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
     '''Populates matches table in db, gathering matches from given season\n
     Can gather advanced stats from players in each match'''
+    print(f'Populating matches from season {season_id}')
     matches = get_season_matches(season_id)
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats),threads=10)
     querys = [query for query_list in result for query in query_list]
