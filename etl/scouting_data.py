@@ -377,6 +377,7 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                     for part,times in lineup_info.items():
                         for time,lineup in times.items():
                             values = f'''("{match['matchId']}", "{team}", "{part}", "{time}",{lineup['scheme']})'''
+                            querys.append(('match_lineup',values))
                             players = lineup['players']
                             # players positions in lineup
                             for player,info in players.items():
@@ -443,6 +444,10 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
     player_match_stats_query_values = []
+    match_lineup_values = []
+    match_lineup_player_position_values = []
+    match_formation_values = []
+    match_substitution_values = []
     match_events_values = []
     events_secondary_types_values = []
     # separate querys
@@ -451,17 +456,27 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             match_query_values.append(query[1])
         elif query[0] == 'player_match_stats':
             player_match_stats_query_values.append(query[1])
+        elif query[0] == 'match_lineup':
+            match_lineup_values.append(query[1])
+        elif query[0] == 'match_lineup_player_position':
+            match_lineup_player_position_values.append(query[1])
+        elif query[0] == 'match_formation':
+            match_formation_values.append(query[1])
+        elif query[0] == 'match_substitution':
+            match_substitution_values.append(query[1])
         elif query[0] == 'match_event':
             match_events_values.append(query[1])
         elif query[0] == 'match_event_secondary_type':
             events_secondary_types_values.append(query[1])
 
+    # match table
     match_on_update = f'''competition_season=new.competition_season, home_team=new.home_team, away_team=new.away_team, date=new.date,\
                           home_score=new.home_score, away_score=new.away_score, winner=new.winner'''
     match_parameters = f'''(idmatch, competition_season, home_team, away_team, date, home_score, away_score, winner)'''
     db_handler.insert_or_update_many('match',match_query_values,on_update=match_on_update,parameters=match_parameters)
 
     if player_advanced_stats:
+        # player_match_stats table
         player_match_stats_on_update = f'''`match`=new.match, player=new.player, offensiveDuels=new.offensiveDuels,\
                                             progressivePasses=new.progressivePasses, forwardPasses=new.forwardPasses,crosses=new.crosses, keyPasses=new.keyPasses,\
                                             defensiveDuels=new.defensiveDuels, interceptions=new.interceptions, recoveries=new.recoveries,\
@@ -471,13 +486,33 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         successfulPasses, longPasses, aerialDuels, losses, ownHalfLosses, goalKicks, receivedPass, dribbles, touchInBox, opponentHalfRecoveries)'''
         db_handler.insert_or_update_many('player_match_stats',player_match_stats_query_values,on_update=player_match_stats_on_update,parameters=player_match_stats_parameters)
 
-    event_on_update = f'''`match`=new.match, player=new.player, matchTimestamp=new.matchTimestamp, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,
-    minute=new.minute, second=new.second, team=new.team, opponentTeam=new.opponentTeam, type=new.type, details=new.details, relatedEventId=new.relatedEventId'''
+    # match_lineup table
+    match_lineup_on_update = f'''`match`=new.match, team=new.team, period=new.period, second=new.second, lineup=new.lineup'''
+    match_lineup_parameters = f'''(`match`, team, period, second, lineup)'''
+    db_handler.insert_or_update_many('match_lineup',match_lineup_values,on_update=match_lineup_on_update,parameters=match_lineup_parameters)
 
+    # match_lineup_player_position table
+    match_lineup_player_position_parameters = f'''(match_lineup_id, player, position)'''
+    db_handler.insert_or_update_many_union('match_lineup_player_position',match_lineup_player_position_values,parameters=match_lineup_player_position_parameters)
+
+    # match_formation table
+    match_formation_on_update = f'''`match`=new.match, player=new.player, assists=new.assists, goals=new.goals, own_goals=new.own_goals, red_cards=new.red_cards, shirt_number=new.shirt_number,\
+                                    yellow_cards=new.yellow_cards, minute=new.minute, team=new.team, type=new.type'''
+    match_formation_parameters = f'''(idmatch_formation, `match`, player, assists, goals, own_goals, red_cards, shirt_number, yellow_cards, minute, team, type)'''
+    db_handler.insert_or_update_many('match_formation',match_formation_values,on_update=match_formation_on_update,parameters=match_formation_parameters)
+
+    # match_substitution table
+    match_substitution_on_update = f'''`match`=new.match, playerIn=new.playerIn, playerOut=new.playerOut, team=new.team, minute=new.minute'''
+    match_substitution_parameters = f'''(`match`, playerIn, playerOut, team, minute)'''
+    db_handler.insert_or_update_many('match_substitution',match_substitution_values,on_update=match_substitution_on_update,parameters=match_substitution_parameters)
+
+    # match_event table
+    event_on_update = f'''`match`=new.match, player=new.player, matchTimestamp=new.matchTimestamp, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                        minute=new.minute, second=new.second, team=new.team, opponentTeam=new.opponentTeam, type=new.type, details=new.details, relatedEventId=new.relatedEventId'''
     event_parameters = f'''(idmatch_event, match, player, matchTimestamp, matchPeriod, location_x, location_y, minute, second, team, opponentTeam, type, details, relatedEventId)'''
-
     db_handler.insert_or_update_many('match_event', match_events_values, on_update=event_on_update, parameters=event_parameters)
 
+    # match_event_secondary_type table
     secondary_type_parameters = f'''(match_event, secondary_type)'''
     db_handler.insert_or_update_many('match_event_secondary_type', events_secondary_types_values, parameters=secondary_type_parameters)
     
