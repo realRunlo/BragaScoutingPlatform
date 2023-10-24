@@ -18,15 +18,23 @@ def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=
     ok_response = False
     tries = 0
     while not ok_response and tries < retries:
-        response = requests.get(url, headers=headers,params=params)
-        if response.status_code == 200:
-            ok_response = True
-        # if too many requests, wait and retry
-        elif response.status_code == 429 and retry:
-            time.sleep(sleep_time)
-        else:
-            break
-        tries += 1
+        try:
+            response = requests.get(url, headers=headers,params=params,timeout=10)
+            if response.status_code == 200:
+                ok_response = True
+            # if too many requests, wait and retry
+            elif response.status_code == 429 and retry:
+                time.sleep(sleep_time)
+            else:
+                break
+            tries += 1
+        except Exception as e:
+            print(f'Error requesting {url}, message: {e}')
+            tries += 1
+            if retry and tries < retries:
+                time.sleep(sleep_time)
+            else:
+                break
     if not ok_response:
         print(f'Error requesting {url}, status code: {response.status_code}, message: {response.text}')
     return response.json() if ok_response else None

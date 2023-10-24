@@ -299,10 +299,10 @@ CREATE TABLE IF NOT EXISTS `scouting`.`match_lineup` (
   `team` INT NOT NULL,
   `period` VARCHAR(45) NOT NULL,
   `second` INT NOT NULL,
-  `id_match_lineup` INT NOT NULL AUTO_INCREMENT,
+  `match_lineup_id` INT NOT NULL AUTO_INCREMENT,
   `lineup` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`match`, `team`, `period`, `second`),
-  UNIQUE INDEX `id_UNIQUE` (`id_match_lineup` ASC) VISIBLE,
+  UNIQUE INDEX `id_UNIQUE` (`match_lineup_id` ASC) VISIBLE,
   INDEX `team_idx` (`team` ASC) VISIBLE,
   CONSTRAINT `ml_match_fk`
     FOREIGN KEY (`match`)
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS `scouting`.`match_lineup_player_position` (
   INDEX `mlpp_player_fk_idx` (`player` ASC) VISIBLE,
   CONSTRAINT `match_lineup_id`
     FOREIGN KEY (`match_lineup_id`)
-    REFERENCES `scouting`.`match_lineup` (`id_match_lineup`),
+    REFERENCES `scouting`.`match_lineup` (`match_lineup_id`),
   CONSTRAINT `mlpp_player_fk`
     FOREIGN KEY (`player`)
     REFERENCES `scouting`.`player` (`idplayer`))
