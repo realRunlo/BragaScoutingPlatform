@@ -1,3 +1,5 @@
+# Provisioning azure cloud infrastructure
+
 terraform {
     required_providers {
         azurerm = {
@@ -51,7 +53,6 @@ resource "azurerm_network_interface" "scouting-rg" {
 }
 
 # Azure virtual machine
-
 resource "azurerm_linux_virtual_machine" "scouting-rg" {
     name                = "machine"
     resource_group_name = azurerm_resource_group.scouting-rg.name
@@ -60,7 +61,7 @@ resource "azurerm_linux_virtual_machine" "scouting-rg" {
     admin_username      = "adminuser"
     network_interface_ids = [
         azurerm_network_interface.scouting-rg.id,
-    ]
+    ]   
 
     admin_ssh_key {
         username   = "adminuser"
@@ -81,39 +82,39 @@ resource "azurerm_linux_virtual_machine" "scouting-rg" {
 }
 
 # mysql server
+resource "azurerm_mysql_flexible_server" "scouting-rg" {
+  name                   = "braga-data-server"
+  resource_group_name    = azurerm_resource_group.scouting-rg.name
+  location               = azurerm_resource_group.scouting-rg.location
 
-resource "azurerm_mysql_server" "scouting-rg" {
-  name                = "braga-data-server"
-  location            = azurerm_resource_group.scouting-rg.location
+  administrator_login    = "dbadmin"
+  administrator_password = "2020-Rockydb2020pw!"
+
+  sku_name               = "B_Standard_B1ms"
+  zone                   =  3
+  
+  storage {
+    size_gb           = 50
+    auto_grow_enabled = true
+    io_scaling_enabled = true
+  }
+
+}
+
+# Allow any connection to mysql server
+resource "azurerm_mysql_flexible_server_firewall_rule" "scouting-rg" {
+  name                = "any"
   resource_group_name = azurerm_resource_group.scouting-rg.name
-
-  administrator_login          = "dbadmin"
-  administrator_login_password = "2020-Rockydb2020pw"
-
-  sku_name   = "B_Gen5_1"
-  storage_mb = 51200 #50Gb
-  version    = "5.7" #mysql version
-
-  auto_grow_enabled                 = true
-  backup_retention_days             = 7
-  geo_redundant_backup_enabled      = false # not supported in basic tier
-  infrastructure_encryption_enabled = false # not supported in basic tier
-  public_network_access_enabled     = true
-  ssl_enforcement_enabled           = true
-  ssl_minimal_tls_version_enforced  = "TLS1_2"
+  server_name         = azurerm_mysql_flexible_server.scouting-rg.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
 }
 
 # mysql database
-
-resource "azurerm_mysql_database" "scouting-rg" {
+resource "azurerm_mysql_flexible_database" "scouting-rg" {
   name                = "scouting"
   resource_group_name = azurerm_resource_group.scouting-rg.name
-  server_name         = azurerm_mysql_server.scouting-rg.name
+  server_name         = azurerm_mysql_flexible_server.scouting-rg.name
   charset             = "utf8"
   collation           = "utf8_unicode_ci"
 }
-
-
-
-
-
