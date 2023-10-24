@@ -193,10 +193,10 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
     querys = []
     for player in players:
         contractInfo = get_player_contract_info(player['wyId'])
-        contractExpiration = contractInfo['contractInfo']
+        contractExpiration = contractInfo['contractExpiration']
         player_agencies = ""
         if 'agencies' in contractInfo and len(contractInfo['agencies']) > 0:
-            player_agencies = contractInfo['agencie'][0]
+            player_agencies = contractInfo['agencies'][0]
             for agencie in contractInfo['agencies'][1:]:
                 player_agencies+= ', ' + agencie
 
@@ -215,9 +215,9 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                 team = entry['teamId']
                 competition = entry['competitionId']
                 # populate career table
-                values = f'''SELECT '{player['wyId']}', idteam_competition_season, '{player['appearances']}','{player['goal']}','{player['minutesPlayed']}',\
-                            '{player['penalties']}','{player['redCards']}','{player['shirtNumber']}','{player['substituteIn']}','{player['substituteOnBench']}',\
-                            '{player['substituteOut']}','{player['yellowCard']}' FROM scouting.team_competition_season WHERE team={team} AND competition_season={season}'''
+                values = f'''SELECT '{player['wyId']}', idteam_competition_season, '{entry['appearances']}','{entry['goal']}','{entry['minutesPlayed']}',\
+                            '{entry['penalties']}','{entry['redCards']}','{entry['shirtNumber']}','{entry['substituteIn']}','{entry['substituteOnBench']}',\
+                            '{entry['substituteOut']}','{entry['yellowCard']}' FROM scouting.team_competition_season WHERE team={team} AND competition_season={season}'''
                 querys.append(('career_entry',values))
 
                 advanced_stats = get_player_advanced_stats(player['wyId'],competition,season)
@@ -302,16 +302,16 @@ def prepare_match_players_stats_insert(match:int):
 def prepare_match_formation_insert(match:int,match_team_info:dict):
     '''Prepare values for match_formation table in db'''
     querys = []
-    for team,team_info in match_team_info.values():
+    for team,team_info in match_team_info.items():
         formation = team_info['formation']
         substitutes = {}
         # get team substitutions
         for player in formation['substitutions']:
-            substitutes[player] = {}
-            substitutes[player]['playerIn'] = player['playerIn']
-            substitutes[player]['playerOut'] = player['playerOut']
-            substitutes[player]['minute'] = player['minute']
-            values = f'''("{match}", "{substitutes[player]['playerIn']}", "{substitutes[player]['playerOut']}", "{team}", "{substitutes[player]['minute']}")'''
+            substitutes[player['playerIn']] = {}
+            substitutes[player['playerIn']]['playerIn'] = player['playerIn']
+            substitutes[player['playerIn']]['playerOut'] = player['playerOut']
+            substitutes[player['playerIn']]['minute'] = player['minute']
+            values = f'''("{match}", "{substitutes[player['playerIn']]['playerIn']}", "{substitutes[player['playerIn']]['playerOut']}", "{team}", "{substitutes[player['playerIn']]['minute']}")'''
             querys.append(('match_substitution',values))
         # team initial lineup
         for player in formation['lineup']:
@@ -337,8 +337,8 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
             yellow_cards = player['yellowCards']
             minute = 0
             type = 'bench'
-            if player in substitutes:
-                minute = substitutes[player]['minute']
+            if player['playerId'] in substitutes:
+                minute = substitutes[player['playerId']]['minute']
                 type = 'substitution'
             values = f'''("{match}", "{player_id}", "{assists}", "{goals}", "{own_goals}", "{red_cards}", "{shirt_number}", "{yellow_cards}", "{minute}", "{team}", "{type}")'''
             querys.append(('match_formation',values))
@@ -367,22 +367,25 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
             match_lineups = get_match_lineups(match['matchId'])
 
             # get team's match formation
-            querys += prepare_match_formation_insert(match,match_info['teamsData'])
+            querys += prepare_match_formation_insert(match['matchId'],match_info['teamsData'])
             
             # get match lineups
             if match_lineups:
-                teams = match_lineups.keys().remove('teams')
+                teams = [x for x in match_lineups if x != "teams"]
                 for team in teams:
                     lineup_info = match_lineups[team]
                     for part,times in lineup_info.items():
-                        for time,lineup in times.items():
-                            values = f'''("{match['matchId']}", "{team}", "{part}", "{time}",{lineup['scheme']})'''
-                            querys.append(('match_lineup',values))
-                            players = lineup['players']
-                            # players positions in lineup
-                            for player,info in players.items():
-                                values = f'''SELECT match_lineup_id, {player},{info['position']} FROM scouting.match_lineup WHERE match={match['matchId']} AND team={team} AND period={part} AND second={time}'''
-                                querys.append(('match_lineup_player_position',values))
+                        for time,lineups in times.items():
+                            for lineup in lineups:
+                                values = f'''("{match['matchId']}", "{team}", "{part}", "{time}",{lineups[lineup]['scheme']})'''
+                                querys.append(('match_lineup',values))
+                                players = lineups[lineup]['players']
+                                # players positions in lineup
+                                for playerdict in players:
+                                    for playerId in playerdict:
+                                        position = playerdict[playerId]['position']
+                                        values = f'''SELECT match_lineup_id, {playerId},{position} FROM scouting.match_lineup WHERE match={match['matchId']} AND team={team} AND period={part} AND second={time}'''
+                                        querys.append(('match_lineup_player_position',values))
 
             # get match advanced stats for each player
             if player_advanced_stats:
@@ -396,8 +399,12 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                 player = event['player']['id']
                 matchTimestamp = event['matchTimestamp']
                 matchPeriod = event['matchPeriod']
-                location_x = event['location']['x']
-                location_y = event['location']['y']
+                if event['location'] != None:
+                    location_x = event['location']['x']
+                    location_y = event['location']['y']
+                else:
+                    location_x = -1 #TODO: ver melhor isto
+                    location_y = -1 #TODO: ver melhor isto
                 minute = event['minute']
                 second = event['second']
                 team = event['team']['id']
@@ -544,25 +551,25 @@ def main(args,db_handler:Db_handler):
         if request_file_path.endswith('json') and os.path.exists(request_file_path):
             request_file = json.load(open(request_file_path))
             # populate areas
-            populate_areas(db_handler) 
+            #populate_areas(db_handler) 
             if 'competitions' in request_file:
                 competitions = request_file['competitions']
                 competitions_info = extract_competitions_info(competitions)
                 #print(competitions_info)
                 competitions_id = [c['wyId'] for c in competitions_info]
                 # populate competitions
-                populate_competitions(db_handler,competitions_id)
+                #populate_competitions(db_handler,competitions_id)
 
                 # populate seasons
                 seasons_id = [s for c in competitions_info for s in c['seasons']]
-                populate_competitions_seasons(db_handler,seasons_id)
+                #populate_competitions_seasons(db_handler,seasons_id)
 
                 s_i = 1
                 # populate teams, players, matches and stats
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_i}/{len(seasons_id)}')
-                    populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=True)
+                    #populate_teams(db_handler,s_id)
+                    #populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_matches(db_handler,s_id,player_advanced_stats=True)
                     populate_rounds(db_handler,s_id)
                     s_i += 1
