@@ -33,11 +33,11 @@ def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=
 
 
 
-def get_most_updated_season(carrer):
-    '''Gets most updated season from player carrer'''
+def get_most_updated_season(career):
+    '''Gets most updated season from player career'''
     most_updated_season = None
     # get most updated season
-    for entry in carrer:
+    for entry in career:
         if not most_updated_season:
             most_updated_season = entry['season']
         else:
@@ -53,11 +53,11 @@ def get_most_updated_season(carrer):
     return most_updated_season
 
 
-def get_latest_carrer_entries(carrer:list[dict],entries:int=5):
-    '''Gets latest carrer entries'''
+def get_latest_career_entries(career:list[dict],entries:int=5):
+    '''Gets latest career entries'''
     entry_list = []
-    if carrer:
-        entry_list = sorted(carrer, key=lambda k: k['season']['startDate'],reverse=True)
+    if career:
+        entry_list = sorted(career, key=lambda k: k['season']['startDate'],reverse=True)
         entry_list = entry_list[0:entries]
     return entry_list
 
@@ -118,14 +118,14 @@ def get_match_info(match,retry:bool=True):
     return match_info 
 
 
-def get_player_carrer(player,retry:bool=True):
-    '''Requests player carrer from API'''
+def get_player_career(player,retry:bool=True):
+    '''Requests player career from API'''
     url = f'{api_url}players/{player}/career'
     headers = {'Authorization': encoded_authentication}
     params = {'details':'season'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
-    player_carrer = result['career'] if result else []
-    return player_carrer
+    player_career = result['career'] if result else []
+    return player_career
 
 
 def get_player_advanced_stats(player,competition,season=None,retry:bool=True):
@@ -167,6 +167,14 @@ def get_season_standings(season,retry:bool=True):
     standings = result['teams'] if result else []
     return standings
 
+def get_season_career(season,retry:bool=True):
+    '''Requests general performance information about all the teams for the given season from API'''
+    url = f'{api_url}seasons/{season}/career'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    season_career = result['rounds'] if result else []
+    return season_career
+
 
 def get_season_players(season,retry:bool=True):
     '''Requests players from API\n
@@ -185,6 +193,14 @@ def get_season_players(season,retry:bool=True):
             result = get_request_api(url,headers=headers,params=params,retry=retry)
             players += result['players']
     return players
+
+def get_player_contract_info(player, retry:bool=True):
+    '''Requests player contract info from API'''
+    url = f'{api_url}players/{player}/contractinfo'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    contractInfo = result if result else None
+    return contractInfo
 
 
 def get_season_matches(season,retry:bool=True):
@@ -211,3 +227,12 @@ def get_match_events(match,retry:bool=True):
     result = get_request_api(url,headers=headers,retry=retry)
     events = result['events'] if result else []
     return events
+
+
+def get_match_lineups(match,retry:bool=True):
+    '''Requests list of all lineups in a match from API'''
+    url = f'{api_url}matches/{match}/formations'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    lineups = result if result else None
+    return lineups
