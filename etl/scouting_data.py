@@ -304,44 +304,45 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
     querys = []
     for team,team_info in match_team_info.items():
         formation = team_info['formation']
-        substitutes = {}
-        # get team substitutions
-        for player in formation['substitutions']:
-            substitutes[player['playerIn']] = {}
-            substitutes[player['playerIn']]['playerIn'] = player['playerIn']
-            substitutes[player['playerIn']]['playerOut'] = player['playerOut']
-            substitutes[player['playerIn']]['minute'] = player['minute']
-            values = f'''("{match}", "{substitutes[player['playerIn']]['playerIn']}", "{substitutes[player['playerIn']]['playerOut']}", "{team_info['teamId']}", "{substitutes[player['playerIn']]['minute']}")'''
-            querys.append(('match_substitution',values))
-        # team initial lineup
-        for player in formation['lineup']:
-            player_id = player['playerId']
-            assists = player['assists']
-            goals = player['goals']
-            own_goals = player['ownGoals']
-            red_cards = player['redCards']
-            shirt_number = player['shirtNumber']
-            yellow_cards = player['yellowCards']
-            minute = 0
-            type = 'lineup'
-            values = f'''("{match}", "{player_id}", "{assists}", "{goals}", "{own_goals}", "{red_cards}", "{shirt_number}", "{yellow_cards}", "{minute}", "{team_info['teamId']}", "{type}")'''
-            querys.append(('match_formation',values))
-        # team bench
-        for player in formation['bench']:
-            player_id = player['playerId']
-            assists = player['assists']
-            goals = player['goals']
-            own_goals = player['ownGoals']
-            red_cards = player['redCards']
-            shirt_number = player['shirtNumber']
-            yellow_cards = player['yellowCards']
-            minute = 0
-            type = 'bench'
-            if player['playerId'] in substitutes:
-                minute = substitutes[player['playerId']]['minute']
-                type = 'substitution'
-            values = f'''("{match}", "{player_id}", "{assists}", "{goals}", "{own_goals}", "{red_cards}", "{shirt_number}", "{yellow_cards}", "{minute}", "{team_info['teamId']}", "{type}")'''
-            querys.append(('match_formation',values))
+        if formation:
+            substitutes = {}
+            # get team substitutions
+            for player in formation['substitutions']:
+                substitutes[player['playerIn']] = {}
+                substitutes[player['playerIn']]['playerIn'] = player['playerIn']
+                substitutes[player['playerIn']]['playerOut'] = player['playerOut']
+                substitutes[player['playerIn']]['minute'] = player['minute']
+                values = f'''("{match}", "{substitutes[player['playerIn']]['playerIn']}", "{substitutes[player['playerIn']]['playerOut']}", "{team_info['teamId']}", "{substitutes[player['playerIn']]['minute']}")'''
+                querys.append(('match_substitution',values))
+            # team initial lineup
+            for player in formation['lineup']:
+                player_id = player['playerId']
+                assists = player['assists']
+                goals = player['goals']
+                own_goals = player['ownGoals']
+                red_cards = player['redCards']
+                shirt_number = player['shirtNumber']
+                yellow_cards = player['yellowCards']
+                minute = 0
+                type = 'lineup'
+                values = f'''("{match}", "{player_id}", "{assists}", "{goals}", "{own_goals}", "{red_cards}", "{shirt_number}", "{yellow_cards}", "{minute}", "{team_info['teamId']}", "{type}")'''
+                querys.append(('match_formation',values))
+            # team bench
+            for player in formation['bench']:
+                player_id = player['playerId']
+                assists = player['assists']
+                goals = player['goals']
+                own_goals = player['ownGoals']
+                red_cards = player['redCards']
+                shirt_number = player['shirtNumber']
+                yellow_cards = player['yellowCards']
+                minute = 0
+                type = 'bench'
+                if player['playerId'] in substitutes:
+                    minute = substitutes[player['playerId']]['minute']
+                    type = 'substitution'
+                values = f'''("{match}", "{player_id}", "{assists}", "{goals}", "{own_goals}", "{red_cards}", "{shirt_number}", "{yellow_cards}", "{minute}", "{team_info['teamId']}", "{type}")'''
+                querys.append(('match_formation',values))
     return querys
 
 
