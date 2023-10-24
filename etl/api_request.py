@@ -483,9 +483,10 @@ def prepare_match_players_stats_insert(match:int):
         received_pass = player_stats['total']['receivedPass']
         dribbles = player_stats['total']['dribbles']
         touch_in_box = player_stats['total']['touchInBox']
+        opponent_half_recoveries = player_stats['total']['opponentHalfRecoveries']
 
         values = f'''("{match}", "{player}", "{offensive_duels}", "{progressive_passes}", "{forward_passes}", "{crosses}", "{key_passes}", "{defensive_duels}", "{interceptions}", "{recoveries}",\
-        "{successful_passes}", "{long_passes}", "{aerial_duels}", "{losses}", "{own_half_losses}", "{goal_kicks}", "{received_pass}", "{dribbles}", "{touch_in_box}")'''
+        "{successful_passes}", "{long_passes}", "{aerial_duels}", "{losses}", "{own_half_losses}", "{goal_kicks}", "{received_pass}", "{dribbles}", "{touch_in_box}", "{opponent_half_recoveries}")'''
 
         querys.append(('player_match_stats',values))
     return querys
@@ -519,7 +520,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
                 successfulPasses=new.successfulPasses, longPasses=new.longPasses, aerialDuels=new.aerialDuels, \
                 losses=new.losses, ownHalfLosses=new.ownHalfLosses, goalKicks=new.goalKicks, receivedPass=new.receivedPass, dribbles=new.dribbles, touchInBox=new.touchInBox'''
         player_match_stats_parameters = f'''(`match`, player, offensiveDuels, progressivePasses, forwardPasses, crosses, keyPasses, defensiveDuels, interceptions, recoveries,\
-        successfulPasses, longPasses, aerialDuels, losses, ownHalfLosses, goalKicks, receivedPass, dribbles, touchInBox)'''
+        successfulPasses, longPasses, aerialDuels, losses, ownHalfLosses, goalKicks, receivedPass, dribbles, touchInBox, opponentHalfRecoveries)'''
         db_handler.insert_or_update_many('player_match_stats',player_match_stats_query_values,on_update=player_match_stats_on_update,parameters=player_match_stats_parameters)
     
 
