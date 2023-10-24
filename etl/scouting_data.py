@@ -1,24 +1,14 @@
-import datetime
-import requests
 import json
 import os
-import sys
-import base64
 import argparse
 import time
 import logging
 from db import Db_handler
 from multiprocessing.pool import ThreadPool
 from utils import get_similar
+from api_handler import *
 
-current_folder = os.path.dirname(__file__)
 
-api_url = 'https://apirest.wyscout.com/v3/'
-
-# Preparing authentication
-authentication = json.load(open(f'{current_folder}/authentication.json'))
-encoded_authentication = base64.b64encode(f'{authentication["username"]}:{authentication["password"]}'.encode('ascii'))
-encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 
 
 def parse_arguments():
@@ -58,186 +48,7 @@ def run_threaded_for(func,iterable, args=None,log=False,threads:int=6):
         print(f'Threaded: Finished {func.__name__} in {time.time()-start_time} seconds')
     return results
 
-        
-def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=0.3,retries:int=30):
-    '''Requests data from API'''
-    ok_response = False
-    tries = 0
-    while not ok_response and tries < retries:
-        response = requests.get(url, headers=headers,params=params)
-        if response.status_code == 200:
-            ok_response = True
-        # if too many requests, wait and retry
-        elif response.status_code == 429 and retry:
-            time.sleep(sleep_time)
-        else:
-            break
-        tries += 1
-    if not ok_response:
-        print(f'Error requesting {url}, status code: {response.status_code}, message: {response.text}')
-    return response.json() if ok_response else None
-
-
-
-def get_most_updated_season(carrer):
-    '''Gets most updated season from player carrer'''
-    most_updated_season = None
-    # get most updated season
-    for entry in carrer:
-        if not most_updated_season:
-            most_updated_season = entry['season']
-        else:
-            if entry['season']['active']:
-                most_updated_season = entry['season']
-            else:
-                entry_date = datetime.datetime.strptime(entry['season']['startDate'], '%Y-%m-%d')
-                most_updated_season_date = datetime.datetime.strptime(most_updated_season['startDate'], '%Y-%m-%d')
-                if entry_date > most_updated_season_date:
-                    most_updated_season = entry['season']
-        if most_updated_season['active']:
-            break
-    return most_updated_season
-
-
-def get_latest_carrer_entries(carrer:list[dict],entries:int=5):
-    '''Gets latest carrer entries'''
-    entry_list = []
-    if carrer:
-        entry_list = sorted(carrer, key=lambda k: k['season']['startDate'],reverse=True)
-        entry_list = entry_list[0:entries]
-    return entry_list
-
-def get_areas(retry:bool=True):
-    '''Requests areas from API'''
-    url = api_url + 'areas'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    areas = result['areas'] if result else []
-    return areas
-
-
-def get_area_competitions(area=None, retry:bool=True):
-    '''Requests area's competitions from API'''
-    area_competitions = []
-    if area:
-        url = api_url + 'competitions'
-        headers = {'Authorization': encoded_authentication}
-        params = {'areaId':area}
-        result = get_request_api(url,headers=headers,params=params,retry=retry)
-        area_competitions = result['competitions'] if result else []
-    return area_competitions
-
-
-def get_competition_info(competition, retry:bool=True):
-    '''Requests competition info from API'''
-    url = f'{api_url}competitions/{competition}'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    competition_info = result if result else None
-    return competition_info
-
-def get_seasons_competitions(competition,retry:bool=True):
-    '''Requests seasons list of a competition from API'''
-    url = f'{api_url}competitions/{competition}/seasons'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    seasons_list = {season['seasonId']:season['season'] for season in result['seasons']} if 'seasons' in result else {}
-    return seasons_list
-
-def get_team_info(team,retry:bool=True):
-    '''Requests team info from API'''
-    url = f'{api_url}teams/{team}'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    team_info = result if result else None
-    return team_info
-
-
-
-def get_match_info(match,retry:bool=True):
-    '''Requests match info from API'''
-    url = f'{api_url}matches/{match}'
-    headers = {'Authorization': encoded_authentication}
-    params = {'useSides':'true'}
-    result = get_request_api(url,headers=headers,params=params,retry=retry)
-    match_info = result if result else None
-    return match_info 
-
-def get_player_carrer(player,retry:bool=True):
-    '''Requests player carrer from API'''
-    url = f'{api_url}players/{player}/career'
-    headers = {'Authorization': encoded_authentication}
-    params = {'details':'season'}
-    result = get_request_api(url,headers=headers,params=params,retry=retry)
-    player_carrer = result['career'] if result else []
-    return player_carrer
-
-
-def get_player_advanced_stats(player,competition,season=None,retry:bool=True):
-    '''Requests player advanced stats from API'''
-    url = f'{api_url}players/{player}/advancedstats'
-    headers = {'Authorization': encoded_authentication}
-    params = {'compId':competition}
-    if season:
-        params['seasonId'] = season
-    result = get_request_api(url,headers=headers,params=params,retry=retry)
-    player_advanced_stats = result if result else None
-    return player_advanced_stats
-
-
-
-
-def get_season_info(season,retry:bool=True):
-    '''Requests season info from API'''
-    url = f'{api_url}seasons/{season}'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    season_info = result if result else None
-    return season_info
-
-def get_season_teams(season,retry:bool=True):
-    '''Requests teams from API'''
-    url = f'{api_url}seasons/{season}/teams'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    teams = result['teams'] if result else []
-    return teams
-
-
-def get_season_players(season,retry:bool=True):
-    '''Requests players from API\n
-    Paged response, so multiple requests are made to get all players'''
-    players = []
-    url = f'{api_url}seasons/{season}/players'
-    headers = {'Authorization': encoded_authentication}
-    params = {'page':1,'limit':100}
-    result = get_request_api(url,headers=headers,params=params,retry=retry)
-    if result:
-        meta = result['meta']
-        players = result['players']
-        # get all players (paged response)
-        while len(players) < meta['total_items']:
-            params['page'] += 1
-            result = get_request_api(url,headers=headers,params=params,retry=retry)
-            players += result['players']
-    return players
-
-
-def get_season_matches(season,retry:bool=True):
-    '''Requests matches from API'''
-    url = f'{api_url}seasons/{season}/matches'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    matches = result['matches'] if result else []
-    return matches
-
-def get_match_players_stats(match,retry:bool=True):
-    '''Requests list of all players stats in a match from API'''
-    url = f'{api_url}matches/{match}/advancedstats/players'
-    headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
-    players_stats = result['players'] if result else []
-    return players_stats
+    
 
 
 def extract_competitions_info(competitions:list):
@@ -309,11 +120,11 @@ def populate_competitions(db_handler:Db_handler,competitions_id:list):
         print(f'Requesting competition {c_i}/{len(competitions_id)}')
         competition_info = get_competition_info(competition_id)
         if competition_info:
-            values = f'''({competition_info['wyId']}, "{competition_info['name']}", "{competition_info['area']['id']}", "{competition_info['gender']}"\
-                , "{competition_info['type']}", "{competition_info['format']}", "{competition_info['divisionLevel']}", "{competition_info['category']}")'''
+            values = f'''({competition_info['wyId']}, "{competition_info['name']}", "{competition_info['area']['id']}", "{competition_info['gender']}",\
+                         "{competition_info['type']}", "{competition_info['format']}", "{competition_info['divisionLevel']}", "{competition_info['category']}")'''
             
             on_update = f'''name="{competition_info['name']}", area="{competition_info['area']['id']}", gender="{competition_info['gender']}",\
-                type="{competition_info['type']}", format="{competition_info['format']}", divisionLevel="{competition_info['divisionLevel']}", category="{competition_info['category']}"'''
+                            type="{competition_info['type']}", format="{competition_info['format']}", divisionLevel="{competition_info['divisionLevel']}", category="{competition_info['category']}"'''
 
             db_handler.insert_or_update('competition',values,on_update)
         c_i += 1
@@ -338,13 +149,14 @@ def prepare_teams_insert(teams,season_id:int):
 
     querys = []
     for team in teams:
-        team_info = get_team_info(team['wyId'])
+        team_info = team['team']
         if team_info:
             values = f'''({team_info['wyId']}, "{team_info['name']}", "{team_info['officialName']}", "{team_info['imageDataURL']}", "{team_info['gender']}", "{team_info['type']}",\
-                "{team_info['city']}", "{team_info['category']}", "{team_info['area']['id']}")'''
+                        "{team_info['city']}", "{team_info['category']}", "{team_info['area']['id']}")'''
             querys.append(('team',values))
 
-            values = f'''("{season_id}", "{team_info['wyId']}")'''
+            values = f'''("{season_id}", "{team_info['wyId']}","{team['totalDraws']}","{team['totalGoalsAgainst']}","{team['totalGoalsFor']}","{team['totalLosses']}",\
+                        "{team['totalPlayed']}","{team['totalPoints']}","{team['totalWins']}")'''
             querys.append(('team_competition_season',values))
     return querys
 
@@ -354,7 +166,7 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates teams table in db, as well as team_competition_season table'''
     season_info = get_season_info(season_id)
     if season_info:
-        teams = get_season_teams(season_id)
+        teams = get_season_standings(season_id)
         result = run_threaded_for(prepare_teams_insert,teams,log=True,args=(season_id))
         querys = [query for query_list in result for query in query_list]
         team_query_values = []
@@ -367,11 +179,12 @@ def populate_teams(db_handler:Db_handler,season_id:int):
                 team_competition_season_query_values.append(query[1])
 
         team_on_update = f'''name=new.name, official_name=new.official_name, icon=new.icon, gender=new.gender, type=new.type,\
-                city=new.city, category=new.category, area=new.area'''
+                             city=new.city, category=new.category, area=new.area'''
         team_parameters = f'''(idteam,name,official_name,icon,gender,type,city,category,area)'''
         
-        team_competition_season_on_update = f'''competition_season=new.competition_season, team=new.team'''
-        team_competition_season_parameters = f'''(competition_season, team)'''
+        team_competition_season_on_update = f'''competition_season=new.competition_season, team=new.team, totalDraws=new.totalDraws, totalGoalsAgainst=new.totalGoalsAgainst,\
+                                                totalGoalsFor=new.totalGoalsFor, totalLosses=new.totalLosses, totalPlayed=new.totalPlayed, totalPoints=new.totalPoints, totalWins=new.totalWins'''
+        team_competition_season_parameters = f'''(competition_season, team, totalDraws, totalGoalsAgainst, totalGoalsFor, totalLosses, totalPlayed, totalPoints, totalWins)'''
         db_handler.insert_or_update_many('team',team_query_values,on_update=team_on_update,parameters=team_parameters)
         db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,on_update=team_competition_season_on_update,parameters=team_competition_season_parameters)
         
@@ -381,7 +194,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
     for player in players:
         player_name = player['firstName'] + ' ' + player['middleName'] + ' ' + player['lastName']
         values = f'''({player['wyId']}, "{player_name}", "{player['shortName']}", "{player['birthArea']['id']}", "{player['birthDate']}", "{player['imageDataURL']}", "{player['foot']}",\
-        "{player['height']}","{player['weight']}","{player['status']}","{player['gender']}","{player['role']['code2']}", "{player['role']['code3']}", "{player['role']['name']}")'''
+                    "{player['height']}","{player['weight']}","{player['status']}","{player['gender']}","{player['role']['code2']}", "{player['role']['code3']}", "{player['role']['name']}")'''
         querys.append(('player',values))
 
         # get player advanced stats
@@ -393,7 +206,9 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                 team = entry['teamId']
                 competition = entry['competitionId']
                 # populate carrer table
-                values = f'''SELECT '{player['wyId']}', idteam_competition_season FROM scouting.team_competition_season WHERE team={team} AND competition_season={season}'''
+                values = f'''SELECT '{player['wyId']}', idteam_competition_season, '{player['appearances']}','{player['goal']}','{player['minutesPlayed']}',\
+                            '{player['penalties']}','{player['redCards']}','{player['shirtNumber']}','{player['substituteIn']}','{player['substituteOnBench']}',\
+                            '{player['substituteOut']}','{player['yellowCard']}' FROM scouting.team_competition_season WHERE team={team} AND competition_season={season}'''
                 querys.append(('carrer_entry',values))
 
                 advanced_stats = get_player_advanced_stats(player['wyId'],competition,season)
@@ -401,7 +216,8 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                     # populate positions table
                     positions = advanced_stats['positions']
                     for position in positions:
-                        values = f'''SELECT '{player['wyId']}', '{position['percent']}','{position['position']['code']}', '{position['position']['name']}',idteam_competition_season FROM scouting.team_competition_season WHERE team='{team}' AND competition_season='{season}' '''
+                        values = f'''SELECT '{player['wyId']}', '{position['percent']}','{position['position']['code']}', '{position['position']['name']}',idteam_competition_season \
+                                    FROM scouting.team_competition_season WHERE team='{team}' AND competition_season='{season}' '''
                         querys.append(('player_positions',values))
     return querys
         
@@ -426,12 +242,14 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             carrer_entry_querys_values.append(query[1])
 
     playere_on_update = f'''name=new.name, short_name=new.short_name, birth_area=new.birth_area, birth_date=new.birth_date, image=new.image, foot=new.foot,\
-        height=new.height, weight=new.weight, status=new.status, gender=new.gender, role_code2=new.role_code2, role_code3=new.role_code3, role_name=new.role_name'''
+                            height=new.height, weight=new.weight, status=new.status, gender=new.gender, role_code2=new.role_code2, role_code3=new.role_code3, role_name=new.role_name'''
     player_parameters = f'''(idplayer,name,short_name,birth_area,birth_date,image,foot,height,weight,status,gender,role_code2,role_code3,role_name)'''
     db_handler.insert_or_update_many('player',player_querys_values,on_update=playere_on_update,parameters=player_parameters)
 
-    carrer_entry_on_update = f'''player=VALUES(player), team_competition_season=VALUES(team_competition_season)'''
-    carrer_parameters = f'''(player, team_competition_season)'''
+    carrer_entry_on_update = f'''player=VALUES(player), team_competition_season=VALUES(team_competition_season), appearances=VALUES(appearances), goal=VALUES(goal), minutesPlayed=VALUES(minutesPlayed),\
+                                penalties=VALUES(penalties), redCards=VALUES(redCards), shirtNumber=VALUES(shirtNumber), substituteIn=VALUES(substituteIn), substituteOnBench=VALUES(substituteOnBench),\
+                                substituteOut=VALUES(substituteOut), yellowCard=VALUES(yellowCard)'''
+    carrer_parameters = f'''(player, team_competition_season, appearances, goal, minutesPlayed, penalties, redCards, shirtNumber, substituteIn, substituteOnBench, substituteOut, yellowCard)'''
     db_handler.insert_or_update_many_union('carrer_entry',carrer_entry_querys_values,on_update=carrer_entry_on_update,parameters=carrer_parameters)
     
     if player_advanced_stats:
@@ -509,16 +327,16 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             player_match_stats_query_values.append(query[1])
 
     match_on_update = f'''competition_season=new.competition_season, home_team=new.home_team, away_team=new.away_team, date=new.date,\
-        home_score=new.home_score, away_score=new.away_score, winner=new.winner'''
+                          home_score=new.home_score, away_score=new.away_score, winner=new.winner'''
     match_parameters = f'''(idmatch, competition_season, home_team, away_team, date, home_score, away_score, winner)'''
     db_handler.insert_or_update_many('match',match_query_values,on_update=match_on_update,parameters=match_parameters)
 
     if player_advanced_stats:
         player_match_stats_on_update = f'''`match`=new.match, player=new.player, offensiveDuels=new.offensiveDuels,\
-                progressivePasses=new.progressivePasses, forwardPasses=new.forwardPasses,crosses=new.crosses, keyPasses=new.keyPasses,\
-                defensiveDuels=new.defensiveDuels, interceptions=new.interceptions, recoveries=new.recoveries,\
-                successfulPasses=new.successfulPasses, longPasses=new.longPasses, aerialDuels=new.aerialDuels, \
-                losses=new.losses, ownHalfLosses=new.ownHalfLosses, goalKicks=new.goalKicks, receivedPass=new.receivedPass, dribbles=new.dribbles, touchInBox=new.touchInBox'''
+                                            progressivePasses=new.progressivePasses, forwardPasses=new.forwardPasses,crosses=new.crosses, keyPasses=new.keyPasses,\
+                                            defensiveDuels=new.defensiveDuels, interceptions=new.interceptions, recoveries=new.recoveries,\
+                                            successfulPasses=new.successfulPasses, longPasses=new.longPasses, aerialDuels=new.aerialDuels, \
+                                            losses=new.losses, ownHalfLosses=new.ownHalfLosses, goalKicks=new.goalKicks, receivedPass=new.receivedPass, dribbles=new.dribbles, touchInBox=new.touchInBox'''
         player_match_stats_parameters = f'''(`match`, player, offensiveDuels, progressivePasses, forwardPasses, crosses, keyPasses, defensiveDuels, interceptions, recoveries,\
         successfulPasses, longPasses, aerialDuels, losses, ownHalfLosses, goalKicks, receivedPass, dribbles, touchInBox, opponentHalfRecoveries)'''
         db_handler.insert_or_update_many('player_match_stats',player_match_stats_query_values,on_update=player_match_stats_on_update,parameters=player_match_stats_parameters)
