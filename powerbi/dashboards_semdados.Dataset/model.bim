@@ -4,7 +4,7 @@
     "annotations": [
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"scouting career_entry\",\"scouting area\",\"scouting competition\",\"scouting competition_season\",\"scouting match\",\"scouting match_event\",\"scouting match_event_secondary_type\",\"scouting match_formation\",\"scouting match_lineup\",\"scouting match_lineup_player_position\",\"scouting match_substitution\",\"scouting player\",\"scouting player_match_stats\",\"scouting player_positions\",\"scouting round\",\"scouting team\",\"scouting team_competition_season\"]"
+        "value": "[\"scouting career_entry\",\"scouting area\",\"scouting competition\",\"scouting competition_season\",\"scouting match\",\"scouting match_event\",\"scouting match_event_secondary_type\",\"scouting match_formation\",\"scouting match_lineup\",\"scouting match_lineup_player_position\",\"scouting match_substitution\",\"scouting player\",\"scouting player_match_stats\",\"scouting player_positions\",\"scouting round\",\"scouting team\",\"scouting team_competition_season\",\"scouting area (2)\",\"scouting career_entry (2)\",\"scouting competition (2)\",\"scouting competition_season (2)\",\"scouting match (2)\",\"scouting match_event (2)\",\"scouting match_event_secondary_type (2)\",\"scouting match_formation (2)\",\"scouting match_lineup (2)\",\"scouting match_lineup_player_position (2)\",\"scouting match_substitution (2)\",\"scouting player (2)\",\"scouting player_match_stats (2)\",\"scouting player_positions (2)\",\"scouting round (2)\",\"scouting team (2)\",\"scouting team_competition_season (2)\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",
@@ -12,7 +12,7 @@
       },
       {
         "name": "PBIDesktopVersion",
-        "value": "2.121.903.0 (23.09)"
+        "value": "2.122.746.0 (23.10)"
       },
       {
         "name": "PBI_ProTooling",
@@ -962,10 +962,6 @@
         "name": "scouting competition",
         "annotations": [
           {
-            "name": "PBI_NavigationStepName",
-            "value": "Navegação"
-          },
-          {
             "name": "PBI_ResultType",
             "value": "Table"
           }
@@ -1088,10 +1084,6 @@
       {
         "name": "scouting competition_season",
         "annotations": [
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navegação"
-          },
           {
             "name": "PBI_ResultType",
             "value": "Table"
@@ -1639,10 +1631,6 @@
       {
         "name": "scouting match",
         "annotations": [
-          {
-            "name": "PBI_NavigationStepName",
-            "value": "Navegação"
-          },
           {
             "name": "PBI_ResultType",
             "value": "Table"

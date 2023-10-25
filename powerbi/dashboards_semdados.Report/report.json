@@ -557,6 +557,15 @@
       "ordinal": 3,
       "visualContainers": [
         {
+          "config": "{\"name\":\"4050ea713d92a29a599c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1029.75886864654,\"y\":19.558573853989813,\"width\":205.36502546689303,\"height\":187.02884382626826,\"z\":6001}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match_lineup.lineup\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match_lineup\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"lineup\"},\"Name\":\"scouting match_lineup.lineup\",\"NativeReferenceName\":\"lineup\"}]},\"drillFilterOtherVisuals\":true}}",
+          "filters": "[]",
+          "height": 187.03,
+          "width": 205.37,
+          "x": 1029.76,
+          "y": 19.56,
+          "z": 6001.00
+        },
+        {
           "config": "{\"name\":\"702a4f388a613706e31c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1029.75886864654,\"y\":206.58741768025806,\"z\":6000,\"width\":205.36502546689303,\"height\":68.45500848896435,\"tabOrder\":6000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition_season.Época\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition_season\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Época\"},\"Name\":\"scouting competition_season.Época\",\"NativeReferenceName\":\"Época\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}},\"isInvertedSelectionMode\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"general\":[{\"properties\":{}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"selection\":[{\"properties\":{\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Época'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
           "filters": "[]",
           "height": 68.46,
