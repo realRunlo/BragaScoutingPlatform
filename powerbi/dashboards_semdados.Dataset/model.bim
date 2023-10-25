@@ -1,0 +1,2469 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"scouting area\",\"scouting carrer_entry\",\"scouting competition\",\"scouting competition_season\",\"scouting match\",\"scouting player\",\"scouting player_match_stats\",\"scouting player_positions\",\"scouting team\",\"scouting team_competition_season\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "1"
+      },
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.121.903.0 (23.09)"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "culture": "pt-PT",
+    "cultures": [
+      {
+        "name": "pt-PT",
+        "linguisticMetadata": {
+          "content": {
+            "DynamicImprovement": "HighConfidence",
+            "Language": "en-US",
+            "Version": "1.0.0"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "relationships": [
+      {
+        "name": "8122fef1-ced5-4c18-b272-25db14fddafb",
+        "fromColumn": "birth_date",
+        "fromTable": "scouting player",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_3de59755-4765-4eb4-89ef-68b2779699d0"
+      },
+      {
+        "name": "c7298b16-4304-4b45-8581-20ba97ee4cdb",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "player",
+        "fromTable": "scouting carrer_entry",
+        "toColumn": "idplayer",
+        "toTable": "scouting player"
+      },
+      {
+        "name": "26eff0ff-020e-47e8-aeeb-741b62a91ff2",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "area",
+        "fromTable": "scouting competition",
+        "toColumn": "idareas",
+        "toTable": "scouting area"
+      },
+      {
+        "name": "afa663de-c0b4-40e3-ad26-2463c77b62fe",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "crossFilteringBehavior": "bothDirections",
+        "fromCardinality": "one",
+        "fromColumn": "competition",
+        "fromTable": "scouting competition_season",
+        "toColumn": "idcompetitions",
+        "toTable": "scouting competition"
+      },
+      {
+        "name": "0f3eea8f-8719-4769-950e-cb938f7e84dc",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "away_team",
+        "fromTable": "scouting match",
+        "toColumn": "idteam",
+        "toTable": "scouting team"
+      },
+      {
+        "name": "c9a74a28-bf86-4bba-975b-74e2babc6d43",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "home_team",
+        "fromTable": "scouting match",
+        "isActive": false,
+        "toColumn": "idteam",
+        "toTable": "scouting team"
+      },
+      {
+        "name": "1dbca726-cda9-419a-8f81-01a77a21bb93",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "birth_area",
+        "fromTable": "scouting player",
+        "toColumn": "idareas",
+        "toTable": "scouting area"
+      },
+      {
+        "name": "9fa22ed6-2254-4617-a918-8c30cad148dc",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "match",
+        "fromTable": "scouting player_match_stats",
+        "toColumn": "idmatch",
+        "toTable": "scouting match"
+      },
+      {
+        "name": "6dd60175-a4d2-45b1-8f1a-926504d41dea",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "player",
+        "fromTable": "scouting player_match_stats",
+        "toColumn": "idplayer",
+        "toTable": "scouting player"
+      },
+      {
+        "name": "66759d65-7d0b-4523-beb4-7a002092028d",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "player",
+        "fromTable": "scouting player_positions",
+        "toColumn": "idplayer",
+        "toTable": "scouting player"
+      },
+      {
+        "name": "b6f8a91d-184f-4b04-bf44-9ede3e8d25c6",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "fromColumn": "area",
+        "fromTable": "scouting team",
+        "isActive": false,
+        "toColumn": "idareas",
+        "toTable": "scouting area"
+      },
+      {
+        "name": "8a629aea-db16-4149-b5a1-0d5c3e3b31d6",
+        "annotations": [
+          {
+            "name": "PBI_IsFromSource",
+            "value": "FS"
+          }
+        ],
+        "crossFilteringBehavior": "bothDirections",
+        "fromCardinality": "one",
+        "fromColumn": "team",
+        "fromTable": "scouting team_competition_season",
+        "toColumn": "idteam",
+        "toTable": "scouting team"
+      },
+      {
+        "name": "3f30bf27-2786-472e-a628-6ca61872c731",
+        "fromColumn": "Data",
+        "fromTable": "scouting match",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_aa539c90-ca40-40ab-9389-b370914d217e"
+      }
+    ],
+    "sourceQueryCulture": "pt-PT",
+    "tables": [
+      {
+        "name": "DateTableTemplate_b6d66a38-f1e8-4998-b733-e6ec8ce26a2f",
+        "annotations": [
+          {
+            "name": "__PBI_TemplateDateTable",
+            "value": "true"
+          },
+          {
+            "name": "DefaultItem",
+            "value": "DateHierarchy"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "b0059d8e-fac5-458f-8c93-eb1b5fdf4335",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Ano",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "4a0f0026-9d4b-4b3a-b69f-b099fbdea048",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "c06a3132-f08b-4b3c-8e76-c41d93658064",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Mês",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "2dda2f8d-c776-41aa-8d7a-1bb66e9191b1",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "4bc852df-a60b-4867-b08a-992c42046d18",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Trimestre",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Tri \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "7635d108-be6a-44a2-a0fc-d7d47d34831d",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dia",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "b4579769-652e-4ca8-a463-869663a4071c",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarquia de Datas",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Ano",
+                "column": "Ano",
+                "lineageTag": "2a74023e-171f-4d97-b137-e5cf5a357052",
+                "ordinal": 0
+              },
+              {
+                "name": "Trimestre",
+                "column": "Trimestre",
+                "lineageTag": "387a9ed9-e2c1-44db-b054-b5114e9f1651",
+                "ordinal": 1
+              },
+              {
+                "name": "Mês",
+                "column": "Mês",
+                "lineageTag": "bbf8e11e-197a-4382-8eb8-e9c67c25c399",
+                "ordinal": 2
+              },
+              {
+                "name": "Dia",
+                "column": "Dia",
+                "lineageTag": "decd7f53-ea4a-40d9-bc41-d3e495101caa",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "d7149697-96b9-41d3-ad78-6b51c06deaa4"
+          }
+        ],
+        "isHidden": true,
+        "isPrivate": true,
+        "lineageTag": "cb2a0e8a-d6af-415d-bd28-fa4baaed2f66",
+        "partitions": [
+          {
+            "name": "DateTableTemplate_b6d66a38-f1e8-4998-b733-e6ec8ce26a2f",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(2015,1,1), Date(2015,1,1))",
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting area",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idareas",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6e1d7116-710d-4258-ac7a-a38f19d66385",
+            "sourceColumn": "idareas",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "alpha3code",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "53d9451c-fd79-438c-8c97-abc9a1fec786",
+            "sourceColumn": "alpha3code",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "b6b9e23f-1e00-46cc-ba0f-d68750ccb9df",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Flag",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataCategory": "ImageUrl",
+            "dataType": "string",
+            "expression": "[URLBandeira]",
+            "isDataTypeInferred": true,
+            "lineageTag": "c9131c95-b3c7-447b-9c63-9f670a82e9cb",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "lineageTag": "0ae94b76-16a9-45ae-88f6-62d906599d00",
+        "measures": [
+          {
+            "name": "País (Competição)",
+            "dataCategory": "Uncategorized",
+            "expression": [
+              "",
+              "VAR PaisCompeticao = SELECTEDVALUE('scouting competition'[area])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[name]),",
+              "        'scouting area'[idareas] = PaisCompeticao",
+              "    )"
+            ],
+            "lineageTag": "a69dabbb-a6b7-4d8a-a3ab-572d1e21e672"
+          },
+          {
+            "name": "País (Equipa)",
+            "expression": [
+              "",
+              "VAR Pais = SELECTEDVALUE('scouting team'[area])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[name]),",
+              "        'scouting area'[idareas] = Pais",
+              "    )"
+            ],
+            "lineageTag": "ebcc74eb-704f-4c3f-a90c-90070b85106c"
+          },
+          {
+            "name": "País (Jogador)",
+            "expression": [
+              "",
+              "VAR Pais = SELECTEDVALUE('scouting player'[birth_area])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[name]),",
+              "        'scouting area'[idareas] = Pais",
+              "    )"
+            ],
+            "lineageTag": "b0f3a46b-b29e-4af3-8239-e7ce40f82ecf"
+          },
+          {
+            "name": "URLBandeira",
+            "expression": [
+              "",
+              "VAR NomeDoPais = LOWER(VALUES('scouting area'[name]))",
+              "VAR URLBase = \"https://cdn.countryflags.com/thumbs/\"  -- URL base das bandeiras",
+              "RETURN",
+              "    URLBase & NomeDoPais & \"/flag-square-250.png\""
+            ],
+            "lineageTag": "3e2f44f3-25ca-4df3-ad01-ad3849570b2d"
+          },
+          {
+            "name": "Medida",
+            "dataCategory": "ImageUrl",
+            "expression": "\"https://cdn.countryflags.com/thumbs/china/flag-square-250.png\"",
+            "lineageTag": "dbf27580-1be5-43bd-8310-dc5632319b34"
+          },
+          {
+            "name": "FlagJogador",
+            "dataCategory": "ImageUrl",
+            "expression": [
+              "",
+              "VAR Pais = SELECTEDVALUE('scouting player'[birth_area])",
+              "VAR NomeDoPais =",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[name]),",
+              "        'scouting area'[idareas] = Pais",
+              "    )",
+              "RETURN \"https://cdn.countryflags.com/thumbs/\" & LOWER(NomeDoPais) & \"/flag-square-250.png\""
+            ],
+            "lineageTag": "cec0bde1-5a75-44f3-aa94-de38f6c2df9b"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "scouting area",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_area = Origem{[Schema=\"scouting\",Item=\"area\"]}[Data]",
+                "in",
+                "    scouting_area"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting carrer_entry",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "player",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "b3ce9785-2fd1-4ae1-b18e-c5e587e34e3d",
+            "sourceColumn": "player",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "team_competition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "ea25ec11-9326-49fb-bd4a-69d8ccc64ad3",
+            "sourceColumn": "team_competition_season",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "88b2e35e-c28d-4da5-9e09-3c62f2e64ea9",
+        "partitions": [
+          {
+            "name": "scouting carrer_entry",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_carrer_entry = Origem{[Schema=\"scouting\",Item=\"carrer_entry\"]}[Data]",
+                "in",
+                "    scouting_carrer_entry"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting competition",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idcompetitions",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8d643330-3cd0-46c0-9ec7-6dfaabcbe372",
+            "sourceColumn": "idcompetitions",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3912955e-71c5-434e-80a2-e37b2493823b",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "area",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "99d95a3b-afc8-453b-a8d9-797b45ab608e",
+            "sourceColumn": "area",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gender",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "b1308868-8850-4d9c-8bf6-a5ede8f62d01",
+            "sourceColumn": "gender",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "955b284b-87f8-49cc-bf21-fd5ea258796b",
+            "sourceColumn": "type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "format",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3af39a3a-d753-4bc3-8c80-472f18c556d6",
+            "sourceColumn": "format",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "divisionLevel",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "d5d262b2-61fc-4250-814c-5d8da667a725",
+            "sourceColumn": "divisionLevel",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "9adb41f3-c8f5-438b-9efa-98720623064d",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "cb5da969-21ef-48cc-a886-7ed70e341164",
+        "partitions": [
+          {
+            "name": "scouting competition",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_competition = Origem{[Schema=\"scouting\",Item=\"competition\"]}[Data]",
+                "in",
+                "    scouting_competition"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting competition_season",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navegação"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idcompetition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "49f8946a-6be8-4e3c-aa0d-7902d3d44450",
+            "sourceColumn": "idcompetition_season",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "startDate",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8959dc9d-1d65-4ddc-ab89-056be0327d41",
+            "sourceColumn": "startDate",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "endDate",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8a8b897f-85a6-42a5-bdbf-e2088efdfe4e",
+            "sourceColumn": "endDate",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "45962242-a33b-4943-84fa-9a4bfda93522",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "competition",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "121fbe06-7eac-4a4a-b276-d8e824a5ef2c",
+            "sourceColumn": "competition",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "icon",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataCategory": "ImageUrl",
+            "dataType": "string",
+            "lineageTag": "fb039d06-0dfb-4fd0-b97b-55797ad0f52f",
+            "sourceColumn": "icon",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Época",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "bc8d73ee-bcbe-4bb3-a6e5-5a565b3e888a",
+            "sourceColumn": "Época",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "562cfb4c-c5f4-4585-84aa-14ae8dd1994b",
+        "partitions": [
+          {
+            "name": "scouting competition_season",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_competition_season = Origem{[Schema=\"scouting\",Item=\"competition_season\"]}[Data],",
+                "    #\"Ano Extraído\" = Table.TransformColumns(scouting_competition_season,{{\"startDate\", Date.Year, Int64.Type}, {\"endDate\", Date.Year, Int64.Type}}),",
+                "    #\"Intervalo Inserido\" = Table.AddColumn(#\"Ano Extraído\", \"Intervalo\", each let rangeSize = 1, offset = 0, inclusive = false, rangeIndex = Number.RoundDown(([startDate] - offset) / rangeSize) in Text.From(rangeIndex * rangeSize + offset, \"pt-PT\") & \"/\" & Text.From((rangeIndex + 1) * rangeSize + offset - (if inclusive then 1 else 0), \"pt-PT\"), type text),",
+                "    #\"Colunas com Nome Mudado\" = Table.RenameColumns(#\"Intervalo Inserido\",{{\"Intervalo\", \"Época\"}})",
+                "in",
+                "    #\"Colunas com Nome Mudado\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting match",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idmatch",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "5189d1f6-36b5-4991-8ffb-514cc3bdf1e2",
+            "sourceColumn": "idmatch",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "competition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "d9a0d9a1-7f4c-469f-b1f1-324549ab15a0",
+            "sourceColumn": "competition_season",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "home_team",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "b95b6338-3697-4b1f-8aaf-50fdc6072089",
+            "sourceColumn": "home_team",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "away_team",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6d53fa3b-8a9f-484f-9020-1b745e7abb7c",
+            "sourceColumn": "away_team",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "home_score",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "8783941e-7907-4683-876b-315fbc4fdc3b",
+            "sourceColumn": "home_score",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "away_score",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "72b05961-7b43-4bfd-b4dc-b3d41beec569",
+            "sourceColumn": "away_score",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "winner",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "084040c4-937b-496f-a884-3c4750b25317",
+            "sourceColumn": "winner",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Data",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "c0b49320-58ec-4dfc-8c41-50b33ecd8c94",
+            "sourceColumn": "Data",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variação",
+                "defaultHierarchy": {
+                  "hierarchy": "Hierarquia de Datas",
+                  "table": "LocalDateTable_aa539c90-ca40-40ab-9389-b370914d217e"
+                },
+                "isDefault": true,
+                "relationship": "3f30bf27-2786-472e-a628-6ca61872c731"
+              }
+            ]
+          },
+          {
+            "name": "Hora",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Time"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Time",
+            "lineageTag": "b075717d-d3d6-4281-946c-5da783391ec0",
+            "sourceColumn": "Hora",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "7da38cd7-5020-4f10-96c2-7cf215bb3b2d",
+        "measures": [
+          {
+            "name": "Vencedor",
+            "expression": [
+              "",
+              "VAR winner = SELECTEDVALUE('scouting match'[winner])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting team'[name]),",
+              "        'scouting team'[idteam] = winner",
+              "    )",
+              ""
+            ],
+            "lineageTag": "e96b875f-391a-4b8a-b4c7-eb998d036986"
+          },
+          {
+            "name": "Visitado",
+            "expression": [
+              "",
+              "VAR HomeTeamID = SELECTEDVALUE('scouting match'[home_team])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting team'[name]),",
+              "        'scouting team'[idteam] = HomeTeamID",
+              "    )",
+              ""
+            ],
+            "lineageTag": "35c0abb7-7e27-4673-ad52-d2489b6dc1ef"
+          },
+          {
+            "name": "Visitante",
+            "expression": [
+              "",
+              "VAR AwayTeamID = SELECTEDVALUE('scouting match'[away_team])",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting team'[name]),",
+              "        'scouting team'[idteam] = AwayTeamID",
+              "    )",
+              ""
+            ],
+            "lineageTag": "9b63ee1e-5da7-465c-8688-3e9e21314b74"
+          },
+          {
+            "name": "IconVisitado",
+            "dataCategory": "ImageUrl",
+            "expression": [
+              "",
+              "VAR HomeTeam = 'scouting match'[Visitado]",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting team'[icon]),",
+              "        'scouting team'[name] = HomeTeam",
+              "    )"
+            ],
+            "lineageTag": "ec7e5f70-5ebd-467d-836f-2b8842dbf7d7"
+          },
+          {
+            "name": "IconVisitante",
+            "dataCategory": "ImageUrl",
+            "expression": [
+              "",
+              "VAR HomeTeam = 'scouting match'[Visitante]",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting team'[icon]),",
+              "        'scouting team'[name] = HomeTeam",
+              "    )"
+            ],
+            "lineageTag": "4bed84a2-961a-448b-b0e8-768b859417f1"
+          },
+          {
+            "name": "NomeCompeticao",
+            "expression": [
+              "",
+              "VAR CompetitionSeasonID = SELECTEDVALUE('scouting match'[competition_season])  ",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting competition'[name]), ",
+              "        FILTER('scouting competition_season', 'scouting competition_season'[idcompetition_season] = CompetitionSeasonID)",
+              "    )",
+              ""
+            ],
+            "lineageTag": "c5205bae-c3db-4b98-8f59-9a0966f2f98a"
+          },
+          {
+            "name": "Pais",
+            "expression": [
+              "",
+              "VAR CompetitionSeasonID = SELECTEDVALUE('scouting match'[competition_season])  ",
+              "VAR AreaID = ",
+              "    CALCULATE(",
+              "        VALUES('scouting competition'[area]), ",
+              "        FILTER('scouting competition_season', 'scouting competition_season'[idcompetition_season] = CompetitionSeasonID)",
+              "    )",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[name]),  -- Substitua 'area' e 'nome' pelos nomes corretos da tabela e da coluna.",
+              "        'scouting area'[idareas] = AreaID",
+              "    )",
+              ""
+            ],
+            "lineageTag": "7c6ec512-76c0-4a61-b493-65c6f07da784"
+          },
+          {
+            "name": "Flag",
+            "dataCategory": "ImageUrl",
+            "expression": [
+              "",
+              "VAR CompetitionSeasonID = SELECTEDVALUE('scouting match'[competition_season])  ",
+              "VAR AreaID = ",
+              "    CALCULATE(",
+              "        VALUES('scouting competition'[area]), ",
+              "        FILTER('scouting competition_season', 'scouting competition_season'[idcompetition_season] = CompetitionSeasonID)",
+              "    )",
+              "RETURN",
+              "    CALCULATE(",
+              "        VALUES('scouting area'[Flag]),  -- Substitua 'area' e 'nome' pelos nomes corretos da tabela e da coluna.",
+              "        'scouting area'[idareas] = AreaID",
+              "    )"
+            ],
+            "lineageTag": "5f54138d-af35-4872-81b9-6cc84b7b602a"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "scouting match",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_match = Origem{[Schema=\"scouting\",Item=\"match\"]}[Data],",
+                "    #\"Data Inserida\" = Table.AddColumn(scouting_match, \"Data\", each DateTime.Date([date]), type date),",
+                "    #\"Tempo Inserido\" = Table.AddColumn(#\"Data Inserida\", \"Hora\", each DateTime.Time([date]), type time),",
+                "    #\"Colunas Removidas\" = Table.RemoveColumns(#\"Tempo Inserido\",{\"date\"})",
+                "in",
+                "    #\"Colunas Removidas\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting player",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idplayer",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "a3f8852b-fec2-48de-abaf-e7ca67cdf3d5",
+            "sourceColumn": "idplayer",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5a664978-787a-4e5b-a6c3-a4b7616c9db0",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "short_name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "b11c75c7-f601-429f-b345-d95ea5d55892",
+            "sourceColumn": "short_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "birth_area",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "2af1ce96-e63d-445a-b0ea-53967136f8e1",
+            "sourceColumn": "birth_area",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "birth_date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "d08910af-bd5d-44c2-b95f-a87944b51226",
+            "sourceColumn": "birth_date",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variação",
+                "defaultHierarchy": {
+                  "hierarchy": "Hierarquia de Datas",
+                  "table": "LocalDateTable_3de59755-4765-4eb4-89ef-68b2779699d0"
+                },
+                "isDefault": true,
+                "relationship": "8122fef1-ced5-4c18-b272-25db14fddafb"
+              }
+            ]
+          },
+          {
+            "name": "image",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataCategory": "ImageUrl",
+            "dataType": "string",
+            "lineageTag": "ecb11969-bca4-45d9-87a0-272df6adb68d",
+            "sourceColumn": "image",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "foot",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "518862c3-462a-425f-81d5-3fb300db26ba",
+            "sourceColumn": "foot",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "height",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "06620a5e-d39f-4f91-9959-09200cf2e4ff",
+            "sourceColumn": "height",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "weight",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6e0f50da-f1c3-4281-b810-ee08ec8c12c3",
+            "sourceColumn": "weight",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "status",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "d85bb594-52e8-4909-bcda-b5cefdf9d00a",
+            "sourceColumn": "status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gender",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "00a09ae8-2c05-4c25-8c0a-4bc23861870c",
+            "sourceColumn": "gender",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "role_code2",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "3d69de59-c04a-41ac-af54-f79705d2b1de",
+            "sourceColumn": "role_code2",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "role_code3",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "fe63a85d-bfb4-4e1b-956e-b428aafbf61c",
+            "sourceColumn": "role_code3",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "role_name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "b3f031d0-a875-452c-a640-286d17fa62bb",
+            "sourceColumn": "role_name",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "7041f5d0-027c-486e-a168-b8a30df83f54",
+        "partitions": [
+          {
+            "name": "scouting player",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_player = Origem{[Schema=\"scouting\",Item=\"player\"]}[Data]",
+                "in",
+                "    scouting_player"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_3de59755-4765-4eb4-89ef-68b2779699d0",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "b06376d7-a35f-4f56-aa37-626adbe7f9ab",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Ano",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "d23c320a-fbe0-47c6-a05d-2ad25bd98f1b",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "8392c8c6-98e8-460a-86fa-00123f6c28bc",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Mês",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "4b79eed0-2034-4a89-b2ca-29703e6e8f44",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "636848bd-5f94-4045-b35f-b84e9dc32389",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Trimestre",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Tri \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "6de309a3-676b-4a11-88de-bf0ae9db9739",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dia",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "1306bcf4-1d5f-4dc2-871f-0b469cfb2e4a",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarquia de Datas",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Ano",
+                "column": "Ano",
+                "lineageTag": "2f3146b6-2647-485e-9a6b-5f48bcb274c5",
+                "ordinal": 0
+              },
+              {
+                "name": "Trimestre",
+                "column": "Trimestre",
+                "lineageTag": "581a53e4-b49d-4288-8504-6eac493c4c27",
+                "ordinal": 1
+              },
+              {
+                "name": "Mês",
+                "column": "Mês",
+                "lineageTag": "d417cdee-d326-4559-b61a-89eeb4ef73ea",
+                "ordinal": 2
+              },
+              {
+                "name": "Dia",
+                "column": "Dia",
+                "lineageTag": "e5f4b50e-6f47-405b-a087-2db93345f600",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "932183e0-4e03-40ca-8507-6a5ec484cbbf"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "62d5c03e-0bce-4efc-b226-d63deda06aff",
+        "partitions": [
+          {
+            "name": "LocalDateTable_3de59755-4765-4eb4-89ef-68b2779699d0",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('scouting player'[birth_date])), 1, 1), Date(Year(MAX('scouting player'[birth_date])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "scouting player_match_stats",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idplayer_match_stats",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "7fb8a6bb-bf5b-475f-9d4c-ca0102f838c9",
+            "sourceColumn": "idplayer_match_stats",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "match",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "f307753d-87d0-4119-8d6f-bb2aca61db94",
+            "sourceColumn": "match",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "player",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "9eb00bca-e15f-4bbe-bdb9-5fa20de9d693",
+            "sourceColumn": "player",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "offensiveDuels",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "2c51b3b9-a2ba-4cbe-97dc-bcbcd1a70366",
+            "sourceColumn": "offensiveDuels",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "progressivePasses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "ce77ff40-c468-4637-8a67-5a6732aa56d4",
+            "sourceColumn": "progressivePasses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "forwardPasses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "4726f7ad-121f-4278-bf68-37ea93527be8",
+            "sourceColumn": "forwardPasses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "crosses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "42d6746d-0348-493e-bd19-21b540e4ca37",
+            "sourceColumn": "crosses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "keyPasses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "3ae01c98-616d-4097-ba1a-52a0c0e18c34",
+            "sourceColumn": "keyPasses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "defensiveDuels",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "134a764c-2af9-428f-8205-959b9d62b4b7",
+            "sourceColumn": "defensiveDuels",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "interceptions",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "a224b9ba-6cb2-4696-b08a-4be0dc2dab5e",
+            "sourceColumn": "interceptions",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "recoveries",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "1cc43616-f297-40b0-bd9d-e825beb40cbc",
+            "sourceColumn": "recoveries",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "successfulPasses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "79a9b929-c5fb-415d-b7b6-2cb448bbdeae",
+            "sourceColumn": "successfulPasses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "longPasses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "1ee7622e-90db-4d21-b7f6-01c8899ace47",
+            "sourceColumn": "longPasses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "aerialDuels",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "6bd74aa8-a72d-45ae-94cf-7016e4edd135",
+            "sourceColumn": "aerialDuels",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "losses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "91359ce4-f88c-46bc-8568-ed553593db98",
+            "sourceColumn": "losses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "ownHalfLosses",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "56538825-8121-4c18-85b6-d743e6f3fd4b",
+            "sourceColumn": "ownHalfLosses",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "opponentHalfRecoveries",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "bc25c6ec-15d4-4246-be1b-d15b1484156b",
+            "sourceColumn": "opponentHalfRecoveries",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "goalKicks",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "5950079c-2141-4da9-b65f-d0a1b8787e60",
+            "sourceColumn": "goalKicks",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "receivedPass",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "fb941557-9456-4302-af0e-70e6fe9fa40d",
+            "sourceColumn": "receivedPass",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "dribbles",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "26c32987-fc5e-40a2-a4c7-c475fcf8c5f1",
+            "sourceColumn": "dribbles",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "touchInBox",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "11d73a57-5781-4d27-9da6-9468089d95e5",
+            "sourceColumn": "touchInBox",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "ae5c634f-88f3-4477-97e9-aff0f80a3393",
+        "partitions": [
+          {
+            "name": "scouting player_match_stats",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_player_match_stats = Origem{[Schema=\"scouting\",Item=\"player_match_stats\"]}[Data]",
+                "in",
+                "    scouting_player_match_stats"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting player_positions",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "player",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "4a8b0746-bddc-4a44-933c-e1b17f73ffc9",
+            "sourceColumn": "player",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "percent",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "d87b40e1-2d0a-4a7f-893f-a8eb4ae413d5",
+            "sourceColumn": "percent",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "code",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "882e3d6f-cbd9-406d-a13d-8d86f9c747c3",
+            "sourceColumn": "code",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "ffd40bdb-b918-442a-8586-6c5e924cc2fd",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "team_competition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "80562775-30ff-467d-9879-90263d6beefa",
+            "sourceColumn": "team_competition_season",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "ce2d1a29-9e76-4534-bebb-e993683825a3",
+        "partitions": [
+          {
+            "name": "scouting player_positions",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_player_positions = Origem{[Schema=\"scouting\",Item=\"player_positions\"]}[Data]",
+                "in",
+                "    scouting_player_positions"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting team",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idteam",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "d11343e1-1746-4203-a0c6-a4e1d8f6cced",
+            "sourceColumn": "idteam",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "5e9dc3dc-fbdc-43dd-a980-11c954687be7",
+            "sourceColumn": "name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "official_name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "49b42c07-f405-4d23-9d26-b2781d035b77",
+            "sourceColumn": "official_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "icon",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataCategory": "ImageUrl",
+            "dataType": "string",
+            "lineageTag": "052b59c5-c20b-47e1-ae2c-d8a3508816ca",
+            "sourceColumn": "icon",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gender",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "d750a802-3196-428a-a002-f5a2a093e365",
+            "sourceColumn": "gender",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "type",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "c01ce026-8a85-4a90-a11f-dc1698a8c3f5",
+            "sourceColumn": "type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "city",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "b669b725-e072-472e-b22c-ca43a196c600",
+            "sourceColumn": "city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "category",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "64bc8c52-fffb-4c1d-9285-1a8d6e6fa213",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "area",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "09a25fea-bccb-4bff-8397-85a125560eb3",
+            "sourceColumn": "area",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "d4329998-af8d-44e1-b84e-7b3984b0d38d",
+        "partitions": [
+          {
+            "name": "scouting team",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_team = Origem{[Schema=\"scouting\",Item=\"team\"]}[Data]",
+                "in",
+                "    scouting_team"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "scouting team_competition_season",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "idteam_competition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "4a74b987-8e25-4040-866a-d946c1953cf9",
+            "sourceColumn": "idteam_competition_season",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "competition_season",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "000d0d40-ab30-4dfd-a3bc-a8a615e9bd9c",
+            "sourceColumn": "competition_season",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "team",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "0323d730-de8e-4c9b-9c68-6cf1bd7cd94a",
+            "sourceColumn": "team",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "232d3e3d-2950-4266-8916-06590791f6b0",
+        "partitions": [
+          {
+            "name": "scouting team_competition_season",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origem = MySQL.Database(\"scouting-prov.mysql.database.azure.com\", \"scouting\", [ReturnSingleDatabase=true]),",
+                "    scouting_team_competition_season = Origem{[Schema=\"scouting\",Item=\"team_competition_season\"]}[Data]",
+                "in",
+                "    scouting_team_competition_season"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_aa539c90-ca40-40ab-9389-b370914d217e",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "27aad330-8acb-4b76-980e-933c48e150d2",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Ano",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "ba0c18ca-c073-4d64-a37e-6022e234cc14",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "e4a267dc-42d2-4501-9a54-8717a11cc7a5",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Mês",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "8e9103ac-b131-4168-a22f-7f8023445ee7",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "70e625f3-9a96-434b-b076-d72ccbaa02fc",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Trimestre",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Tri \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "74ff7592-8ad5-464b-a1db-05d2e2dfb18d",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Dia",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "51ff5c4c-a105-4d40-9a45-c39ab9e8be38",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Hierarquia de Datas",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Ano",
+                "column": "Ano",
+                "lineageTag": "0a3919ad-6eac-4b93-a70f-90a05ec38aa0",
+                "ordinal": 0
+              },
+              {
+                "name": "Trimestre",
+                "column": "Trimestre",
+                "lineageTag": "2f35ba9a-2221-4cf3-8e6e-aa81b91470d1",
+                "ordinal": 1
+              },
+              {
+                "name": "Mês",
+                "column": "Mês",
+                "lineageTag": "ff5184be-9865-4117-9c9b-be89e4ca2e44",
+                "ordinal": 2
+              },
+              {
+                "name": "Dia",
+                "column": "Dia",
+                "lineageTag": "6d78a162-f88f-4e9d-a692-0350f49237ff",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "3f3c487a-5b2e-40ef-accd-0c751d73e798"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "863161fc-07b9-4702-b0aa-2e2b2295d8f7",
+        "partitions": [
+          {
+            "name": "LocalDateTable_aa539c90-ca40-40ab-9389-b370914d217e",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('scouting match'[Data])), 1, 1), Date(Year(MAX('scouting match'[Data])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      }
+    ]
+  }
+}

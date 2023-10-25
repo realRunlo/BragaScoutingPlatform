@@ -1,0 +1,142 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 1700.7490653973102,
+        "y": 329.33943468891005
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 2457.5107976572481,
+            "y": 599.98142540405672
+          },
+          "nodeIndex": "scouting area",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2011.915574402854,
+            "y": 74.006964444998516
+          },
+          "nodeIndex": "scouting carrer_entry",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2744.6306388900066,
+            "y": 385.60693420767495
+          },
+          "nodeIndex": "scouting competition",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3031.701032485053,
+            "y": 295.18457228786758
+          },
+          "nodeIndex": "scouting competition_season",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2282.2202313439375,
+            "y": 960.96336322027366
+          },
+          "nodeIndex": "scouting match",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2083.5105277725756,
+            "y": 253.64931916116427
+          },
+          "nodeIndex": "scouting player",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2022.0895850677362,
+            "y": 607.40569670654679
+          },
+          "nodeIndex": "scouting player_match_stats",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1796.7970073539364,
+            "y": 356.42328392401487
+          },
+          "nodeIndex": "scouting player_positions",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2567.7470001011457,
+            "y": 803.79746733894331
+          },
+          "nodeIndex": "scouting team",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2700.6801224228743,
+            "y": 1152.7632518642431
+          },
+          "nodeIndex": "scouting team_competition_season",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas as tabelas",
+      "zoomValue": 79.553182037699784,
+      "pinKeyFieldsToTop": true,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas as tabelas",
+  "defaultDiagram": "Todas as tabelas"
+}

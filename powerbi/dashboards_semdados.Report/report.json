@@ -1,0 +1,749 @@
+{
+  "config": "{\"version\":\"5.48\",\"themeCollection\":{\"baseTheme\":{\"name\":\"CY23SU08\",\"version\":\"5.48\",\"type\":2},\"customTheme\":{\"name\":\"AccessibleNeutral\",\"version\":\"5.48\",\"type\":2}},\"activeSectionIndex\":6,\"defaultDrillFilterOtherVisuals\":true,\"slowDataSourceSettings\":{\"isCrossHighlightingDisabled\":false,\"isSlicerSelectionsButtonEnabled\":false,\"isFilterSelectionsButtonEnabled\":false,\"isFieldWellButtonEnabled\":false,\"isApplyAllButtonEnabled\":false},\"linguisticSchemaSyncVersion\":2,\"settings\":{\"useNewFilterPaneExperience\":true,\"allowChangeFilterTypes\":true,\"useStylableVisualContainerHeader\":true,\"queryLimitOption\":6,\"exportDataMode\":1,\"useDefaultAggregateDisplayName\":true},\"objects\":{\"section\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Top'\"}}}}}],\"outspacePane\":[{\"properties\":{\"expanded\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}",
+  "layoutOptimization": 0,
+  "pods": [
+    {
+      "boundSection": "ReportSection",
+      "config": "{}",
+      "name": "Pod"
+    },
+    {
+      "boundSection": "ReportSectiona996e5a3c77af68cfd00",
+      "config": "{}",
+      "name": "Pod1"
+    },
+    {
+      "boundSection": "ReportSection1c2cad51421d685b884c",
+      "config": "{}",
+      "name": "Pod2"
+    },
+    {
+      "boundSection": "ReportSection93c623cc0c2d5a0c9f92",
+      "config": "{}",
+      "name": "Pod3",
+      "parameters": "[{\"name\":\"Param_Filterfabdb82a01966f824c64\",\"boundFilter\":\"Filterfabdb82a01966f824c64\",\"fieldExpr\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting match\"}},\"Property\":\"Visitado\"}}},{\"name\":\"Param_Filterbc326c9790fa1157b8b8\",\"boundFilter\":\"Filterbc326c9790fa1157b8b8\",\"fieldExpr\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting match\"}},\"Property\":\"Visitante\"}}}]",
+      "type": 1
+    }
+  ],
+  "publicCustomVisuals": [
+    "ChicletSlicer1448559807354",
+    "ImageGrid_FC5183B9_926C_45E0_B5F7_0CE9EAF1DA9B",
+    "PBI_CV_81BBAD08_3ADD_466C_8819_9FACA21A6B8F",
+    "PBI_CV_885EF3C3_31C1_4745_B2B9_20771D5AD196",
+    "simpleImageEBC4593F96F1425FB3D84C5BF02B5075",
+    "textSearchSlicerF85E2E78BE4A4D7D9F99ED75B5D71C85"
+  ],
+  "resourcePackages": [
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "items": [
+          {
+            "name": "150px-Sporting_Clube_Braga7564522872254535.png",
+            "path": "150px-Sporting_Clube_Braga7564522872254535.png",
+            "type": 100
+          },
+          {
+            "name": "transferir0513011263030998.jpeg",
+            "path": "transferir0513011263030998.jpeg",
+            "type": 100
+          },
+          {
+            "name": "transferir14617343833411534.jpeg",
+            "path": "transferir14617343833411534.jpeg",
+            "type": 100
+          },
+          {
+            "name": "transferir39144861419550936.jpeg",
+            "path": "transferir39144861419550936.jpeg",
+            "type": 100
+          },
+          {
+            "name": "transferir4475166358346476.jpeg",
+            "path": "transferir4475166358346476.jpeg",
+            "type": 100
+          },
+          {
+            "name": "transferir6532364538933713.jpeg",
+            "path": "transferir6532364538933713.jpeg",
+            "type": 100
+          }
+        ],
+        "name": "RegisteredResources",
+        "type": 1
+      }
+    },
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "items": [
+          {
+            "name": "AccessibleNeutral",
+            "path": "BuiltInThemes/AccessibleNeutral.json",
+            "type": 201
+          },
+          {
+            "name": "CY23SU08",
+            "path": "BaseThemes/CY23SU08.json",
+            "type": 202
+          }
+        ],
+        "name": "SharedResources",
+        "type": 2
+      }
+    }
+  ],
+  "sections": [
+    {
+      "config": "{\"objects\":{\"outspace\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir0513011263030998.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}],\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}]}}",
+      "displayName": "Jogador",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSection",
+      "ordinal": 1,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"21a1f310a33db656b4ae\",\"layouts\":[{\"id\":0,\"position\":{\"x\":887.0667782426779,\"y\":39.76033472803347,\"z\":0,\"width\":353.72987447698745,\"height\":190.57539748953974,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.name\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting player.name\",\"NativeReferenceName\":\"name\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Basic'\"}}}}}],\"general\":[{\"properties\":{\"selfFilterEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"outlineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":0,\"Percent\":0}}}}},\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'Ricardo Jorge  Luz Horta'\"}}]]}}}]}},\"selfFilter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Where\":[{\"Condition\":{\"Contains\":{\"Left\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"}},\"Right\":{\"Literal\":{\"Value\":\"'Horta'\"}}}},\"Annotations\":{\"PowerBI.MParameterBehavior\":1}}]}}}}],\"selection\":[{\"properties\":{\"singleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"strictSingleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"header\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Jogadores'\"}}},\"showRestatement\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"outlineStyle\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"background\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":0,\"Percent\":0}}}}},\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"pendingChangesIcon\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"items\":[{\"properties\":{\"outlineStyle\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"background\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":0,\"Percent\":0}}}}}}}]}}}",
+          "filters": "[]",
+          "height": 190.58,
+          "width": 353.73,
+          "x": 887.07,
+          "y": 39.76,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"2cca53d528b66d94750c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":170.55027100757385,\"y\":49.98887253670268,\"z\":7000,\"width\":97.03722315948167,\"height\":74.98330880505402,\"tabOrder\":7000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.role_name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_name\"},\"Name\":\"scouting player.role_name\",\"NativeReferenceName\":\"role_name\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_name\"}}}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 74.98,
+          "width": 97.04,
+          "x": 170.55,
+          "y": 49.99,
+          "z": 7000.00
+        },
+        {
+          "config": "{\"name\":\"467fc95bdfd49571c468\",\"layouts\":[{\"id\":0,\"position\":{\"x\":170.55027100757385,\"y\":124.9721813417567,\"z\":5000,\"width\":97.03722315948167,\"height\":67.6320040202448,\"tabOrder\":5000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.role_code2\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_code2\"},\"Name\":\"scouting player.role_code2\",\"NativeReferenceName\":\"role_code2\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_code2\"}}}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 67.63,
+          "width": 97.04,
+          "x": 170.55,
+          "y": 124.97,
+          "z": 5000.00
+        },
+        {
+          "config": "{\"name\":\"7455003ee924190d7cae\",\"layouts\":[{\"id\":0,\"position\":{\"x\":419.0243727341254,\"y\":49.98887253670268,\"z\":11000,\"width\":79.39409167593955,\"height\":74.98330880505402,\"tabOrder\":11000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.gender\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"gender\"},\"Name\":\"scouting player.gender\",\"NativeReferenceName\":\"gender\"}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 74.98,
+          "width": 79.39,
+          "x": 419.02,
+          "y": 49.99,
+          "z": 11000.00
+        },
+        {
+          "config": "{\"name\":\"74e51c58fac6c2c5fa1e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":17.643131483542124,\"y\":198.48522918984887,\"z\":8000,\"width\":138.2045299544133,\"height\":64.69148210632112,\"tabOrder\":8000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.short_name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"short_name\"},\"Name\":\"scouting player.short_name\",\"NativeReferenceName\":\"short_name\"}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 64.69,
+          "width": 138.20,
+          "x": 17.64,
+          "y": 198.49,
+          "z": 8000.00
+        },
+        {
+          "config": "{\"name\":\"96e4b3928afb1a129d8e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":625.445576874252,\"y\":285.23883790939755,\"z\":13000,\"width\":615.0462442421385,\"height\":435.28635160132023,\"tabOrder\":13000}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Y\":[{\"queryRef\":\"Sum(scouting player_match_stats.crosses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.dribbles)\"},{\"queryRef\":\"Sum(scouting player_match_stats.forwardPasses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.goalKicks)\"},{\"queryRef\":\"Sum(scouting player_match_stats.keyPasses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.longPasses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.offensiveDuels)\"},{\"queryRef\":\"Sum(scouting player_match_stats.opponentHalfRecoveries)\"},{\"queryRef\":\"Sum(scouting player_match_stats.progressivePasses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.receivedPass)\"},{\"queryRef\":\"Sum(scouting player_match_stats.successfulPasses)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player_match_stats\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"crosses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.crosses)\",\"NativeReferenceName\":\"Soma de crosses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"dribbles\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.dribbles)\",\"NativeReferenceName\":\"Soma de dribbles\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"forwardPasses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.forwardPasses)\",\"NativeReferenceName\":\"Soma de forwardPasses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"goalKicks\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.goalKicks)\",\"NativeReferenceName\":\"Soma de goalKicks\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"keyPasses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.keyPasses)\",\"NativeReferenceName\":\"Soma de keyPasses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"longPasses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.longPasses)\",\"NativeReferenceName\":\"Soma de longPasses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"offensiveDuels\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.offensiveDuels)\",\"NativeReferenceName\":\"Soma de offensiveDuels\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"opponentHalfRecoveries\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.opponentHalfRecoveries)\",\"NativeReferenceName\":\"Soma de opponentHalfRecoveries\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"progressivePasses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.progressivePasses)\",\"NativeReferenceName\":\"Soma de progressivePasses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"receivedPass\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.receivedPass)\",\"NativeReferenceName\":\"Soma de receivedPass\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"successfulPasses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.successfulPasses)\",\"NativeReferenceName\":\"Soma de successfulPasses\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"crosses\"}},\"Function\":0}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true,\"objects\":{\"legend\":[{\"properties\":{\"position\":{\"expr\":{\"Literal\":{\"Value\":\"'Left'\"}}}}}],\"valueAxis\":[{\"properties\":{\"showAxisTitle\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"labels\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"labelOrientation\":{\"expr\":{\"Literal\":{\"Value\":\"1D\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 435.29,
+          "width": 615.05,
+          "x": 625.45,
+          "y": 285.24,
+          "z": 13000.00
+        },
+        {
+          "config": "{\"name\":\"9765e85cca80c2aecfea\",\"layouts\":[{\"id\":0,\"position\":{\"x\":17.643131483542124,\"y\":49.98887253670268,\"z\":1000,\"width\":138.2045299544133,\"height\":142.61531282529882,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"simpleImageEBC4593F96F1425FB3D84C5BF02B5075\",\"projections\":{\"imageURL\":[{\"queryRef\":\"scouting player.image\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"},\"Name\":\"scouting player.image\",\"NativeReferenceName\":\"image\"}]},\"drillFilterOtherVisuals\":true}}",
+          "filters": "[]",
+          "height": 142.62,
+          "width": 138.20,
+          "x": 17.64,
+          "y": 49.99,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"a94d8ae58f0ce33bb374\",\"layouts\":[{\"id\":0,\"position\":{\"x\":283.7603646936358,\"y\":149.96661761010805,\"z\":10000,\"width\":217.59862163035285,\"height\":113.21009368606195,\"tabOrder\":9000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting area.País (Jogador)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting area\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"País (Jogador)\"},\"Name\":\"scouting area.País (Jogador)\",\"NativeReferenceName\":\"País (Jogador)\"}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 113.21,
+          "width": 217.60,
+          "x": 283.76,
+          "y": 149.97,
+          "z": 10000.00
+        },
+        {
+          "config": "{\"name\":\"c731cff211774b4244db\",\"layouts\":[{\"id\":0,\"position\":{\"x\":283.7603646936358,\"y\":49.98887253670268,\"z\":2000,\"width\":79.39409167593955,\"height\":74.98330880505402,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.foot\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"foot\"},\"Name\":\"scouting player.foot\",\"NativeReferenceName\":\"foot\"}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 74.98,
+          "width": 79.39,
+          "x": 283.76,
+          "y": 49.99,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"d1fb844727a0c0ac312e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":625.0746268656716,\"y\":183.5820895522388,\"z\":14000,\"width\":62.6865671641791,\"height\":82.38805970149254,\"tabOrder\":14000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting area.FlagJogador\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting area\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"FlagJogador\"},\"Name\":\"scouting area.FlagJogador\",\"NativeReferenceName\":\" \"}]},\"autoSelectVisualType\":false,\"columnProperties\":{\"scouting area.FlagJogador\":{\"displayName\":\" \"}},\"drillFilterOtherVisuals\":true,\"objects\":{\"columnHeaders\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"8D\"}}}}}],\"grid\":[{\"properties\":{\"imageWidth\":{\"expr\":{\"Literal\":{\"Value\":\"50D\"}}},\"imageHeight\":{\"expr\":{\"Literal\":{\"Value\":\"50D\"}}},\"gridHorizontal\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"gridVertical\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"outlineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":0,\"Percent\":0}}}}}}}],\"columnWidth\":[{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"57.37313018662658D\"}}}},\"selector\":{\"metadata\":\"scouting area.FlagJogador\"}}]},\"vcObjects\":{\"padding\":[{\"properties\":{\"top\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"right\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"left\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"bottom\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 82.39,
+          "width": 62.69,
+          "x": 625.07,
+          "y": 183.58,
+          "z": 14000.00
+        },
+        {
+          "config": "{\"name\":\"d255d06c2fb87409d4ac\",\"layouts\":[{\"id\":0,\"position\":{\"x\":170.55027100757385,\"y\":192.6041853620015,\"z\":6000,\"width\":97.03722315948167,\"height\":70.5725259341685,\"tabOrder\":6000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.role_code3\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_code3\"},\"Name\":\"scouting player.role_code3\",\"NativeReferenceName\":\"role_code3\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"role_code3\"}}}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 70.57,
+          "width": 97.04,
+          "x": 170.55,
+          "y": 192.60,
+          "z": 6000.00
+        },
+        {
+          "config": "{\"name\":\"d5a5748597b213dc2035\",\"layouts\":[{\"id\":0,\"position\":{\"x\":518.47492805013,\"y\":160.26480514870346,\"z\":3000,\"width\":98.50748411644352,\"height\":105.85878890125274,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(scouting player.weight)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"weight\"}},\"Function\":0},\"Name\":\"Sum(scouting player.weight)\",\"NativeReferenceName\":\"Peso (Kg)\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"weight\"}},\"Function\":0}}}]},\"columnProperties\":{\"Sum(scouting player.weight)\":{\"displayName\":\"Peso (Kg)\"}},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 105.86,
+          "width": 98.51,
+          "x": 518.47,
+          "y": 160.26,
+          "z": 3000.00
+        },
+        {
+          "config": "{\"name\":\"d94b32243d6a59ad690d\",\"layouts\":[{\"id\":0,\"position\":{\"x\":518.47492805013,\"y\":49.99523337656521,\"z\":4000,\"width\":98.50748411644352,\"height\":99.97774507340536,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(scouting player.height)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"height\"}},\"Function\":0},\"Name\":\"Sum(scouting player.height)\",\"NativeReferenceName\":\"Soma de height\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"height\"}},\"Function\":0}}}]},\"columnProperties\":{\"Sum(scouting player.height)\":{\"displayName\":\"Altura (cm)\"}},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 99.98,
+          "width": 98.51,
+          "x": 518.47,
+          "y": 50.00,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"ee04a05af51b0cc8706d\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":9000,\"width\":100,\"height\":40,\"tabOrder\":10000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 9000.00
+        },
+        {
+          "config": "{\"name\":\"f6cea8746ba875925b40\",\"layouts\":[{\"id\":0,\"position\":{\"x\":17.827427369337347,\"y\":285.23883790939755,\"z\":12000,\"width\":598.704435820246,\"height\":435.28635160132023,\"tabOrder\":12000}}],\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Y\":[{\"queryRef\":\"Sum(scouting player_match_stats.aerialDuels)\"},{\"queryRef\":\"Sum(scouting player_match_stats.defensiveDuels)\"},{\"queryRef\":\"Sum(scouting player_match_stats.interceptions)\"},{\"queryRef\":\"Sum(scouting player_match_stats.ownHalfLosses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.losses)\"},{\"queryRef\":\"Sum(scouting player_match_stats.recoveries)\"},{\"queryRef\":\"Sum(scouting player_match_stats.touchInBox)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player_match_stats\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"aerialDuels\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.aerialDuels)\",\"NativeReferenceName\":\"Soma de aerialDuels\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"defensiveDuels\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.defensiveDuels)\",\"NativeReferenceName\":\"Soma de defensiveDuels\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"interceptions\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.interceptions)\",\"NativeReferenceName\":\"Soma de interceptions\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"ownHalfLosses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.ownHalfLosses)\",\"NativeReferenceName\":\"Soma de ownHalfLosses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"losses\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.losses)\",\"NativeReferenceName\":\"Soma de losses\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"recoveries\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.recoveries)\",\"NativeReferenceName\":\"Soma de recoveries\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"touchInBox\"}},\"Function\":0},\"Name\":\"Sum(scouting player_match_stats.touchInBox)\",\"NativeReferenceName\":\"Soma de touchInBox\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"aerialDuels\"}},\"Function\":0}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true,\"objects\":{\"legend\":[{\"properties\":{\"position\":{\"expr\":{\"Literal\":{\"Value\":\"'Left'\"}}},\"showGradientLegend\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"valueAxis\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"showAxisTitle\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"labels\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 435.29,
+          "width": 598.70,
+          "x": 17.83,
+          "y": 285.24,
+          "z": 12000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}],\"background\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir6532364538933713.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}]}}",
+      "displayName": "Competição",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSection1c2cad51421d685b884c",
+      "ordinal": 4,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"21515663deadf6618f5d\",\"layouts\":[{\"id\":0,\"position\":{\"x\":50.1188455008489,\"y\":152.8013582342954,\"z\":1000,\"width\":427.8438030560272,\"height\":524.4142614601019,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"TODO: \"}]},{\"textRuns\":[{\"value\":\"Adicionar Classificação da competição\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"\"}]}]}}]}}}",
+          "filters": "[]",
+          "height": 524.41,
+          "width": 427.84,
+          "x": 50.12,
+          "y": 152.80,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"585d4d572eed3fe4dd6c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":486.51952461799664,\"y\":152.8013582342954,\"z\":2000,\"width\":748.1154499151104,\"height\":253.03904923599322,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"TODO: \"}]},{\"textRuns\":[{\"value\":\"Adicionar ultimos 4-5 jogos jogados \"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"\"}]}]}}]}}}",
+          "filters": "[]",
+          "height": 253.04,
+          "width": 748.12,
+          "x": 486.52,
+          "y": 152.80,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"5a7622f78c1aaf9fd3e9\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":0,\"width\":100,\"height\":40,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"d7493f2b29af73be3f9e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":50.1188455008489,\"y\":69.6774193548387,\"z\":4000,\"width\":427.8438030560272,\"height\":72.12224108658744,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"TODO: \"}]},{\"textRuns\":[{\"value\":\"Adicionar Descrição da competição (Nome, país e divisão)\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"\"}]}]}}]}}}",
+          "filters": "[]",
+          "height": 72.12,
+          "width": 427.84,
+          "x": 50.12,
+          "y": 69.68,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"e691abdbd68dcb7b108a\",\"layouts\":[{\"id\":0,\"position\":{\"x\":486.51952461799664,\"y\":415.6196943972835,\"z\":3000,\"width\":748.1154499151104,\"height\":261.59592529711375,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"TODO: \"}]},{\"textRuns\":[{\"value\":\"Adicionar estatísticas da liga: melhores marcadores, mais assistências (jogadores), melhor rating na liga até ao momento (top 5???)\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"\"}]}]}}]}}}",
+          "filters": "[]",
+          "height": 261.60,
+          "width": 748.12,
+          "x": 486.52,
+          "y": 415.62,
+          "z": 3000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}],\"background\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir14617343833411534.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}]}}",
+      "displayName": "Equipa",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSection800294e7bd28fcdbe20b",
+      "ordinal": 2,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"26e665e28d6d216c10be\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1041.9949790794979,\"y\":10.96836820083682,\"z\":1000,\"width\":224.8515481171548,\"height\":579.9524686192468,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting team.name\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting team.name\",\"NativeReferenceName\":\"name\"}]},\"queryOptions\":{\"keepProjectionOrder\":true},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Basic'\"}}}}}],\"general\":[{\"properties\":{\"selfFilterEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'Sporting Braga'\"}}]]}}}]}}}}],\"selection\":[{\"properties\":{\"strictSingleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"header\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Equipas'\"}}},\"showRestatement\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]},\"vcObjects\":{\"general\":[{\"properties\":{\"keepLayerOrder\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"visualHeader\":[{\"properties\":{\"showSmartNarrativeButton\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 579.95,
+          "width": 224.85,
+          "x": 1041.99,
+          "y": 10.97,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"28730648f772bcca7ae0\",\"layouts\":[{\"id\":0,\"position\":{\"x\":296.14594142259415,\"y\":111.0547280334728,\"z\":3000,\"width\":170.00970711297072,\"height\":69.92334728033472,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting team.city\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"city\"},\"Name\":\"scouting team.city\",\"NativeReferenceName\":\"city\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 69.92,
+          "width": 170.01,
+          "x": 296.15,
+          "y": 111.05,
+          "z": 3000.00
+        },
+        {
+          "config": "{\"name\":\"3b26c2768cd1fa560d6a\",\"layouts\":[{\"id\":0,\"position\":{\"x\":13.232348612656592,\"y\":198.48522918984887,\"z\":8000,\"width\":335.2194981873003,\"height\":510.1805520657597,\"tabOrder\":8000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.image\"},{\"queryRef\":\"scouting player.name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting player.name\",\"NativeReferenceName\":\"name\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"},\"Name\":\"scouting player.image\",\"NativeReferenceName\":\"image\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"}}}]},\"drillFilterOtherVisuals\":true,\"filterSortOrder\":3,\"objects\":{\"values\":[{\"properties\":{},\"selector\":{\"data\":[{\"dataViewWildcard\":{\"matchingOption\":1}}],\"metadata\":\"scouting player.image\"}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[{\"name\":\"Filter24e8e352e7375639f4b5\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"image\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":0},{\"name\":\"Filter69b44730589f52ffef08\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"name\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":1}]",
+          "height": 510.18,
+          "width": 335.22,
+          "x": 13.23,
+          "y": 198.49,
+          "z": 8000.00
+        },
+        {
+          "config": "{\"name\":\"49a7c5dc93f73e16d80b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":296.14594142259415,\"y\":39.76033472803347,\"z\":5000,\"width\":170.00970711297072,\"height\":71.29439330543933,\"tabOrder\":5000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting area.País (Equipa)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting area\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"País (Equipa)\"},\"Name\":\"scouting area.País (Equipa)\",\"NativeReferenceName\":\"País (Equipa)\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"País (Equipa)\"}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"values\":[{\"properties\":{\"urlIcon\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 71.29,
+          "width": 170.01,
+          "x": 296.15,
+          "y": 39.76,
+          "z": 5000.00
+        },
+        {
+          "config": "{\"name\":\"5fb962695f035a97dbc7\",\"layouts\":[{\"id\":0,\"position\":{\"x\":146.70192468619246,\"y\":111.0547280334728,\"z\":6000,\"width\":82.26276150627615,\"height\":69.92334728033472,\"tabOrder\":6000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting team.gender\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"gender\"},\"Name\":\"scouting team.gender\",\"NativeReferenceName\":\"gender\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"gender\"}}}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 69.92,
+          "width": 82.26,
+          "x": 146.70,
+          "y": 111.05,
+          "z": 6000.00
+        },
+        {
+          "config": "{\"name\":\"713b37f7d3a70001b1d6\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":0,\"width\":100,\"height\":40,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"81b89e2a8825ea172a8c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":146.70192468619246,\"y\":39.76033472803347,\"z\":4000,\"width\":149.44401673640166,\"height\":71.29439330543933,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting team.official_name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"official_name\"},\"Name\":\"scouting team.official_name\",\"NativeReferenceName\":\"official_name\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"official_name\"}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"grid\":[{\"properties\":{}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 71.29,
+          "width": 149.44,
+          "x": 146.70,
+          "y": 39.76,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"b8b2dcb039309fc29da6\",\"layouts\":[{\"id\":0,\"position\":{\"x\":228.96468619246863,\"y\":111.0547280334728,\"z\":7000,\"width\":67.18125523012553,\"height\":69.92334728033472,\"tabOrder\":7000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting team.type\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"type\"},\"Name\":\"scouting team.type\",\"NativeReferenceName\":\"type\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"type\"}}}]},\"drillFilterOtherVisuals\":true,\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 69.92,
+          "width": 67.18,
+          "x": 228.96,
+          "y": 111.05,
+          "z": 7000.00
+        },
+        {
+          "config": "{\"name\":\"fdcbff7d84161b741e2a\",\"layouts\":[{\"id\":0,\"position\":{\"x\":13.710460251046024,\"y\":39.76033472803347,\"z\":2000,\"width\":132.99146443514644,\"height\":141.21774058577407,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"simpleImageEBC4593F96F1425FB3D84C5BF02B5075\",\"projections\":{\"imageURL\":[{\"queryRef\":\"scouting team.icon\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting team\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"icon\"},\"Name\":\"scouting team.icon\",\"NativeReferenceName\":\"icon\"}]},\"drillFilterOtherVisuals\":true}}",
+          "filters": "[]",
+          "height": 141.22,
+          "width": 132.99,
+          "x": 13.71,
+          "y": 39.76,
+          "z": 2000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"background\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir4475166358346476.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}],\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}]}}",
+      "displayName": "Jogo",
+      "displayOption": 1,
+      "filters": "[{\"name\":\"Filterfabdb82a01966f824c64\",\"expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting match\"}},\"Property\":\"Visitado\"}},\"type\":\"Categorical\",\"howCreated\":5},{\"name\":\"Filterbc326c9790fa1157b8b8\",\"expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting match\"}},\"Property\":\"Visitante\"}},\"type\":\"Categorical\",\"howCreated\":5}]",
+      "height": 720.00,
+      "name": "ReportSection93c623cc0c2d5a0c9f92",
+      "ordinal": 6,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"09ddc42bcb113b6bcc3b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":927.8098471986418,\"y\":173.5823429541596,\"z\":8000,\"width\":352.05432937181666,\"height\":510.9677419354839,\"tabOrder\":8000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.image\"},{\"queryRef\":\"scouting player.name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting player.name\",\"NativeReferenceName\":\"name\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"},\"Name\":\"scouting player.image\",\"NativeReferenceName\":\"image\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"}}}]},\"drillFilterOtherVisuals\":true,\"filterSortOrder\":3,\"objects\":{\"values\":[{\"properties\":{},\"selector\":{\"data\":[{\"dataViewWildcard\":{\"matchingOption\":1}}],\"metadata\":\"scouting player.image\"}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[{\"name\":\"Filter24e8e352e7375639f4b5\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"image\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":0},{\"name\":\"Filter69b44730589f52ffef08\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"name\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":1}]",
+          "height": 510.97,
+          "width": 352.05,
+          "x": 927.81,
+          "y": 173.58,
+          "z": 8000.00
+        },
+        {
+          "config": "{\"name\":\"273a779a79595108412b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":173.5823429541596,\"z\":7000,\"width\":352.05432937181666,\"height\":510.9677419354839,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting player.image\"},{\"queryRef\":\"scouting player.name\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting player\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting player.name\",\"NativeReferenceName\":\"name\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"},\"Name\":\"scouting player.image\",\"NativeReferenceName\":\"image\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"image\"}}}]},\"drillFilterOtherVisuals\":true,\"filterSortOrder\":3,\"objects\":{\"values\":[{\"properties\":{},\"selector\":{\"data\":[{\"dataViewWildcard\":{\"matchingOption\":1}}],\"metadata\":\"scouting player.image\"}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[{\"name\":\"Filter24e8e352e7375639f4b5\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"image\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":0},{\"name\":\"Filter69b44730589f52ffef08\",\"expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Entity\":\"scouting player\"}},\"Property\":\"name\"}},\"type\":\"Categorical\",\"howCreated\":0,\"isHiddenInViewMode\":false,\"ordinal\":1}]",
+          "height": 510.97,
+          "width": 352.05,
+          "x": 0.00,
+          "y": 173.58,
+          "z": 7000.00
+        },
+        {
+          "config": "{\"name\":\"342d53902e81815bc6a8\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1151,\"y\":62.6865671641791,\"z\":12000,\"width\":108.35820895522387,\"height\":111.94029850746269,\"tabOrder\":12000}}],\"singleVisual\":{\"visualType\":\"PBI_CV_81BBAD08_3ADD_466C_8819_9FACA21A6B8F\",\"projections\":{\"imageUrl\":[{\"queryRef\":\"scouting match.IconVisitante\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"IconVisitante\"},\"Name\":\"scouting match.IconVisitante\",\"NativeReferenceName\":\" \"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"IconVisitante\"}}}]},\"columnProperties\":{\"scouting match.IconVisitante\":{\"displayName\":\" \"}},\"drillFilterOtherVisuals\":true,\"objects\":{}}}",
+          "filters": "[]",
+          "height": 111.94,
+          "width": 108.36,
+          "x": 1151.00,
+          "y": 62.69,
+          "z": 12000.00
+        },
+        {
+          "config": "{\"name\":\"36cb08a98e49adb408ff\",\"layouts\":[{\"id\":0,\"position\":{\"x\":351.56756756756755,\"y\":173.83783783783784,\"z\":1000,\"width\":288,\"height\":330.8108108108108,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"pythonVisual\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.idmatch\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"idmatch\"},\"Name\":\"scouting match.idmatch\",\"NativeReferenceName\":\"idmatch\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"script\":[{\"properties\":{\"source\":{\"expr\":{\"Literal\":{\"Value\":\"'from mplsoccer import VerticalPitch\\nimport matplotlib.pyplot as plt\\n\\nFIGWIDTH = 7\\nFIGHEIGHT = 8\\nNROWS = 1\\nNCOLS = 1\\nSPACE = 0\\nMAX_GRID = 1\\n\\n# here we setup the padding to get a 16:9 aspect ratio for the axis\\n# note 80 is the StatsBomb width and 120 is the StatsBomb length\\n# this will extend the (axis) grassy effect to the figure edges\\nPAD_TOP = 2\\nPAD_BOTTOM = 2\\nPAD_SIDES = ((120 + PAD_TOP + PAD_BOTTOM) * FIGWIDTH / FIGHEIGHT - 80) / 2\\npitch = VerticalPitch(pad_top=PAD_TOP, pad_bottom=PAD_BOTTOM,\\n                      pad_left=PAD_SIDES, pad_right=PAD_SIDES,\\n                      pitch_color=''grass'', stripe=True, line_color=''white'')\\n\\nGRID_WIDTH, GRID_HEIGHT = pitch.grid_dimensions(figwidth=FIGWIDTH, figheight=FIGHEIGHT,\\n                                                nrows=NROWS, ncols=NCOLS,\\n                                                max_grid=MAX_GRID, space=SPACE)\\nTITLE_HEIGHT = 0\\nENDNOTE_HEIGHT = 0\\n\\nfig, ax = pitch.grid(figheight=FIGHEIGHT, grid_width=GRID_WIDTH,\\n                     grid_height=GRID_HEIGHT, space=SPACE,\\n                     ncols=NCOLS, nrows=NROWS, title_height=TITLE_HEIGHT,\\n                     endnote_height=ENDNOTE_HEIGHT, axis=True)\\n\\nplt.show()  # If you are using a Jupyter notebook you do not need this line\\n'\"}}},\"provider\":{\"expr\":{\"Literal\":{\"Value\":\"'Python'\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 330.81,
+          "width": 288.00,
+          "x": 351.57,
+          "y": 173.84,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"41ac9de3eae4742f7e20\",\"layouts\":[{\"id\":0,\"position\":{\"x\":564.7538200339559,\"y\":107.57215619694398,\"z\":5000,\"width\":74.56706281833617,\"height\":66.01018675721562,\"tabOrder\":6000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(scouting match.home_score)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"home_score\"}},\"Function\":0},\"Name\":\"Sum(scouting match.home_score)\",\"NativeReferenceName\":\"Soma de home_score\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"home_score\"}},\"Function\":0}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 66.01,
+          "width": 74.57,
+          "x": 564.75,
+          "y": 107.57,
+          "z": 5000.00
+        },
+        {
+          "config": "{\"name\":\"476b81fd2fbc5a6a9211\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":0,\"width\":100,\"height\":40,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"56d3999297b75506fc6d\",\"layouts\":[{\"id\":0,\"position\":{\"x\":805.0746268656716,\"y\":81.49253731343283,\"z\":15000,\"width\":78.80597014925372,\"height\":82,\"tabOrder\":15000}}],\"singleVisual\":{\"visualType\":\"PBI_CV_81BBAD08_3ADD_466C_8819_9FACA21A6B8F\",\"projections\":{\"imageUrl\":[{\"queryRef\":\"scouting match.Flag\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Flag\"},\"Name\":\"scouting match.Flag\",\"NativeReferenceName\":\" \"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Flag\"}}}]},\"columnProperties\":{\"scouting match.Flag\":{\"displayName\":\" \"}},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"padding\":[{\"properties\":{\"top\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 82.00,
+          "width": 78.81,
+          "x": 805.07,
+          "y": 81.49,
+          "z": 15000.00
+        },
+        {
+          "config": "{\"name\":\"64c45d8fbf4936bd7ae2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":352.05432937181666,\"y\":506.07809847198644,\"z\":10000,\"width\":575.7555178268251,\"height\":178.47198641765706,\"tabOrder\":10000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"NOTA: Se calhar aqui vão ficar as estatísticas do jogo\"}]},{\"textRuns\":[{\"value\":\"TODO:\"}]},{\"textRuns\":[{\"value\":\"Colocar imagens das equipas corretas - JA ESTA\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"Colocar nomes e resultado corretos     - JA ESTA\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"Colocar mais dados do jogo (competição, país, época)??? - JÁ ESTA \"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"Listar os jogadores do 11 inicial + banco de cada equipa\"}],\"listType\":\"bullet\"},{\"textRuns\":[{\"value\":\"Colocar ícones a representar os jogadores do 11 inicial através das suas camisolas\"}],\"listType\":\"bullet\"}]}}]}}}",
+          "filters": "[]",
+          "height": 178.47,
+          "width": 575.76,
+          "x": 352.05,
+          "y": 506.08,
+          "z": 10000.00
+        },
+        {
+          "config": "{\"name\":\"6b174d4203de871cfa7e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":428.05970149253733,\"y\":0,\"z\":11000,\"width\":145.97014925373134,\"height\":72.53731343283582,\"tabOrder\":11000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Min(scouting competition_season.Época)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition_season\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Época\"}},\"Function\":3},\"Name\":\"Min(scouting competition_season.Época)\",\"NativeReferenceName\":\"Época1\"}]},\"columnProperties\":{\"Min(scouting competition_season.Época)\":{\"displayName\":\"Época\"}},\"drillFilterOtherVisuals\":true,\"objects\":{\"labels\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"16D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 72.54,
+          "width": 145.97,
+          "x": 428.06,
+          "y": 0.00,
+          "z": 11000.00
+        },
+        {
+          "config": "{\"name\":\"714ff33257111f93406e\",\"layouts\":[{\"id\":0,\"position\":{\"x\":33.134328358208954,\"y\":60.8955223880597,\"z\":2000,\"width\":101.19402985074626,\"height\":112.83582089552239,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"PBI_CV_81BBAD08_3ADD_466C_8819_9FACA21A6B8F\",\"projections\":{\"imageUrl\":[{\"queryRef\":\"scouting match.IconVisitado\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"IconVisitado\"},\"Name\":\"scouting match.IconVisitado\",\"NativeReferenceName\":\" \"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"IconVisitado\"}}}]},\"columnProperties\":{\"scouting match.IconVisitado\":{\"displayName\":\" \"}},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"visualHeader\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"padding\":[{\"properties\":{\"top\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 112.84,
+          "width": 101.19,
+          "x": 33.13,
+          "y": 60.90,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"827bc89e0024760c9b29\",\"layouts\":[{\"id\":0,\"position\":{\"x\":151.34328358208955,\"y\":72.53731343283582,\"z\":3000,\"width\":243.5820895522388,\"height\":92.23880597014926,\"tabOrder\":5000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Visitado\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Visitado\"},\"Name\":\"scouting match.Visitado\",\"NativeReferenceName\":\"Visitado\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"labels\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"37D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 92.24,
+          "width": 243.58,
+          "x": 151.34,
+          "y": 72.54,
+          "z": 3000.00
+        },
+        {
+          "config": "{\"name\":\"a15fb5a25c834de6f6c1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":640.5432937181664,\"y\":107.57215619694398,\"z\":6000,\"width\":70.89983022071307,\"height\":66.01018675721562,\"tabOrder\":7000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Sum(scouting match.away_score)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"away_score\"}},\"Function\":0},\"Name\":\"Sum(scouting match.away_score)\",\"NativeReferenceName\":\"Soma de away_score\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"away_score\"}},\"Function\":0}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 66.01,
+          "width": 70.90,
+          "x": 640.54,
+          "y": 107.57,
+          "z": 6000.00
+        },
+        {
+          "config": "{\"name\":\"b191c686c301af2a607c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":859.7014925373134,\"y\":2.6865671641791042,\"z\":14000,\"width\":119.1044776119403,\"height\":68.05970149253731,\"tabOrder\":14000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Pais\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Pais\"},\"Name\":\"scouting match.Pais\",\"NativeReferenceName\":\"Pais\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"labels\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"18D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 68.06,
+          "width": 119.10,
+          "x": 859.70,
+          "y": 2.69,
+          "z": 14000.00
+        },
+        {
+          "config": "{\"name\":\"c750e26a281686d0c13a\",\"layouts\":[{\"id\":0,\"position\":{\"x\":905.3731343283582,\"y\":72.53731343283582,\"z\":4000,\"width\":235.52238805970148,\"height\":92.23880597014926,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Visitante\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Visitante\"},\"Name\":\"scouting match.Visitante\",\"NativeReferenceName\":\"Visitante\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"labels\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"37D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 92.24,
+          "width": 235.52,
+          "x": 905.37,
+          "y": 72.54,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"dc48b36213dbfb30e3b9\",\"layouts\":[{\"id\":0,\"position\":{\"x\":639.5675675675675,\"y\":175.13513513513513,\"z\":9000,\"width\":288,\"height\":330.8108108108108,\"tabOrder\":9000}}],\"singleVisual\":{\"visualType\":\"pythonVisual\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.idmatch\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"idmatch\"},\"Name\":\"scouting match.idmatch\",\"NativeReferenceName\":\"idmatch\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"script\":[{\"properties\":{\"source\":{\"expr\":{\"Literal\":{\"Value\":\"'from mplsoccer import VerticalPitch\\nimport matplotlib.pyplot as plt\\n\\nFIGWIDTH = 7\\nFIGHEIGHT = 8\\nNROWS = 1\\nNCOLS = 1\\nSPACE = 0\\nMAX_GRID = 1\\n\\n# here we setup the padding to get a 16:9 aspect ratio for the axis\\n# note 80 is the StatsBomb width and 120 is the StatsBomb length\\n# this will extend the (axis) grassy effect to the figure edges\\nPAD_TOP = 2\\nPAD_BOTTOM = 2\\nPAD_SIDES = ((120 + PAD_TOP + PAD_BOTTOM) * FIGWIDTH / FIGHEIGHT - 80) / 2\\npitch = VerticalPitch(pad_top=PAD_TOP, pad_bottom=PAD_BOTTOM,\\n                      pad_left=PAD_SIDES, pad_right=PAD_SIDES,\\n                      pitch_color=''grass'', stripe=True, line_color=''white'')\\n\\nGRID_WIDTH, GRID_HEIGHT = pitch.grid_dimensions(figwidth=FIGWIDTH, figheight=FIGHEIGHT,\\n                                                nrows=NROWS, ncols=NCOLS,\\n                                                max_grid=MAX_GRID, space=SPACE)\\nTITLE_HEIGHT = 0\\nENDNOTE_HEIGHT = 0\\n\\nfig, ax = pitch.grid(figheight=FIGHEIGHT, grid_width=GRID_WIDTH,\\n                     grid_height=GRID_HEIGHT, space=SPACE,\\n                     ncols=NCOLS, nrows=NROWS, title_height=TITLE_HEIGHT,\\n                     endnote_height=ENDNOTE_HEIGHT, axis=True)\\n\\nplt.show()  # If you are using a Jupyter notebook you do not need this line\\n'\"}}},\"provider\":{\"expr\":{\"Literal\":{\"Value\":\"'Python'\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 330.81,
+          "width": 288.00,
+          "x": 639.57,
+          "y": 175.14,
+          "z": 9000.00
+        },
+        {
+          "config": "{\"name\":\"e511b5c22b12e0ba1ff1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":591.044776119403,\"y\":0,\"z\":13000,\"width\":258.8059701492537,\"height\":81.49253731343283,\"tabOrder\":13000}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.NomeCompeticao\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"NomeCompeticao\"},\"Name\":\"scouting match.NomeCompeticao\",\"NativeReferenceName\":\"NomeCompeticao\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"labels\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"27D\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 81.49,
+          "width": 258.81,
+          "x": 591.04,
+          "y": 0.00,
+          "z": 13000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}],\"background\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir6532364538933713.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}]}}",
+      "displayName": "Competições",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSectiona996e5a3c77af68cfd00",
+      "ordinal": 3,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"36be54b27b4013a779bb\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1030.0032911316841,\"y\":481.62989980700866,\"z\":4000,\"width\":205.36502546689303,\"height\":66.01018675721562,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition.gender\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"gender\"},\"Name\":\"scouting competition.gender\",\"NativeReferenceName\":\"gender\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"general\":[{\"properties\":{\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Género'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}],\"visualHeader\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 66.01,
+          "width": 205.37,
+          "x": 1030.00,
+          "y": 481.63,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"702a4f388a613706e31c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1029.75886864654,\"y\":206.58741768025806,\"z\":6000,\"width\":205.36502546689303,\"height\":68.45500848896435,\"tabOrder\":6000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition_season.Época\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition_season\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Época\"},\"Name\":\"scouting competition_season.Época\",\"NativeReferenceName\":\"Época\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"general\":[{\"properties\":{}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"selection\":[{\"properties\":{\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Época'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 68.46,
+          "width": 205.37,
+          "x": 1029.76,
+          "y": 206.59,
+          "z": 6000.00
+        },
+        {
+          "config": "{\"name\":\"731676a666003a893689\",\"layouts\":[{\"id\":0,\"position\":{\"x\":260.5970149253731,\"y\":228.3582089552239,\"z\":1000,\"width\":711.9402985074627,\"height\":312.5373134328358,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting area.País (Competição)\"},{\"queryRef\":\"scouting area.Flag\"},{\"queryRef\":\"scouting competition.name\"},{\"queryRef\":\"scouting competition.gender\"},{\"queryRef\":\"scouting competition.format\"},{\"queryRef\":\"scouting competition.category\"},{\"queryRef\":\"Sum(scouting competition.divisionLevel)\"},{\"queryRef\":\"scouting competition.type\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition\",\"Type\":0},{\"Name\":\"s1\",\"Entity\":\"scouting area\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting competition.name\",\"NativeReferenceName\":\"Competição\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"gender\"},\"Name\":\"scouting competition.gender\",\"NativeReferenceName\":\"gender\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"format\"},\"Name\":\"scouting competition.format\",\"NativeReferenceName\":\"format\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"category\"},\"Name\":\"scouting competition.category\",\"NativeReferenceName\":\"category\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"divisionLevel\"},\"Name\":\"Sum(scouting competition.divisionLevel)\",\"NativeReferenceName\":\"divisionLevel\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"type\"},\"Name\":\"scouting competition.type\",\"NativeReferenceName\":\"type\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s1\"}},\"Property\":\"País (Competição)\"},\"Name\":\"scouting area.País (Competição)\",\"NativeReferenceName\":\"País (Competição)\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s1\"}},\"Property\":\"Flag\"},\"Name\":\"scouting area.Flag\",\"NativeReferenceName\":\" \"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s1\"}},\"Property\":\"Flag\"}}}]},\"columnProperties\":{\"Sum(scouting competition.divisionLevel)\":{\"displayName\":\"Divisão\"},\"scouting competition.name\":{\"displayName\":\"Competição\"},\"scouting area.Flag\":{\"displayName\":\" \"}},\"drillFilterOtherVisuals\":true,\"objects\":{\"grid\":[{\"properties\":{\"imageHeight\":{\"expr\":{\"Literal\":{\"Value\":\"50D\"}}},\"imageWidth\":{\"expr\":{\"Literal\":{\"Value\":\"50D\"}}},\"textSize\":{\"expr\":{\"Literal\":{\"Value\":\"10D\"}}},\"gridHorizontalWeight\":{\"expr\":{\"Literal\":{\"Value\":\"1D\"}}},\"outlineStyle\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"gridVerticalWeight\":{\"expr\":{\"Literal\":{\"Value\":\"2D\"}}},\"rowPadding\":{\"expr\":{\"Literal\":{\"Value\":\"9D\"}}}}}],\"columnFormatting\":[{\"properties\":{\"styleTotal\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Center'\"}}},\"styleValues\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"styleHeader\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}},\"selector\":{\"metadata\":\"scouting area.Flag\"}}],\"columnHeaders\":[{\"properties\":{\"autoSizeColumnWidth\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"columnWidth\":[{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"117D\"}}}},\"selector\":{\"metadata\":\"scouting area.País (Competição)\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"82D\"}}}},\"selector\":{\"metadata\":\"scouting area.Flag\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"99D\"}}}},\"selector\":{\"metadata\":\"scouting competition.name\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"54D\"}}}},\"selector\":{\"metadata\":\"scouting competition.gender\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"123.43283137109925D\"}}}},\"selector\":{\"metadata\":\"scouting competition.format\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"74.64179508491134D\"}}}},\"selector\":{\"metadata\":\"scouting competition.category\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"73.70147658397742D\"}}}},\"selector\":{\"metadata\":\"Sum(scouting competition.divisionLevel)\"}},{\"properties\":{\"value\":{\"expr\":{\"Literal\":{\"Value\":\"71.02986415179072D\"}}}},\"selector\":{\"metadata\":\"scouting competition.type\"}}],\"values\":[{\"properties\":{\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"10D\"}}}}}]},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}],\"lockAspect\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"general\":[{\"properties\":{\"keepLayerOrder\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"border\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"dropShadow\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"padding\":[{\"properties\":{\"bottom\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}}}}],\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"''\"}}}}}],\"spacing\":[{\"properties\":{\"verticalSpacing\":{\"expr\":{\"Literal\":{\"Value\":\"10D\"}}}}}],\"divider\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"width\":{\"expr\":{\"Literal\":{\"Value\":\"1D\"}}}}}],\"subTitle\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 312.54,
+          "width": 711.94,
+          "x": 260.60,
+          "y": 228.36,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"9bac1859b57d3fda5e50\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1030.0032911316841,\"y\":414.39730218391855,\"z\":3000,\"width\":205.36502546689303,\"height\":67.23259762308999,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition.divisionLevel\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"divisionLevel\"},\"Name\":\"scouting competition.divisionLevel\",\"NativeReferenceName\":\"Soma de divisionLevel\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"general\":[{\"properties\":{\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"1D\"}}}}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Divisão'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 67.23,
+          "width": 205.37,
+          "x": 1030.00,
+          "y": 414.40,
+          "z": 3000.00
+        },
+        {
+          "config": "{\"name\":\"a1d8d09b4d3892083812\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1030.0032911316841,\"y\":348.387115426703,\"z\":2000,\"width\":205.36502546689303,\"height\":66.01018675721562,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition.name\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting competition.name\",\"NativeReferenceName\":\"name\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"general\":[{\"properties\":{\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"selfFilterEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"selection\":[{\"properties\":{\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Ligas'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 66.01,
+          "width": 205.37,
+          "x": 1030.00,
+          "y": 348.39,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"d501e93b8e5d36e97f1c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":0,\"width\":100,\"height\":40,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"d8a4eeb1c5942887869c\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1029.75886864654,\"y\":275.0424261692222,\"z\":5000,\"width\":205.36502546689303,\"height\":73.3446519524618,\"tabOrder\":5000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting area.name\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting area\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"name\"},\"Name\":\"scouting area.name\",\"NativeReferenceName\":\"name\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"general\":[{\"properties\":{\"selfFilterEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'País'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 73.34,
+          "width": 205.37,
+          "x": 1029.76,
+          "y": 275.04,
+          "z": 5000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"outspacePane\":[{\"properties\":{\"width\":{\"expr\":{\"Literal\":{\"Value\":\"202L\"}}}}}],\"background\":[{\"properties\":{\"color\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":0,\"Percent\":0}}}}},\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir39144861419550936.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}],\"outspace\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"''\"}}},\"url\":{\"expr\":{\"Literal\":{\"Value\":\"''\"}}}}}}}],\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}]}}",
+      "displayName": "Página principal",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSectionb02afd8507c8e33c1db6",
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"05a6c5fcfc3c73f5093b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":491.42857142857144,\"y\":17.142857142857142,\"z\":0,\"width\":300,\"height\":300,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"image\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"imageUrl\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"150px-Sporting_Clube_Braga7564522872254535.png\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 300.00,
+          "width": 300.00,
+          "x": 491.43,
+          "y": 17.14,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"4014d22c91248257c3e2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":555.7142857142858,\"y\":331.42857142857144,\"z\":1000,\"width\":167.14285714285717,\"height\":57.142857142857146,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'blank'\"}}},\"lineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}}},\"selector\":{\"id\":\"default\"}}],\"shape\":[{\"properties\":{\"tileShape\":{\"expr\":{\"Literal\":{\"Value\":\"'rectangleRounded'\"}}}},\"selector\":{\"id\":\"default\"}}],\"text\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Jogadores'\"}}},\"fontColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}},\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"20D\"}}}},\"selector\":{\"id\":\"default\"}},{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"fill\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'PageNavigation'\"}}},\"navigationSection\":{\"expr\":{\"Literal\":{\"Value\":\"'ReportSection'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 57.14,
+          "width": 167.14,
+          "x": 555.71,
+          "y": 331.43,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"7959c9642afed0ab13de\",\"layouts\":[{\"id\":0,\"position\":{\"x\":582.8571428571429,\"y\":395.7142857142857,\"z\":2000,\"width\":117.14285714285715,\"height\":57.142857142857146,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'blank'\"}}},\"lineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}}},\"selector\":{\"id\":\"default\"}}],\"shape\":[{\"properties\":{\"tileShape\":{\"expr\":{\"Literal\":{\"Value\":\"'rectangleRounded'\"}}}},\"selector\":{\"id\":\"default\"}}],\"text\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Equipas'\"}}},\"fontColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}},\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"20D\"}}}},\"selector\":{\"id\":\"default\"}},{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"fill\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'PageNavigation'\"}}},\"navigationSection\":{\"expr\":{\"Literal\":{\"Value\":\"'ReportSection800294e7bd28fcdbe20b'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 57.14,
+          "width": 117.14,
+          "x": 582.86,
+          "y": 395.71,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"9fe8704da5ad479f5773\",\"layouts\":[{\"id\":0,\"position\":{\"x\":582.8571428571429,\"y\":528.5714285714286,\"z\":4000,\"width\":117.14285714285715,\"height\":57.142857142857146,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'blank'\"}}},\"lineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}}},\"selector\":{\"id\":\"default\"}}],\"shape\":[{\"properties\":{\"tileShape\":{\"expr\":{\"Literal\":{\"Value\":\"'rectangleRounded'\"}}}},\"selector\":{\"id\":\"default\"}}],\"text\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Jogos'\"}}},\"fontColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}},\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"20D\"}}}},\"selector\":{\"id\":\"default\"}},{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"fill\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'PageNavigation'\"}}},\"navigationSection\":{\"expr\":{\"Literal\":{\"Value\":\"'ReportSectionc20c519e382a653972f4'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 57.14,
+          "width": 117.14,
+          "x": 582.86,
+          "y": 528.57,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"d66c7be3d90447e75f3f\",\"layouts\":[{\"id\":0,\"position\":{\"x\":545.7142857142858,\"y\":461.42857142857144,\"z\":3000,\"width\":190,\"height\":57.142857142857146,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'blank'\"}}},\"lineColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}}},\"selector\":{\"id\":\"default\"}}],\"shape\":[{\"properties\":{\"tileShape\":{\"expr\":{\"Literal\":{\"Value\":\"'rectangleRounded'\"}}}},\"selector\":{\"id\":\"default\"}}],\"text\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Competições'\"}}},\"fontColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}},\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"20D\"}}}},\"selector\":{\"id\":\"default\"}},{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"fill\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'PageNavigation'\"}}},\"navigationSection\":{\"expr\":{\"Literal\":{\"Value\":\"'ReportSectiona996e5a3c77af68cfd00'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 57.14,
+          "width": 190.00,
+          "x": 545.71,
+          "y": 461.43,
+          "z": 3000.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{\"objects\":{\"background\":[{\"properties\":{\"image\":{\"image\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'transferir.jpeg'\"}}},\"url\":{\"expr\":{\"ResourcePackageItem\":{\"PackageName\":\"RegisteredResources\",\"PackageType\":1,\"ItemName\":\"transferir4475166358346476.jpeg\"}}},\"scaling\":{\"expr\":{\"Literal\":{\"Value\":\"'Fit'\"}}}}},\"transparency\":{\"expr\":{\"Literal\":{\"Value\":\"80D\"}}}}}],\"displayArea\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Middle'\"}}}}}]}}",
+      "displayName": "Jogos",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "ReportSectionc20c519e382a653972f4",
+      "ordinal": 5,
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"29c874db8c5f9834558f\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":0,\"z\":0,\"width\":100,\"height\":40,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'back'\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Back'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 40.00,
+          "width": 100.00,
+          "x": 0.00,
+          "y": 0.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"3e5c9629b91d579d150b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1039.2528870292888,\"y\":137.10460251046024,\"z\":4000,\"width\":216.6252719665272,\"height\":69.92334728033472,\"tabOrder\":4000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting competition_season.Época\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition_season\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Época\"},\"Name\":\"scouting competition_season.Época\",\"NativeReferenceName\":\"Época\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Dropdown'\"}}}}}],\"general\":[{\"properties\":{\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"1D\"}}},\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting competition_season\",\"Type\":0}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Época\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'2023/2024'\"}}]]}}}]}}}}],\"selection\":[{\"properties\":{\"strictSingleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"singleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"header\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]},\"vcObjects\":{\"general\":[{\"properties\":{\"keepLayerOrder\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Época'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 69.92,
+          "width": 216.63,
+          "x": 1039.25,
+          "y": 137.10,
+          "z": 4000.00
+        },
+        {
+          "config": "{\"name\":\"529f4ffc46a619b047dd\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1039.6239330543935,\"y\":207.027949790795,\"z\":2000,\"width\":216.6252719665272,\"height\":71.29439330543933,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Data\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"},\"Name\":\"scouting match.Data\",\"NativeReferenceName\":\"Data\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true,\"objects\":{\"data\":[{\"properties\":{\"startDate\":{\"expr\":{\"Literal\":{\"Value\":\"datetime'2023-08-01T00:00:00'\"}}},\"endDate\":{\"expr\":{\"Literal\":{\"Value\":\"datetime'2023-10-08T00:00:00'\"}}},\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Between'\"}}}}}],\"pendingChangesIcon\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"slider\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"general\":[{\"properties\":{\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Where\":[{\"Condition\":{\"And\":{\"Left\":{\"Comparison\":{\"ComparisonKind\":2,\"Left\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"}},\"Right\":{\"Literal\":{\"Value\":\"datetime'2023-08-01T00:00:00'\"}}}},\"Right\":{\"Comparison\":{\"ComparisonKind\":3,\"Left\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"}},\"Right\":{\"Literal\":{\"Value\":\"datetime'2023-10-09T00:00:00'\"}}}}}}}]}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Intervalo dos jogos'\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 71.29,
+          "width": 216.63,
+          "x": 1039.62,
+          "y": 207.03,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"766d7d8a03a1ee44e693\",\"layouts\":[{\"id\":0,\"position\":{\"x\":1039.6239330543935,\"y\":278.3223430962342,\"z\":3000,\"width\":216.6252719665272,\"height\":267.35397489539747,\"tabOrder\":3000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Hora\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Hora\"},\"Name\":\"scouting match.Hora\",\"NativeReferenceName\":\"Hora\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Hora\"}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Basic'\"}}},\"isInvertedSelectionMode\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}],\"general\":[{\"properties\":{\"orientation\":{\"expr\":{\"Literal\":{\"Value\":\"0D\"}}},\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Where\":[{\"Condition\":{\"Not\":{\"Expression\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Hora\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"datetime'1899-12-30T10:00:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T16:15:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T16:30:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T17:00:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T17:15:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T17:45:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T18:15:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T18:45:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T19:15:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T19:30:00'\"}}],[{\"Literal\":{\"Value\":\"datetime'1899-12-30T19:45:00'\"}}]]}}}}}]}}}}],\"header\":[{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Horas'\"}}},\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"selection\":[{\"properties\":{\"strictSingleSelect\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"selectAllCheckboxEnabled\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}}]},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"alignment\":{\"expr\":{\"Literal\":{\"Value\":\"'center'\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Horas'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 267.35,
+          "width": 216.63,
+          "x": 1039.62,
+          "y": 278.32,
+          "z": 3000.00
+        },
+        {
+          "config": "{\"name\":\"bc9425eb7755fed7408b\",\"layouts\":[{\"id\":0,\"position\":{\"x\":49.357656903765694,\"y\":215.2542259414226,\"z\":1000,\"width\":781.4962343096234,\"height\":327.68,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"scouting match.Visitado\"},{\"queryRef\":\"Sum(scouting match.home_score)\"},{\"queryRef\":\"Sum(scouting match.away_score)\"},{\"queryRef\":\"scouting match.Visitante\"},{\"queryRef\":\"scouting match.Data.Variação.Hierarquia de Datas.Ano\"},{\"queryRef\":\"scouting match.Vencedor\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"s\",\"Entity\":\"scouting match\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"home_score\"},\"Name\":\"Sum(scouting match.home_score)\",\"NativeReferenceName\":\"home_score\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"away_score\"},\"Name\":\"Sum(scouting match.away_score)\",\"NativeReferenceName\":\"away_score\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"},\"Name\":\"scouting match.Data.Variação.Hierarquia de Datas.Ano\",\"NativeReferenceName\":\"Data Ano\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Visitado\"},\"Name\":\"scouting match.Visitado\",\"NativeReferenceName\":\"Visitado\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Visitante\"},\"Name\":\"scouting match.Visitante\",\"NativeReferenceName\":\"Visitante\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Vencedor\"},\"Name\":\"scouting match.Vencedor\",\"NativeReferenceName\":\"Vencedor\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"s\"}},\"Property\":\"Data\"}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"stylePreset\":[{\"properties\":{\"name\":{\"expr\":{\"Literal\":{\"Value\":\"'Condensed'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 327.68,
+          "width": 781.50,
+          "x": 49.36,
+          "y": 215.25,
+          "z": 1000.00
+        },
+        {
+          "config": "{\"name\":\"d5ec4d5049ba73888c20\",\"layouts\":[{\"id\":0,\"position\":{\"x\":716.4179104477612,\"y\":542.6865671641791,\"z\":5000,\"width\":114.6268656716418,\"height\":63.582089552238806,\"tabOrder\":5000}}],\"singleVisual\":{\"visualType\":\"actionButton\",\"drillFilterOtherVisuals\":true,\"objects\":{\"icon\":[{\"properties\":{\"shapeType\":{\"expr\":{\"Literal\":{\"Value\":\"'blank'\"}}}},\"selector\":{\"id\":\"default\"}}],\"text\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}}}},{\"properties\":{\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'detalhes de jogo'\"}}},\"fontColor\":{\"solid\":{\"color\":{\"expr\":{\"ThemeDataColor\":{\"ColorId\":1,\"Percent\":0}}}}},\"bold\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"fontSize\":{\"expr\":{\"Literal\":{\"Value\":\"13D\"}}}},\"selector\":{\"id\":\"default\"}}]},\"vcObjects\":{\"visualLink\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"type\":{\"expr\":{\"Literal\":{\"Value\":\"'Drillthrough'\"}}},\"drillthroughSection\":{\"expr\":{\"Literal\":{\"Value\":\"'ReportSection93c623cc0c2d5a0c9f92'\"}}},\"disabledTooltip\":{\"expr\":{\"Literal\":{\"Value\":\"'Detalhes'\"}}},\"enabledTooltip\":{\"expr\":{\"Literal\":{\"Value\":\"'Detalhes'\"}}}}}],\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'DETALHES'\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 63.58,
+          "width": 114.63,
+          "x": 716.42,
+          "y": 542.69,
+          "z": 5000.00
+        }
+      ],
+      "width": 1280.00
+    }
+  ],
+  "theme": "AccessibleNeutral"
+}
