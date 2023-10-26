@@ -2,7 +2,7 @@ import json
 import os
 import logging
 import sys
-from MySQLdb import _mysql
+import pymssql
 
 
 class Db_handler:
@@ -31,7 +31,7 @@ class Db_handler:
     def create_connection(self):
         """Creates a connection to the MySQL database"""
         try:
-            self.connection = _mysql.connect(**self.db_config)
+            self.connection = pymssql.connect(**self.db_config)
             self.log('Connection to the database established')
         except Exception as e:
             self.connection = None
@@ -39,66 +39,77 @@ class Db_handler:
             self.log(e,logging.ERROR)
 
 
-    def insert(self,table:str, values:str):
+    def insert(self,table:str, values:str,database:str='scouting'):
         """Inserts values into a table"""
         if self.connection:
-            self.log(f'''Query: INSERT INTO scouting.{table} VALUES {values}''')
+            self.log(f'''Query: INSERT INTO {database}.{table} VALUES {values}''')
+            cursor = self.connection.cursor()
             try:
-                self.connection.query(f"""INSERT INTO scouting.{table} VALUES {values}""")
-                self.connection.commit()
+                cursor.execute(f"""INSERT INTO {database}.{table} VALUES {values}""")
                 self.log(f'Values {values} inserted into table {table}')
             except Exception as e:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
+            cursor.close()
 
-    def insert_or_update(self,table:str, values:str,on_update:str='',parameters:str='',ignore:bool=True):
+    def insert_or_update(self,table:str, values:str,key_parameters:list[str],parameters:str,update:bool=True,database:str='scouting'):
         """Inserts/updates values into a table"""
         if self.connection:
             #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
-            self.log(f'''Query: INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
+            self.log(f'''Query: INSERT INTO {database}.{table} {parameters} VALUES {values}''')
+            cursor = self.connection.cursor()
             try:
-                query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} VALUES {values} as new'''
-                if on_update != '':
-                    query += f' ON DUPLICATE KEY UPDATE {on_update}'
-                self.connection.query(query)
-                self.connection.commit()
+                # create parameters group
+                parameters_group = f"{','.join(parameters)}"
+                # create on clause
+                on_clause = []
+                for key in key_parameters:
+                    on_clause.append(f'target.{key} = source.{key}')
+                on_clause = ' AND '.join(on_clause)
+                
+                # create insert values
+                insert_values = []
+                for param in parameters:
+                    insert_values.append(f'source.{param}')
+                insert_values = f"({','.join(insert_values)})"
+
+                on_update = ''
+                if update:
+                    # create on update
+                    on_update = []
+                    for param in parameters:
+                        if param not in key_parameters:
+                            on_update.append(f'target.{param} = source.{param}')
+                    on_update = ','.join(on_update)
+                
+                query = f'''MERGE {database}.{table} as target 
+                                USING 
+                                    (VALUES {values}) 
+                                    AS source ({parameters_group})
+                                ON ({on_clause})
+                                WHEN NOT MATCHED THEN 
+                                    INSERT ({parameters_group})
+                                    VALUES {insert_values}'''
+                if update and on_update != '':
+                        query += f'''
+                        WHEN MATCHED THEN 
+                                        UPDATE SET {on_update}'''
+                query += ';'
+                cursor.execute(query)
                 self.log(f'Values {values} inserted/updated into table {table}')
             except Exception as e:
                 self.log(f'Error inserting/updating values {values} into table {table}\n{e}',logging.ERROR)
-                open('error.txt','w').write(query)
+                open('error.txt','w', encoding="utf-8").write(query)
                 sys.exit()
+            self.connection.commit()
+            cursor.close()
 
 
-    def insert_or_update_many(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500,ignore:bool=True):
-        """Inserts/updates values into a table in batches"""
-        if self.connection:
-            self.log(f'''Query: Inserting multiple values into scouting.{table}''')
-            try:
-                batch = ','.join(values[0:batch_size])
-                # reduce batch_size if query is bigger than 0.7 MB
-                while len(batch.encode('utf-8')) > 700000:
-                    batch_size = int(batch_size/2)
-                    batch = ','.join(values[0:batch_size])
-                print(f'batch_size: {batch_size}')
-                i = 0
-                while i < len(values):
-                    batch = ','.join(values[i:i+batch_size])
-                    query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} VALUES {batch} as new'''
-                    if on_update != '':
-                        query += f' ON DUPLICATE KEY UPDATE {on_update}'
-                    self.connection.query(query)
-                    self.connection.commit()
-                    i += batch_size
-                self.log(f'Values inserted/updated into table {table}')
-            except Exception as e:
-                self.log(f'Error inserting/updating values into table {table}\n',logging.ERROR)
-                self.log(e,logging.ERROR)
-                open('error.txt','w').write(query)
-                sys.exit()
     
-    def insert_or_update_many_union(self,table:str, values:list[str],on_update:str='',parameters:str='',batch_size:int=500,ignore:bool=True):
+    def insert_or_update_many(self,table:str, values:list[str],key_parameters:list[str],parameters:str,update:bool=True,batch_size:int=500,database:str='scouting',delimiter:str=','):
         """Inserts/updates values into a table in batches using union all to connect values"""
         if self.connection:
-            self.log(f'''Query: Inserting multiple values into scouting.{table} (UNION ALL)''')
+            self.log(f'''Query: Inserting multiple values into {database}.{table}''')
+            cursor = self.connection.cursor()
             try:
                 batch = ' UNION ALL '.join(values[0:batch_size])
                 # reduce batch_size if query is bigger than 0.7 MB
@@ -106,20 +117,58 @@ class Db_handler:
                     batch_size = int(batch_size/2)
                     batch = ' UNION ALL '.join(values[0:batch_size])
                 i = 0
+
+                # create parameters group
+                parameters_group = f"{','.join(parameters)}"
+                # create on clause
+                on_clause = []
+                for key in key_parameters:
+                    on_clause.append(f'target.{key} = source.{key}')
+                on_clause = ' AND '.join(on_clause)
+                
+                # create insert values
+                insert_values = []
+                for param in parameters:
+                    insert_values.append(f'source.{param}')
+                insert_values = f"({','.join(insert_values)})"
+
+                on_update = ''
+                if update:
+                    # create on update
+                    on_update = []
+                    for param in parameters:
+                        if param not in key_parameters:
+                            on_update.append(f'target.{param} = source.{param}')
+                    on_update = ','.join(on_update)
+
+                # insert values
                 while i < len(values):
-                    batch = ' UNION ALL '.join(values[i:i+batch_size])
-                    query = f'''INSERT {'IGNORE' if ignore else ''} INTO scouting.{table} {parameters} {batch}'''
-                    if on_update != '':
-                        query += f' ON DUPLICATE KEY UPDATE {on_update}'
-                    self.connection.query(query)
-                    self.connection.commit()
+                    batch = delimiter.join(values[i:i+batch_size])
+                    if delimiter == ',':
+                        batch = f'VALUES {batch}'
+                    query = f'''MERGE {database}.{table} as target 
+                                USING 
+                                    ({batch}) 
+                                    AS source ({parameters_group})
+                                ON ({on_clause})
+                                WHEN NOT MATCHED THEN 
+                                    INSERT ({parameters_group}) 
+                                    VALUES {insert_values}'''
+                    if update and on_update != '':
+                        query += f'''
+                        WHEN MATCHED THEN 
+                                        UPDATE SET {on_update}'''
+                    query += ';'
+                    cursor.execute(query)
                     i += batch_size
                 self.log(f'Values inserted/updated into table {table}')
             except Exception as e:
                 self.log(f'Error inserting/updating values into table {table}\n',logging.ERROR)
                 self.log(e,logging.ERROR)
-                open('error.txt','w').write(query)
+                open('error.txt','w', encoding="utf-8").write(query)
                 sys.exit()
+            self.connection.commit()
+            cursor.close()
 
 
     def close_connection(self):
