@@ -398,7 +398,6 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                 id = event['id']
                 matchid = event['matchId']
                 player = event['player']['id']
-                matchTimestamp = event['matchTimestamp']
                 matchPeriod = event['matchPeriod']
                 if event['location'] != None:
                     location_x = event['location']['x']
@@ -408,37 +407,42 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                     location_y = -1 #TODO: ver melhor isto
                 minute = event['minute']
                 second = event['second']
-                team = event['team']['id']
-                opponentTeam = event['opponentTeam']['id']
-                type = event['type']['primary']
-                details = {}
                 if event['pass'] != None:
-                    details['pass'] = event['pass']
-                if event['shot'] != None:
-                    details['shot'] = event['shot']
-                if event['groundDuel'] != None:
-                    details['groundDuel'] = event['groundDuel']
-                if event['aerialDuel'] != None:
-                    details['aerialDuel'] = event['aerialDuel']
-                if event['infraction'] != None:
-                    details['infraction'] = event['infraction']
-                if event['carry'] != None:    
-                    details['carry'] = event['carry']
-                if event['possession'] != None:   
-                    details['possession'] = event['possession']
-                
-                relatedEventId = event['relatedEventId'] if event['relatedEventId'] else -1
-                details = json.dumps(details).replace("'","\\'")
-                
-                values = f'''("{id}", "{matchid}", "{player}", "{matchTimestamp}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}", 
-                "{team}", "{opponentTeam}", "{type}", '{details}', "{relatedEventId}")'''
-                
-                querys.append(('match_event',values))
+                    accurate = event['pass']['accurate']
+                    recipient = event['pass']['recipient']['id']
+                    endlocation_x = event['pass']['endLocation']['x']
+                    endlocation_y = event['pass']['endLocation']['y']
+                    values = f'''("{id}", "{matchid}", "{player}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}"
+                    , "{accurate}", "{recipient}", "{endlocation_x}", "{endlocation_y}")'''
+                    querys.append(('match_event_pass',values))
 
-                secondary_types = event['type']['secondary']
-                for secondary_type in secondary_types:
-                    valuesst = f'''("{id}","{secondary_type}")'''
-                    querys.append(('match_event_secondary_type',valuesst))
+                elif event['shot'] != None:
+                    isGoal = event['shot']['isGoal']
+                    onTarget = event['shot']['onTarget']
+                    xg = event['shot']['xg']
+                    postShotXg = event['shot']['postShotXg']
+                    values = f'''("{id}", "{matchid}", "{player}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}"
+                    , "{isGoal}", "{onTarget}", "{xg}", "{postShotXg}")'''
+                    querys.append(('match_event_shot',values))
+
+                elif event['infraction'] != None and (event['infraction']['yellowCard'] or event['infraction']['redCard']):
+                    yellowCard = event['infraction']['yellowCard']
+                    redCard = event['infraction']['redCard']
+                    values = f'''("{id}", "{matchid}", "{player}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}"
+                    , "{yellowCard}", "{redCard}")'''
+                    querys.append(('match_event_infraction',values))
+
+                elif event['carry'] != None:    
+                    endlocation_x = event['carry']['endLocation']['x']
+                    endlocation_y = event['carry']['endLocation']['y']
+                    values = f'''("{id}", "{matchid}", "{player}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}"
+                    , "{endlocation_x}", "{endlocation_y}")'''
+                    querys.append(('match_event_carry',values))
+
+                else:
+                    values = f'''("{id}", "{matchid}", "{player}", "{matchPeriod}", "{location_x}", "{location_y}", "{minute}", "{second}"
+                    )'''
+                    querys.append(('match_event_other',values))
 
     return querys
         
@@ -458,8 +462,13 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     match_lineup_player_position_values = []
     match_formation_values = []
     match_substitution_values = []
-    match_events_values = []
-    events_secondary_types_values = []
+    match_events_values = {
+        "pass" : [],
+        "shot" : [],
+        "infraction" : [],
+        "carry" : [],
+        "other" : []
+    }
     # separate querys
     for query in querys:
         if query[0] == 'match':
@@ -474,10 +483,16 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             match_formation_values.append(query[1])
         elif query[0] == 'match_substitution':
             match_substitution_values.append(query[1])
-        elif query[0] == 'match_event':
-            match_events_values.append(query[1])
-        elif query[0] == 'match_event_secondary_type':
-            events_secondary_types_values.append(query[1])
+        elif query[0] == 'match_event_pass':
+            match_events_values['pass'].append(query[1])
+        elif query[0] == 'match_event_shot':
+            match_events_values['shot'].append(query[1])
+        elif query[0] == 'match_event_infraction':
+            match_events_values['infraction'].append(query[1])
+        elif query[0] == 'match_event_carry':
+            match_events_values['carry'].append(query[1])
+        elif query[0] == 'match_event_other':
+            match_events_values['other'].append(query[1])
 
     print('Inserting matches into db',match_query_values)
     # match table
@@ -519,15 +534,31 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     db_handler.insert_or_update_many('match_substitution',match_substitution_values,on_update=match_substitution_on_update,parameters=match_substitution_parameters)
 
     # match_event table
-    event_on_update = f'''`match`=new.match, player=new.player, matchTimestamp=new.matchTimestamp, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
-                            minute=new.minute, second=new.second, team=new.team, opponentTeam=new.opponentTeam, type=new.type, details=new.details, relatedEventId=new.relatedEventId'''
-    event_parameters = f'''(idmatch_event, `match`, player, matchTimestamp, matchPeriod, location_x, location_y, minute, second, team, opponentTeam, type, details, relatedEventId)'''
-    db_handler.insert_or_update_many('match_event', match_events_values, on_update=event_on_update, parameters=event_parameters)
-
-    # match_event_secondary_type table
-    secondary_type_parameters = f'''(match_event, secondary_type)'''
-    secondary_type_on_update = f'''secondary_type=VALUES(secondary_type)'''
-    db_handler.insert_or_update_many('match_event_secondary_type', events_secondary_types_values,on_update=secondary_type_on_update, parameters=secondary_type_parameters)
+    # other
+    match_event_other_on_update = f'''`match`=new.match, player=new.player, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                            minute=new.minute, second=new.second'''
+    match_event_other_parameters = f'''(idmatch_event, `match`, player, matchPeriod, location_x, location_y, minute, second)'''
+    db_handler.insert_or_update_many('match_event_other', match_events_values['other'], on_update=match_event_other_on_update, parameters=match_event_other_parameters)
+    # pass
+    match_event_pass_on_update = f'''`match`=new.match, player=new.player, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                            minute=new.minute, second=new.second, accurate=new.accurate, recipient=new.recipient, endlocation_x = new.endlocation_x, endlocation_y=new.endlocation_y'''
+    match_event_pass_parameters = f'''(idmatch_event, `match`, player, matchPeriod, location_x, location_y, minute, second, accurate, recipient, endlocation_x, endlocation_y)'''
+    db_handler.insert_or_update_many('match_event_pass', match_events_values['pass'], on_update=match_event_pass_on_update, parameters=match_event_pass_parameters)
+    # shot
+    match_event_shot_on_update = f'''`match`=new.match, player=new.player, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                            minute=new.minute, second=new.second, isGoal=new.isGoal, onTarget=new.onTarget, xg = new.xg, postShotXg=new.postShotXg'''
+    match_event_shot_parameters = f'''(idmatch_event, `match`, player, matchPeriod, location_x, location_y, minute, second, isGoal, onTarget, xg, postShotXg)'''
+    db_handler.insert_or_update_many('match_event_shot', match_events_values['shot'], on_update=match_event_shot_on_update, parameters=match_event_shot_parameters)
+    # carry
+    match_event_carry_on_update = f'''`match`=new.match, player=new.player, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                            minute=new.minute, second=new.second, endlocation_x = new.endlocation_x, endlocation_y=new.endlocation_y'''
+    match_event_carry_parameters = f'''(idmatch_event, `match`, player, matchPeriod, location_x, location_y, minute, second, endlocation_x, endlocation_y)'''
+    db_handler.insert_or_update_many('match_event_carry', match_events_values['carry'], on_update=match_event_carry_on_update, parameters=match_event_carry_parameters)
+    # infraction
+    match_event_infraction_on_update = f'''`match`=new.match, player=new.player, matchPeriod=new.matchPeriod, location_x=new.location_x, location_y=new.location_y,\
+                            minute=new.minute, second=new.second, yellowCard = new.yellowCard, redCard=new.redCard'''
+    match_event_infraction_parameters = f'''(idmatch_event, `match`, player, matchPeriod, location_x, location_y, minute, second, yellowCard, redCard)'''
+    db_handler.insert_or_update_many('match_event_infraction', match_events_values['infraction'], on_update=match_event_infraction_on_update, parameters=match_event_infraction_parameters)
     
 
 
