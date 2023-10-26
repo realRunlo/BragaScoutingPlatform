@@ -59,17 +59,18 @@ class Db_handler:
             cursor = self.connection.cursor()
             try:
                 # create parameters group
-                parameters_group = f"{','.join(parameters)}"
+                parameters_group = [f"[{param}]" for param in parameters]
+                parameters_group = f"{','.join(parameters_group)}"
                 # create on clause
                 on_clause = []
                 for key in key_parameters:
-                    on_clause.append(f'target.{key} = source.{key}')
+                    on_clause.append(f'target.[{key}] = source.[{key}]')
                 on_clause = ' AND '.join(on_clause)
                 
                 # create insert values
                 insert_values = []
                 for param in parameters:
-                    insert_values.append(f'source.{param}')
+                    insert_values.append(f'source.[{param}]')
                 insert_values = f"({','.join(insert_values)})"
 
                 on_update = ''
@@ -78,7 +79,7 @@ class Db_handler:
                     on_update = []
                     for param in parameters:
                         if param not in key_parameters:
-                            on_update.append(f'target.{param} = source.{param}')
+                            on_update.append(f'target.[{param}] = source.[{param}]')
                     on_update = ','.join(on_update)
                 
                 query = f'''MERGE {database}.{table} as target 
@@ -119,17 +120,18 @@ class Db_handler:
                 i = 0
 
                 # create parameters group
-                parameters_group = f"{','.join(parameters)}"
+                parameters_group = [f"[{param}]" for param in parameters]
+                parameters_group = f"{','.join(parameters_group)}"
                 # create on clause
                 on_clause = []
                 for key in key_parameters:
-                    on_clause.append(f'target.{key} = source.{key}')
+                    on_clause.append(f'target.[{key}] = source.[{key}]')
                 on_clause = ' AND '.join(on_clause)
                 
                 # create insert values
                 insert_values = []
                 for param in parameters:
-                    insert_values.append(f'source.{param}')
+                    insert_values.append(f'source.[{param}]')
                 insert_values = f"({','.join(insert_values)})"
 
                 on_update = ''
@@ -138,7 +140,7 @@ class Db_handler:
                     on_update = []
                     for param in parameters:
                         if param not in key_parameters:
-                            on_update.append(f'target.{param} = source.{param}')
+                            on_update.append(f'target.[{param}] = source.[{param}]')
                     on_update = ','.join(on_update)
 
                 # insert values
