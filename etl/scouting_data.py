@@ -284,6 +284,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                 player_agencies+= ', ' + agencie
 
         player_name = player['firstName'] + ' ' + player['middleName'] + ' ' + player['lastName']
+        player_name = process_mssql_value(player_name)
         wyId = process_mssql_value(player['wyId'])
         shortName = process_mssql_value(player['shortName'])
         birthArea = process_mssql_value(player['birthArea']['id'])
@@ -714,25 +715,25 @@ def main(args,db_handler:Db_handler):
         if request_file_path.endswith('json') and os.path.exists(request_file_path):
             request_file = json.load(open(request_file_path))
             # populate areas
-            #populate_areas(db_handler) 
+            populate_areas(db_handler) 
             if 'competitions' in request_file:
                 competitions = request_file['competitions']
                 competitions_info = extract_competitions_info(competitions)
                 #print(competitions_info)
                 competitions_id = [c['wyId'] for c in competitions_info]
                 # populate competitions
-                #populate_competitions(db_handler,competitions_id)
+                populate_competitions(db_handler,competitions_id)
 
                 # populate seasons
                 seasons_id = [s for c in competitions_info for s in c['seasons']]
-                #populate_competitions_seasons(db_handler,seasons_id)
+                populate_competitions_seasons(db_handler,seasons_id)
 
                 s_i = 1
                 # populate teams, players, matches and stats
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                    #populate_teams(db_handler,s_id)
-                    #populate_players(db_handler,s_id,player_advanced_stats=True)
+                    populate_teams(db_handler,s_id)
+                    populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_matches(db_handler,s_id,player_advanced_stats=True)
                     populate_rounds(db_handler,s_id)
                     s_i += 1
