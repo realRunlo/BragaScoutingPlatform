@@ -4,8 +4,8 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 260.20329381910068,
-        "y": 375.84920218314539
+        "x": 1508.4535250712281,
+        "y": 404.88711709220365
       },
       "nodes": [
         {
@@ -225,6 +225,58 @@
           "nodeLineageTag": "6dee93a7-37b8-4b46-b46b-449fdf8746e1",
           "size": {
             "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1865.4266501978504,
+            "y": 865.730210312183
+          },
+          "nodeIndex": "home stats",
+          "nodeLineageTag": "df9fd6a3-b809-49f1-b023-12b6c37cd1d8",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2149.4266501978504,
+            "y": 865.730210312183
+          },
+          "nodeIndex": "partidas",
+          "nodeLineageTag": "f3eb1217-e2a2-4039-a2e1-3aebe465589d",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2433.4266501978504,
+            "y": 865.730210312183
+          },
+          "nodeIndex": "team stats",
+          "nodeLineageTag": "5b3c4a2c-499e-4f4a-afef-00ece40fc19e",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2707.4266501978504,
+            "y": 937.730210312183
+          },
+          "nodeIndex": "result colours",
+          "nodeLineageTag": "3df67aa1-5550-4451-af55-c53bfc3dc719",
+          "size": {
+            "height": 128,
             "width": 234
           },
           "zIndex": 0
