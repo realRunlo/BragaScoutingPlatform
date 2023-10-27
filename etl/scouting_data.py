@@ -7,6 +7,10 @@ from db import Db_handler
 from multiprocessing.pool import ThreadPool
 from utils import get_similar
 from api_handler import *
+from tqdm import tqdm
+
+pbar_players = tqdm()
+pbar_matches = tqdm()
 
 
 
@@ -347,6 +351,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                         values = f'''SELECT '{wyId}', '{position_percent}','{position_code}', '{position_name}',idteam_competition_season \
                                     FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
                         querys.append(('player_positions',values))
+        pbar_players.update(1)
     return querys
         
     
@@ -355,6 +360,7 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     '''Populates players table in db'''
     print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
+    pbar_players.total = len(players)
     result = run_threaded_for(prepare_players_insert,players,log=True,args=(player_advanced_stats),threads=12)
     querys = [query for query_list in result for query in query_list]
     player_querys_values = []
@@ -487,10 +493,24 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
             dateutc = process_date_utc(match_info['dateutc'])
             winner = process_mssql_value(match_info['winner'])
 
+
             values = f'''('{wyId}','{seasonId}', '{home_team}', '{away_team}', '{dateutc}',\
             '{home_score}','{away_score}', '{winner}')'''
 
             querys.append(('match',values))
+
+            # get match players and populate player table to avoid errors
+            players = []
+            for team in match_info['teamsData']:
+                for player in match_info['teamsData'][team]['formation']['lineup']:
+                    player['wyId'] = player['playerId']
+                    players.append(player)
+                for player in match_info['teamsData'][team]['formation']['bench']:
+                    player['wyId'] = player['playerId']
+                    players.append(player)
+            results = prepare_players_insert(players)
+            querys += results
+
 
             match_events = get_match_events(match['matchId'])
             match_lineups = get_match_lineups(match['matchId'])
@@ -573,7 +593,7 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                 else:
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}')'''
                     querys.append(('match_event_other',values))
-
+        pbar_matches.update(1)
     return querys
         
 
@@ -584,6 +604,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     Can gather advanced stats from players in each match'''
     print(f'Populating matches from season {season_id}')
     matches = get_season_matches(season_id)
+    pbar_matches.total = len(matches)
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats),threads=10)
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
@@ -733,8 +754,8 @@ def main(args,db_handler:Db_handler):
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                     populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_matches(db_handler,s_id,player_advanced_stats=True)
+                    populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_rounds(db_handler,s_id)
                     s_i += 1
 
