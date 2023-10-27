@@ -1,3 +1,4 @@
 pybase64
 jellyfish
-mysqlclient
+pymssql
+tqdm

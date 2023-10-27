@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import sys
+import threading
 import pymssql
 
 
@@ -13,6 +14,7 @@ class Db_handler:
     logger = None
 
     def __init__(self,config:dict=None,config_json:str=None,logger:logging.Logger=None) -> None:
+        self.db_lock = threading.Lock()
         if logger:
             self.logger = logger
         if config:
@@ -172,6 +174,23 @@ class Db_handler:
             self.connection.commit()
             cursor.close()
 
+
+    def select(self,table:str,parameters:str,where:str='',database:str='scouting',log:bool=False):
+        """Selects values from a table"""
+        if self.connection:
+            with self.db_lock:
+                if log:
+                    self.log(f'''Query: SELECT {parameters} FROM [{database}].[{table}] {where}''')
+                cursor = self.connection.cursor()
+                try:
+                    cursor.execute(f'''SELECT {parameters} FROM [{database}].[{table}] {where}''')
+                    if log:
+                        self.log(f'Values selected from table {table}')
+                    return cursor.fetchall()
+                except Exception as e:
+                    if log:
+                        self.log(f'Error selecting values from table {table}\n{e}',logging.ERROR)
+                cursor.close()
 
     def close_connection(self):
         """Closes the connection to the MySQL database"""

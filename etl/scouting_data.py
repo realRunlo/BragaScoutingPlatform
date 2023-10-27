@@ -29,7 +29,7 @@ def parse_arguments():
 
 
 
-def run_threaded_for(func,iterable, args=None,log=False,threads:int=6):
+def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6):
     '''Runs a function for each value in iterable'''
     if log:
         start_time = time.time()
@@ -43,7 +43,8 @@ def run_threaded_for(func,iterable, args=None,log=False,threads:int=6):
         else:
             iterable_divided[i] = iterable[i*max_slice_size:(i+1)*max_slice_size]
             
-    thread_args = [[x,args] if args else [x] for x in iterable_divided]
+
+    thread_args = [[x]+args if args else [x] for x in iterable_divided]
     pool = ThreadPool(threads)
     results = pool.starmap(func,thread_args)
     pool.close()
@@ -101,6 +102,18 @@ def process_mssql_bool(value:str,default:str='0'):
             pass
     return value
     
+
+def db_non_existent_players(players:list,db_handler:Db_handler):
+    '''Returns list of players that are not in db'''
+    where_statement = 'where idplayer in ('
+    for player in players:
+        where_statement += f"'{player['wyId']}',"
+    where_statement = where_statement[:-1] + ')'
+    db_players = db_handler.select('player','*',where_statement)
+    if db_players:
+        db_players = [p[0] for p in db_players]
+    non_existent_players = [p for p in players if p['wyId'] not in db_players]
+    return non_existent_players
 
 
 def extract_competitions_info(competitions:list):
@@ -256,7 +269,7 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     season_info = get_season_info(season_id)
     if season_info:
         teams = get_season_standings(season_id)
-        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=(season_id))
+        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id])
         querys = [query for query_list in result for query in query_list]
         team_query_values = []
         team_competition_season_query_values = []
@@ -361,7 +374,7 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
     pbar_players.total = len(players)
-    result = run_threaded_for(prepare_players_insert,players,log=True,args=(player_advanced_stats),threads=12)
+    result = run_threaded_for(prepare_players_insert,players,log=True,args=[player_advanced_stats],threads=12)
     querys = [query for query_list in result for query in query_list]
     player_querys_values = []
     player_positions_querys_values = []
@@ -478,7 +491,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 
 
 
-def prepare_matches_insert(matches,player_advanced_stats:bool=False):
+def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:bool=False):
     querys = []
     for match in matches:
         match_info = get_match_info(match['matchId'])
@@ -499,16 +512,16 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
 
             querys.append(('match',values))
 
-            # get match players and populate player table to avoid errors
+            # get match players and populate player table with non existent players to avoid errors
             players = []
             for team in match_info['teamsData']:
-                for player in match_info['teamsData'][team]['formation']['lineup']:
-                    player['wyId'] = player['playerId']
-                    players.append(player)
-                for player in match_info['teamsData'][team]['formation']['bench']:
-                    player['wyId'] = player['playerId']
-                    players.append(player)
-            results = prepare_players_insert(players)
+                if match_info['teamsData'][team]['formation']:
+                    for player in match_info['teamsData'][team]['formation']['lineup']:
+                        players.append(player['player'])
+                    for player in match_info['teamsData'][team]['formation']['bench']:
+                        players.append(player['player'])
+            players = db_non_existent_players(players,db_handler)
+            results = prepare_players_insert(players,player_advanced_stats=player_advanced_stats)
             querys += results
 
 
@@ -605,9 +618,13 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     print(f'Populating matches from season {season_id}')
     matches = get_season_matches(season_id)
     pbar_matches.total = len(matches)
-    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats),threads=10)
+    pbar_players.disable = True
+    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,player_advanced_stats],threads=10)
+    pbar_players.disable = False
+    pbar_players.reset()
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
+    player_query_values = []
     player_match_stats_query_values = []
     match_lineup_values = []
     match_lineup_player_position_values = []
@@ -624,6 +641,8 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     for query in querys:
         if query[0] == 'match':
             match_query_values.append(query[1])
+        elif query[0] == 'player':
+            player_query_values.append(query[1])
         elif query[0] == 'player_match_stats':
             player_match_stats_query_values.append(query[1])
         elif query[0] == 'match_lineup':
@@ -650,6 +669,13 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     match_key_parameters = ['idmatch']
     match_parameters = ['idmatch', 'competition_season', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
     db_handler.insert_or_update_many('match',match_query_values,key_parameters=match_key_parameters,parameters=match_parameters)
+
+    # player table
+    player_key_parameters = ['idplayer']
+    player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
+                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency']
+    db_handler.insert_or_update_many('player',player_query_values,key_parameters=player_key_parameters,parameters=player_parameters)
+                         
 
     if player_advanced_stats:
         # player_match_stats table
@@ -754,8 +780,8 @@ def main(args,db_handler:Db_handler):
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                     populate_teams(db_handler,s_id)
-                    populate_matches(db_handler,s_id,player_advanced_stats=True)
                     populate_players(db_handler,s_id,player_advanced_stats=True)
+                    populate_matches(db_handler,s_id,player_advanced_stats=True)
                     populate_rounds(db_handler,s_id)
                     s_i += 1
 
