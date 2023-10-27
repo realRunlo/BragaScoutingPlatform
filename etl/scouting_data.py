@@ -7,6 +7,10 @@ from db import Db_handler
 from multiprocessing.pool import ThreadPool
 from utils import get_similar
 from api_handler import *
+from tqdm import tqdm
+
+pbar_players = tqdm()
+pbar_matches = tqdm()
 
 
 
@@ -347,6 +351,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
                         values = f'''SELECT '{wyId}', '{position_percent}','{position_code}', '{position_name}',idteam_competition_season \
                                     FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
                         querys.append(('player_positions',values))
+        pbar_players.update(1)
     return querys
         
     
@@ -355,6 +360,7 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     '''Populates players table in db'''
     print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
+    pbar_players.total = len(players)
     result = run_threaded_for(prepare_players_insert,players,log=True,args=(player_advanced_stats),threads=12)
     querys = [query for query_list in result for query in query_list]
     player_querys_values = []
@@ -587,7 +593,7 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
                 else:
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}')'''
                     querys.append(('match_event_other',values))
-
+        pbar_matches.update(1)
     return querys
         
 
@@ -598,6 +604,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     Can gather advanced stats from players in each match'''
     print(f'Populating matches from season {season_id}')
     matches = get_season_matches(season_id)
+    pbar_matches.total = len(matches)
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=(player_advanced_stats),threads=10)
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
