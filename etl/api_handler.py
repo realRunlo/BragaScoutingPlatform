@@ -173,6 +173,14 @@ def get_season_standings(season,retry:bool=True):
     params = {'details':'teams'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
     standings = result['teams'] if result else []
+    if standings:
+        unique_teams = {}
+        for team in standings:
+            if team['teamId'] not in unique_teams:
+                unique_teams[team['teamId']] = team
+            else:
+                if team['totalPlayed'] > unique_teams[team['teamId']]['totalPlayed']:
+                    unique_teams[team['teamId']] = team
     return standings
 
 def get_season_career(season,retry:bool=True):
