@@ -487,10 +487,24 @@ def prepare_matches_insert(matches,player_advanced_stats:bool=False):
             dateutc = process_date_utc(match_info['dateutc'])
             winner = process_mssql_value(match_info['winner'])
 
+
             values = f'''('{wyId}','{seasonId}', '{home_team}', '{away_team}', '{dateutc}',\
             '{home_score}','{away_score}', '{winner}')'''
 
             querys.append(('match',values))
+
+            # get match players and populate player table to avoid errors
+            players = []
+            for team in match_info['teamsData']:
+                for player in match_info['teamsData'][team]['formation']['lineup']:
+                    player['wyId'] = player['playerId']
+                    players.append(player)
+                for player in match_info['teamsData'][team]['formation']['bench']:
+                    player['wyId'] = player['playerId']
+                    players.append(player)
+            results = prepare_players_insert(players)
+            querys += results
+
 
             match_events = get_match_events(match['matchId'])
             match_lineups = get_match_lineups(match['matchId'])
@@ -733,8 +747,8 @@ def main(args,db_handler:Db_handler):
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                     populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_matches(db_handler,s_id,player_advanced_stats=True)
+                    populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_rounds(db_handler,s_id)
                     s_i += 1
 

@@ -120,7 +120,7 @@ def get_match_info(match,retry:bool=True):
     '''Requests match info from API'''
     url = f'{api_url}matches/{match}'
     headers = {'Authorization': encoded_authentication}
-    params = {'useSides':'true'}
+    params = {'useSides':'true','details':'players'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
     match_info = result if result else None
     return match_info 
