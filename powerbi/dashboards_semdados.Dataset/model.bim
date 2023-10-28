@@ -4469,7 +4469,7 @@
               }
             ],
             "dataType": "int64",
-            "expression": "classification_table_team_stats[GS] - classification_table_team_stats[GM]",
+            "expression": "classification_table_team_stats[GM] - classification_table_team_stats[GS]",
             "formatString": "0",
             "isDataTypeInferred": true,
             "lineageTag": "90cbe34b-37f1-4ad6-9fa5-38aa2dc533de",
