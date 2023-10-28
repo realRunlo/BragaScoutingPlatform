@@ -54,20 +54,20 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
     return results
 
 
-def process_date(date:str):
+def process_date(value:str):
     '''Process date string'''
     date = ''
     try:
-        date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
+        date = datetime.datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%d')
     except Exception as e:
         pass
     return date
 
-def process_date_utc(date:str):
+def process_date_utc(value:str):
     '''Process dateutc string'''
     date = ''
     try:
-        date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
+        date = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
     except Exception as e:
         pass
     return date
@@ -80,27 +80,27 @@ def process_mssql_value(value:str):
 
 def process_mssql_number(value:str,default:str='-1'):
     '''Process number to be inserted in mssql db'''
-    value = default
+    number = default
     if value:
-        value = value.replace("\'","\'\'")
-    if value.strip() in ['','None']:
-        value = default
-    return value
+        number = f'{value}'.replace("\'","\'\'")
+    if number.strip() in ['','None']:
+        number = default
+    return number
 
 def process_mssql_bool(value:str,default:str='0'):
     '''Process bool to be inserted in mssql db'''
-    value = default
+    bool = default
     if value:
         try:
-            value = value.replace("\'","\'\'").lower()
-            if value == 'true':
-                value = '1'
+            bool = f'{value}'.replace("\'","\'\'").lower()
+            if bool == 'true':
+                bool = '1'
             else:
-                value = '0'
+                bool = '0'
         except Exception as e:
-            value = default
+            bool = default
             pass
-    return value
+    return bool
     
 
 def db_non_existent_players(players:list,db_handler:Db_handler):
@@ -621,7 +621,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     pbar_players.disable = True
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,player_advanced_stats],threads=10)
     pbar_players.disable = False
-    pbar_players.reset()
+    pbar_players.refresh()
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
     player_query_values = []

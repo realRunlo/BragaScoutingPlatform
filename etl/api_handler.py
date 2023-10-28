@@ -181,6 +181,7 @@ def get_season_standings(season,retry:bool=True):
             else:
                 if team['totalPlayed'] > unique_teams[team['teamId']]['totalPlayed']:
                     unique_teams[team['teamId']] = team
+        standings = list(unique_teams.values())
     return standings
 
 def get_season_career(season,retry:bool=True):
