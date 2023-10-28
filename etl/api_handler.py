@@ -229,11 +229,14 @@ def get_season_matches(season,retry:bool=True):
     matches = result['matches'] if result else []
     return matches
 
-def get_match_players_stats(match,retry:bool=True):
+def get_match_players_stats(match,players:bool=False,retry:bool=True):
     '''Requests list of all players stats in a match from API'''
     url = f'{api_url}matches/{match}/advancedstats/players'
     headers = {'Authorization': encoded_authentication}
-    result = get_request_api(url,headers=headers,retry=retry)
+    params = None
+    if players:
+        params = {'details':'player'}
+    result = get_request_api(url,headers=headers,params=params,retry=retry)
     players_stats = result['players'] if result else []
     return players_stats
 

@@ -14,7 +14,6 @@ pbar_matches = tqdm()
 
 
 
-
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
@@ -81,7 +80,7 @@ def process_mssql_value(value:str):
 def process_mssql_number(value:str,default:str='-1'):
     '''Process number to be inserted in mssql db'''
     number = default
-    if value:
+    if f'{value}':
         number = f'{value}'.replace("\'","\'\'")
     if number.strip() in ['','None']:
         number = default
@@ -90,7 +89,7 @@ def process_mssql_number(value:str,default:str='-1'):
 def process_mssql_bool(value:str,default:str='0'):
     '''Process bool to be inserted in mssql db'''
     bool = default
-    if value:
+    if f'{value}':
         try:
             bool = f'{value}'.replace("\'","\'\'").lower()
             if bool == 'true':
@@ -106,13 +105,24 @@ def process_mssql_bool(value:str,default:str='0'):
 def db_non_existent_players(players:list,db_handler:Db_handler):
     '''Returns list of players that are not in db'''
     where_statement = 'where idplayer in ('
+    #remove duplicates in players list
+    unique_players = {}
     for player in players:
-        where_statement += f"'{player['wyId']}',"
+        if player['wyId'] not in unique_players:
+            unique_players[player['wyId']]= player
+
+    # create where statement
+    for player_id in unique_players:
+        where_statement += f"'{player_id}',"
     where_statement = where_statement[:-1] + ')'
+
+    # get players from db
     db_players = db_handler.select('player','*',where_statement)
     if db_players:
         db_players = [p[0] for p in db_players]
-    non_existent_players = [p for p in players if p['wyId'] not in db_players]
+
+    # get non existent players
+    non_existent_players = [p for p in unique_players.values() if p['wyId'] not in db_players]
     return non_existent_players
 
 
@@ -373,7 +383,7 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     '''Populates players table in db'''
     print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
-    pbar_players.total = len(players)
+    pbar_players.reset(total=len(players))
     result = run_threaded_for(prepare_players_insert,players,log=True,args=[player_advanced_stats],threads=12)
     querys = [query for query_list in result for query in query_list]
     player_querys_values = []
@@ -404,10 +414,11 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         db_handler.insert_or_update_many('player_positions',player_positions_querys_values,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
 
 
-def prepare_match_players_stats_insert(match:int):
+def prepare_match_players_stats_insert(match:int,players:bool=False):
     '''Prepare values for player_match_stats table in db'''
     querys = []
-    match_players_stats = get_match_players_stats(match)
+    players_list = []
+    match_players_stats = get_match_players_stats(match,players=players)
     for player_stats in match_players_stats:
         player = process_mssql_value(player_stats['playerId'])
         offensive_duels = process_mssql_number(player_stats['total']['offensiveDuels'])
@@ -435,7 +446,16 @@ def prepare_match_players_stats_insert(match:int):
                      '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}')'''
 
         querys.append(('player_match_stats',values))
+        if players:
+            if player_stats['player']:
+                players_list.append(player_stats['player'])
+            # inconsistency (player is not registered in API), remove last query
+            else:
+                querys.pop()
+    if players:
+        return querys,players_list
     return querys
+    
 
 
 def prepare_match_formation_insert(match:int,match_team_info:dict):
@@ -493,6 +513,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 
 def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:bool=False):
     querys = []
+    matches_players_list = []
     for match in matches:
         match_info = get_match_info(match['matchId'])
         # get match basic info
@@ -512,17 +533,13 @@ def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:b
 
             querys.append(('match',values))
 
-            # get match players and populate player table with non existent players to avoid errors
-            players = []
+            # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
                 if match_info['teamsData'][team]['formation']:
                     for player in match_info['teamsData'][team]['formation']['lineup']:
-                        players.append(player['player'])
+                        matches_players_list.append(player['player'])
                     for player in match_info['teamsData'][team]['formation']['bench']:
-                        players.append(player['player'])
-            players = db_non_existent_players(players,db_handler)
-            results = prepare_players_insert(players,player_advanced_stats=player_advanced_stats)
-            querys += results
+                        matches_players_list.append(player['player'])
 
 
             match_events = get_match_events(match['matchId'])
@@ -549,13 +566,16 @@ def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:b
                                         position = process_mssql_value(playerdict[playerId]['position'])
                                         values = f'''SELECT match_lineup_id, '{playerId}','{position}' 
                                                     FROM [scouting].[match_lineup] 
-                                                    WHERE [match]='{match['matchId']}' AND team='{team}' AND period='{part}' AND second='{time}' '''
+                                                    WHERE [match]='{match['matchId']}' AND [team]='{team}' AND [period]='{part}' AND [second]='{time}' '''
                                         querys.append(('match_lineup_player_position',values))
 
             # get match advanced stats for each player
             if player_advanced_stats:
-                query_list = prepare_match_players_stats_insert(match['matchId'])
+                query_list,players_list = prepare_match_players_stats_insert(match['matchId'],players=True)
                 querys += query_list
+                # get match players for populate (because of api inconsistency)
+                matches_players_list += players_list
+                
 
             # get match events
             for event in match_events:
@@ -607,6 +627,10 @@ def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:b
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}')'''
                     querys.append(('match_event_other',values))
         pbar_matches.update(1)
+    # prepare insert of non existent players
+    matches_players_list = db_non_existent_players(matches_players_list,db_handler)
+    results = prepare_players_insert(matches_players_list,player_advanced_stats=player_advanced_stats)
+    querys += results
     return querys
         
 
@@ -617,11 +641,13 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     Can gather advanced stats from players in each match'''
     print(f'Populating matches from season {season_id}')
     matches = get_season_matches(season_id)
-    pbar_matches.total = len(matches)
+    pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,player_advanced_stats],threads=10)
     pbar_players.disable = False
-    pbar_players.refresh()
+    pbar_matches.refresh()
+    pbar_matches.reset()
+    pbar_players.clear()
     querys = [query for query_list in result for query in query_list]
     match_query_values = []
     player_query_values = []
@@ -664,7 +690,6 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         elif query[0] == 'match_event_other':
             match_events_values['other'].append(query[1])
 
-    print('Inserting matches into db',match_query_values)
     # match table
     match_key_parameters = ['idmatch']
     match_parameters = ['idmatch', 'competition_season', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
