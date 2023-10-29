@@ -65,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "scouting-rg" {
 
     admin_ssh_key {
         username   = "adminuser"
-        public_key = file("~/.ssh/vm1.pub")
+        public_key = file("~/.ssh/vm1.pub") 
     }
 
     os_disk {
