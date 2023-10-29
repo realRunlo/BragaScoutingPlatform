@@ -6,3 +6,4 @@ db/DigiCertGlobalRootCA.crt.pem
 etl/request.json
 powerbi/dashboards_semdados.Dataset/.pbi/cache.abf
 powerbi/dashboards_semdados.Dataset/.pbi/unappliedChanges.json
+terraform.*
