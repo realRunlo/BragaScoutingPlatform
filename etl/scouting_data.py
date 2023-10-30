@@ -299,7 +299,7 @@ def populate_teams(db_handler:Db_handler,season_id:int):
         db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
         
 
-def prepare_players_insert(players,player_advanced_stats:bool=False):
+def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
     querys = []
     for player in players:
         contractInfo = get_player_contract_info(player['wyId'])
@@ -339,9 +339,9 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
         # get player advanced stats
         if player_advanced_stats:
             career = get_player_career(player['wyId'])
-            career = get_latest_career_entries(career,entries=5)
+            entries = get_season_career_entries(career,season_id)
             # populate career table
-            for entry in career:
+            for entry in entries:
                 season = process_mssql_value(entry['seasonId'])
                 team = process_mssql_value(entry['teamId'])
                 competition = process_mssql_value(entry['competitionId'])
@@ -385,7 +385,7 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     print(f'Populating players from season {season_id}')
     players = get_season_players(season_id)
     pbar_players.reset(total=len(players))
-    result = run_threaded_for(prepare_players_insert,players,log=True,args=[player_advanced_stats],threads=12)
+    result = run_threaded_for(prepare_players_insert,players,log=True,args=[season_id,player_advanced_stats],threads=12)
     querys = [query for query_list in result for query in query_list]
     player_querys_values = []
     player_positions_querys_values = []
@@ -512,7 +512,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 
 
 
-def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:bool=False):
+def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanced_stats:bool=False):
     querys = []
     matches_players_list = []
     for match in matches:
@@ -630,7 +630,7 @@ def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:b
         pbar_matches.update(1)
     # prepare insert of non existent players
     matches_players_list = db_non_existent_players(matches_players_list,db_handler)
-    results = prepare_players_insert(matches_players_list,player_advanced_stats=player_advanced_stats)
+    results = prepare_players_insert(matches_players_list,season_id,player_advanced_stats=player_advanced_stats)
     querys += results
     return querys
         
@@ -644,7 +644,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     matches = get_season_matches(season_id)
     pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
-    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,player_advanced_stats],threads=10)
+    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,season_id,player_advanced_stats],threads=10)
     pbar_players.disable = False
     pbar_matches.refresh()
     pbar_matches.reset()

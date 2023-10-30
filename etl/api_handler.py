@@ -61,12 +61,11 @@ def get_most_updated_season(career):
     return most_updated_season
 
 
-def get_latest_career_entries(career:list[dict],entries:int=5):
+def get_season_career_entries(career:list[dict],season_id):
     '''Gets latest career entries'''
     entry_list = []
     if career:
-        entry_list = sorted(career, key=lambda k: k['season']['startDate'],reverse=True)
-        entry_list = entry_list[0:entries]
+        entry_list = [k for k in career if k['seasonId'] == season_id]
     return entry_list
 
 def get_areas(retry:bool=True):
