@@ -292,10 +292,10 @@ def populate_teams(db_handler:Db_handler,season_id:int):
 
         team_key_parameters = ['idteam']
         team_parameters = ['idteam','name','official_name','icon','gender','type','city','category','area']
+        db_handler.insert_or_update_many('team',team_query_values,key_parameters=team_key_parameters,parameters=team_parameters)
         
         team_competition_season_key_parameters = ['competition_season','team']
         team_competition_season_parameters = ['competition_season','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins']
-        db_handler.insert_or_update_many('team',team_query_values,key_parameters=team_key_parameters,parameters=team_parameters)
         db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
         
 
@@ -327,12 +327,13 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
         role_name = process_mssql_value(player['role']['name'])
         contractExpiration = process_date(contractExpiration)
         player_agencies = process_mssql_value(player_agencies)
+        current_team = process_mssql_number(player['currentTeamId'])
 
         values = f'''('{wyId}', '{player_name}', '{shortName}', '{birthArea}', \
                     '{birthDate}', '{imageDataURL}', '{foot}',\
                     '{height}','{weight}','{status}','{gender}',\
                     '{role_code2}', '{role_code3}', '{role_name}'\
-                    ,'{contractExpiration}','{player_agencies}')'''
+                    ,'{contractExpiration}','{player_agencies}','{current_team}')'''
         querys.append(('player',values))
 
         # get player advanced stats
@@ -357,7 +358,7 @@ def prepare_players_insert(players,player_advanced_stats:bool=False):
 
                 values = f'''SELECT '{wyId}', idteam_competition_season, '{appearances}','{goal}','{minutesPlayed}',\
                             '{penalties}','{redCards}','{shirtNumber}','{substituteIn}','{substituteOnBench}',\
-                            '{substituteOut}','{yellowCard}' 
+                            '{substituteOut}','{yellowCard}','{team}','{season}' 
                             FROM [scouting].[team_competition_season] 
                             WHERE [team]='{team}' AND [competition_season]='{season}' '''
                 querys.append(('career_entry',values))
@@ -400,12 +401,12 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     player_key_parameters = ['idplayer']
     player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
-                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency']
+                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
     db_handler.insert_or_update_many('player',player_querys_values,key_parameters=player_key_parameters,parameters=player_parameters)
 
     career_entry_key_parameters = ['player','team_competition_season']
     career_entry_parameters = ['player','team_competition_season','appearances','goal','minutesPlayed','penalties',
-                               'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard']
+                               'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard','team','competition_season']
     db_handler.insert_or_update_many('career_entry',career_entry_querys_values,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
     
     if player_advanced_stats:
@@ -577,7 +578,7 @@ def prepare_matches_insert(matches,db_handler:Db_handler,player_advanced_stats:b
                 matches_players_list += players_list
                 
 
-            # get match events
+            # # get match events
             for event in match_events:
                 id = process_mssql_value(event['id'])
                 matchid = process_mssql_value(event['matchId'])
@@ -690,7 +691,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         elif query[0] == 'match_event_other':
             match_events_values['other'].append(query[1])
 
-    # match table
+    # # match table
     match_key_parameters = ['idmatch']
     match_parameters = ['idmatch', 'competition_season', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
     db_handler.insert_or_update_many('match',match_query_values,key_parameters=match_key_parameters,parameters=match_parameters)
@@ -698,7 +699,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     # player table
     player_key_parameters = ['idplayer']
     player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
-                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency']
+                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
     db_handler.insert_or_update_many('player',player_query_values,key_parameters=player_key_parameters,parameters=player_parameters)
                          
 
