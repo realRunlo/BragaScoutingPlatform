@@ -281,22 +281,6 @@ def prepare_teams_insert(teams,season_id:int):
     return querys
 
 
-#def populate_rounds(db_handler:Db_handler,season_id:int):
-#    '''Populates rounds table in db'''
-#    print(f'Populating rounds from season {season_id}')
-#    season_rounds = get_season_career(season_id)
-#    querys = []
-#    for sr in season_rounds:
-#        round = sr['round']
-#        startDate = process_date(round['startDate'])
-#        endDate = process_date(round['endDate'])
-#        name = process_mssql_value(round['name'])
-#        
-#        values = f'''('{season_id}','{startDate}', '{endDate}', '{name}' )'''
-#        querys.append(values)
-#    rounds_key_parameters = ['competition_season','startDate','endDate']
-#    parameters = ['competition_season','startDate','endDate','name']
-#    db_handler.insert_or_update_many('round',querys,key_parameters=rounds_key_parameters,parameters=parameters)
 
 def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates teams table in db, as well as team_competition_season table'''    
@@ -317,7 +301,7 @@ def populate_teams(db_handler:Db_handler,season_id:int):
         groups = season_round['groups']
         teams = []
         for group in groups:
-            teams_group = group['team']
+            teams_group = group['teams']
             teams += teams_group
         
         result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id])
@@ -396,7 +380,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         # get player advanced stats
         if player_advanced_stats:
             career = get_player_career(player['wyId'])
-            entries = get_season_career_entries(career,season_id)
+            entries = get_season_career_entries(career,int(season_id))
             # populate career table
             for entry in entries:
                 season = process_mssql_value(entry['seasonId'])

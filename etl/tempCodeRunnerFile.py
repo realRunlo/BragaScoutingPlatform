@@ -1,1 +1,1 @@
-get_player_advanced_stats
+get_season_career_entries

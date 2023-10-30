@@ -61,7 +61,7 @@ def get_most_updated_season(career):
     return most_updated_season
 
 
-def get_season_career_entries(career:list[dict],season_id):
+def get_season_career_entries(career:list[dict],season_id:int):
     '''Gets latest career entries'''
     entry_list = []
     if career:
