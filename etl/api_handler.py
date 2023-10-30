@@ -187,7 +187,7 @@ def get_season_career(season,retry:bool=True):
     '''Requests general performance information about all the teams for the given season from API'''
     url = f'{api_url}seasons/{season}/career'
     headers = {'Authorization': encoded_authentication}
-    params = {'details':'round'}
+    params = {'details':'round,team'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
     season_career = result['rounds'] if result else []
     return season_career

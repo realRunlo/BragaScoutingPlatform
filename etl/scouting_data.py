@@ -135,7 +135,8 @@ def extract_competitions_info(competitions:list):
     for competition in competitions:
         c_i = {
             'wyId':None,
-            'seasons':[]
+            'seasons':[],
+            'custom_name' : None
         }
         if 'wyId' in competition:
             c_i['wyId'] = competition['wyId']
@@ -153,6 +154,8 @@ def extract_competitions_info(competitions:list):
             else:
                 #ERROR
                 continue
+        if 'tm_code' in competition:
+            c_i['custom_name'] = competition['tm_code']
         for season in competition['seasons']:
             if 'wyId' in season:
                 c_i['seasons'].append(season['wyId'])
@@ -195,7 +198,7 @@ def populate_areas(db_handler:Db_handler):
 def populate_competitions(db_handler:Db_handler,competitions_id:list):
     '''Populates competitions table in db'''
     c_i = 0
-    for competition_id in competitions_id:
+    for competition_id,competition_custom_name in competitions_id:
         print(f'Requesting competition {c_i}/{len(competitions_id)}')
         competition_info = get_competition_info(competition_id)
         if competition_info:
@@ -207,12 +210,13 @@ def populate_competitions(db_handler:Db_handler,competitions_id:list):
             format = process_mssql_value(competition_info['format'])
             divisionLevel = process_mssql_value(competition_info['divisionLevel'])
             category = process_mssql_value(competition_info['category'])
+            custom_name =process_mssql_value(competition_custom_name)
 
             values = f'''('{wyId}', '{name}', '{area_id}', '{gender}',\
-                         '{type}', '{format}', '{divisionLevel}', '{category}')'''
+                         '{type}', '{format}', '{divisionLevel}', '{category}', '{custom_name}')'''
             
             key_parameters = ['idcompetitions']
-            parameters = ['idcompetitions','name','area','gender','type','format','divisionLevel','category']
+            parameters = ['idcompetitions','name','area','gender','type','format','divisionLevel','category','custom_name']
 
             db_handler.insert_or_update('competition',values,key_parameters=key_parameters,parameters=parameters)
         c_i += 1
@@ -259,45 +263,98 @@ def prepare_teams_insert(teams,season_id:int):
                         '{city}', '{category}', '{area_id}')'''
             querys.append(('team',values))
 
-            totalDraws = process_mssql_value(team['totalDraws'])
-            totalGoalsAgainst = process_mssql_value(team['totalGoalsAgainst'])
-            totalGoalsFor = process_mssql_value(team['totalGoalsFor'])
-            totalLosses = process_mssql_value(team['totalLosses'])
-            totalPlayed = process_mssql_value(team['totalPlayed'])
-            totalPoints = process_mssql_value(team['totalPoints'])
-            totalWins = process_mssql_value(team['totalWins'])
+            totalDraws = process_mssql_number(team['gameDraw'])
+            totalGoalsAgainst = process_mssql_number(team['goalAgainst'])
+            totalGoalsFor = process_mssql_number(team['goalPro'])
+            totalLosses = process_mssql_number(team['gameLost'])
+            totalPlayed = process_mssql_number(team['gameTotal'])
+            totalPoints = process_mssql_number(team['points'])
+            totalWins = process_mssql_number(team['gameWon'])
+            rank = process_mssql_number(team['rank'])
 
-            values = f'''('{season_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
-                        '{totalPlayed}','{totalPoints}','{totalWins}')'''
-            querys.append(('team_competition_season',values))
+            values_tcsr = f'''('{season_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
+                        '{totalPlayed}','{totalPoints}','{totalWins}','{rank}')'''
+            
+            values_tcs = f'''('{season_id}', '{wyId}')'''
+            querys.append(('team_competition_season_round',values_tcsr))
+            querys.append(('team_competition_season',values_tcs))
     return querys
 
-    
+
+#def populate_rounds(db_handler:Db_handler,season_id:int):
+#    '''Populates rounds table in db'''
+#    print(f'Populating rounds from season {season_id}')
+#    season_rounds = get_season_career(season_id)
+#    querys = []
+#    for sr in season_rounds:
+#        round = sr['round']
+#        startDate = process_date(round['startDate'])
+#        endDate = process_date(round['endDate'])
+#        name = process_mssql_value(round['name'])
+#        
+#        values = f'''('{season_id}','{startDate}', '{endDate}', '{name}' )'''
+#        querys.append(values)
+#    rounds_key_parameters = ['competition_season','startDate','endDate']
+#    parameters = ['competition_season','startDate','endDate','name']
+#    db_handler.insert_or_update_many('round',querys,key_parameters=rounds_key_parameters,parameters=parameters)
 
 def populate_teams(db_handler:Db_handler,season_id:int):
-    '''Populates teams table in db, as well as team_competition_season table'''
-    season_info = get_season_info(season_id)
-    if season_info:
-        teams = get_season_standings(season_id)
-        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id])
-        querys = [query for query_list in result for query in query_list]
-        team_query_values = []
-        team_competition_season_query_values = []
-        # separate querys
-        for query in querys:
-            if query[0] == 'team':
-                team_query_values.append(query[1])
-            elif query[0] == 'team_competition_season':
-                team_competition_season_query_values.append(query[1])
+    '''Populates teams table in db, as well as team_competition_season table'''    
+    season_rounds = get_season_career(season_id)
 
-        team_key_parameters = ['idteam']
-        team_parameters = ['idteam','name','official_name','icon','gender','type','city','category','area']
-        db_handler.insert_or_update_many('team',team_query_values,key_parameters=team_key_parameters,parameters=team_parameters)
+    rounds_queries = []
+    teams_queries = []
+
+    for season_round in season_rounds:
+        round = season_round['round']
+        startDate = process_date(round['startDate'])
+        endDate = process_date(round['endDate'])
+        name = process_mssql_value(round['name'])
+        roundid = process_mssql_value(round['wyId'])
+        values = f'''('{roundid}','{season_id}','{startDate}', '{endDate}', '{name}' )'''
+        rounds_queries.append(values)
+        #process round
+        groups = season_round['groups']
+        teams = []
+        for group in groups:
+            teams_group = group['team']
+            teams += teams_group
         
-        team_competition_season_key_parameters = ['competition_season','team']
-        team_competition_season_parameters = ['competition_season','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins']
-        db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
-        
+        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id])
+        teams_queries += [query for query_list in result for query in query_list]
+    
+    team_query_values = []
+    team_competition_season_round_query_values = []
+    team_competition_season_query_values = []
+    
+    # separate querys
+    for query in teams_queries:
+        if query[0] == 'team':
+            team_query_values.append(query[1])
+        elif query[0] == 'team_competition_season_round':
+            team_competition_season_round_query_values.append(query[1])
+        elif query[0] == 'team_competition_season':
+            team_competition_season_query_values.append(query[1])
+
+    #insert rounds
+    rounds_key_parameters = ['idcompetition_season_round']
+    parameters = ['idcompetition_season_round','competition_season','startDate','endDate','name']
+    db_handler.insert_or_update_many('competition_season_round',rounds_queries,key_parameters=rounds_key_parameters,parameters=parameters)
+    
+    #insert teams
+    team_key_parameters = ['idteam']
+    team_parameters = ['idteam','name','official_name','icon','gender','type','city','category','area']
+    db_handler.insert_or_update_many('team',team_query_values,key_parameters=team_key_parameters,parameters=team_parameters)
+
+    #insert teams competition season
+    team_competition_season_key_parameters = ['competition_season','team']
+    team_competition_season_parameters = ['competition_season','team']
+    db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
+    
+    #insert teams competition season rounds
+    team_competition_season_round_key_parameters = ['competition_season_round','team']
+    team_competition_season_round_parameters = ['competition_season_round','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins','rank']
+    db_handler.insert_or_update_many('team_competition_season_round',team_competition_season_round_query_values,key_parameters=team_competition_season_round_key_parameters,parameters=team_competition_season_round_parameters)
 
 def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
     querys = []
@@ -756,24 +813,6 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     db_handler.insert_or_update_many('match_event_infraction', match_events_values['infraction'], key_parameters=match_event_infraction_key_parameters, parameters=match_event_infraction_parameters)
     
 
-
-def populate_rounds(db_handler:Db_handler,season_id:int):
-    '''Populates rounds table in db'''
-    print(f'Populating rounds from season {season_id}')
-    season_rounds = get_season_career(season_id)
-    querys = []
-    for sr in season_rounds:
-        round = sr['round']
-        startDate = process_date(round['startDate'])
-        endDate = process_date(round['endDate'])
-        name = process_mssql_value(round['name'])
-        
-        values = f'''('{season_id}','{startDate}', '{endDate}', '{name}' )'''
-        querys.append(values)
-    rounds_key_parameters = ['competition_season','startDate','endDate']
-    parameters = ['competition_season','startDate','endDate','name']
-    db_handler.insert_or_update_many('round',querys,key_parameters=rounds_key_parameters,parameters=parameters)
-
         
 
 
@@ -793,7 +832,7 @@ def main(args,db_handler:Db_handler):
                 competitions = request_file['competitions']
                 competitions_info = extract_competitions_info(competitions)
                 #print(competitions_info)
-                competitions_id = [c['wyId'] for c in competitions_info]
+                competitions_id = [(c['wyId'],c['custom_name']) for c in competitions_info]
                 # populate competitions
                 populate_competitions(db_handler,competitions_id)
 
@@ -808,7 +847,6 @@ def main(args,db_handler:Db_handler):
                     populate_teams(db_handler,s_id)
                     populate_players(db_handler,s_id,player_advanced_stats=True)
                     populate_matches(db_handler,s_id,player_advanced_stats=True)
-                    populate_rounds(db_handler,s_id)
                     s_i += 1
 
         else:
