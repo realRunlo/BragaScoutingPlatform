@@ -33,6 +33,7 @@ class Db_handler:
     def create_connection(self):
         """Creates a connection to the MySQL database"""
         try:
+
             self.connection = pymssql.connect(**self.db_config)
             self.log('Connection to the database established')
         except Exception as e:
@@ -47,7 +48,7 @@ class Db_handler:
             self.log(f'''Query: INSERT INTO {database}.{table} VALUES {values}''')
             cursor = self.connection.cursor()
             try:
-                cursor.execute(f"""INSERT INTO {database}.{table} VALUES {values}""")
+                cursor.execute(f"""INSERT INTO [{database}].[{table}] VALUES {values}""")
                 self.log(f'Values {values} inserted into table {table}')
             except Exception as e:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
@@ -84,7 +85,7 @@ class Db_handler:
                             on_update.append(f'target.[{param}] = source.[{param}]')
                     on_update = ','.join(on_update)
                 
-                query = f'''MERGE {database}.{table} as target 
+                query = f'''MERGE [{database}].[{table}] as target 
                                 USING 
                                     (VALUES {values}) 
                                     AS source ({parameters_group})
@@ -150,7 +151,7 @@ class Db_handler:
                     batch = delimiter.join(values[i:i+batch_size])
                     if delimiter == ',':
                         batch = f'VALUES {batch}'
-                    query = f'''MERGE {database}.{table} as target 
+                    query = f'''MERGE [{database}].[{table}] as target 
                                 USING 
                                     ({batch}) 
                                     AS source ({parameters_group})
