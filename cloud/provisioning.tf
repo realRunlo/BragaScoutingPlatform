@@ -14,7 +14,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "scouting-rg" {
-    name     = "resources"
+    name     = "scouting-rg"
     location = "West Europe"
 }
 
