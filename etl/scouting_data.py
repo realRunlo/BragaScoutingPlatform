@@ -570,6 +570,7 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
         if match_info:
             wyId = process_mssql_value(match_info['wyId'])
             seasonId = process_mssql_value(match_info['seasonId'])
+            roundId = process_mssql_value(match_info['roundId'])
             home_team = process_mssql_value(match_info['teamsData']['home']['teamId'])
             home_score = process_mssql_value(match_info['teamsData']['home']['score'])
             away_team = process_mssql_value(match_info['teamsData']['away']['teamId'])
@@ -578,7 +579,7 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
             winner = process_mssql_value(match_info['winner'])
 
 
-            values = f'''('{wyId}','{seasonId}', '{home_team}', '{away_team}', '{dateutc}',\
+            values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', '{dateutc}',\
             '{home_score}','{away_score}', '{winner}')'''
 
             querys.append(('match',values))
@@ -742,7 +743,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     # # match table
     match_key_parameters = ['idmatch']
-    match_parameters = ['idmatch', 'competition_season', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
+    match_parameters = ['idmatch', 'competition_season','round', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
     db_handler.insert_or_update_many('match',match_query_values,key_parameters=match_key_parameters,parameters=match_parameters)
 
     # player table
