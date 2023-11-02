@@ -54,6 +54,24 @@ class Db_handler:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
             cursor.close()
 
+    def update(self,table:str,parameter:str,value:str,where:str,database:str='scouting',log:bool=False):
+        """Update values into a table"""
+        if self.connection:
+            if log:
+                self.log(f'''Query: UPDATE {database}.{table} SET {parameter} = {value} {where}''')
+            cursor = self.connection.cursor()
+            try:
+                query = f'''UPDATE {database}.{table} SET {parameter} = {value} {where}'''
+                cursor.execute(query)
+            except Exception as e:
+                if log:
+                    self.log(f'Error updating value {value} on {parameter} into table {table}\n{e}',logging.ERROR)
+                open('error.txt','w', encoding="utf-8").write(query)
+                sys.exit()
+            self.connection.commit()
+            cursor.close()
+
+
     def insert_or_update(self,table:str, values:str,key_parameters:list[str],parameters:str,update:bool=True,database:str='scouting'):
         """Inserts/updates values into a table"""
         if self.connection:
