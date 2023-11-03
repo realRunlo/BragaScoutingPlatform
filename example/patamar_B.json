@@ -335,6 +335,26 @@
                     "end": "2020"
                 }
             ]
+        },
+        {
+            "wyId": 198,
+            "name": "First Division A",
+            "area": "BEL",
+            "tm_code":"BE1",
+            "seasons": [
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2019",
+                    "end": "2020"
+                }
+            ]
         }
     ]
 }

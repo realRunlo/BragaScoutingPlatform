@@ -1,6 +1,8 @@
 import json
 import os
 import argparse
+import random
+import threading
 import time
 import logging
 from db import Db_handler
@@ -9,8 +11,12 @@ from utils import get_similar
 from api_handler import *
 from tqdm import tqdm
 
+pbar_competitions = tqdm()
+pbar_seasons = tqdm()
+pbar_teams = tqdm()
 pbar_players = tqdm()
 pbar_matches = tqdm()
+
 
 
 
@@ -174,6 +180,7 @@ def extract_competitions_info(competitions:list):
         competitions_info[c_i['wyId']]=c_i
         if c_i['wyId'] not in competition_list:
             competition_list.append(c_i['wyId'])
+
     return [competitions_info[c] for c in competition_list]
 
 def prepare_areas_insert(areas):
@@ -198,13 +205,11 @@ def populate_areas(db_handler:Db_handler):
 
 
 
-
-def populate_competitions(db_handler:Db_handler,competitions_id:list):
-    '''Populates competitions table in db'''
-    c_i = 0
-    values = []
+def prepare_competitions_insert(competitions_id:list):
+    '''Prepare competitions values for insert in db'''
+    file_name = f'{tmp_folder}/competitions_names_{time.time()}_{random.randint(0,10000)}.txt'
+    values_file = open(file_name,'w',encoding='utf-8')
     for competition_id,competition_custom_name in competitions_id:
-        print(f'Requesting competition {c_i}/{len(competitions_id)}')
         competition_info = get_competition_info(competition_id)
         if competition_info:
             wyId = process_mssql_value(competition_info['wyId'])
@@ -217,42 +222,69 @@ def populate_competitions(db_handler:Db_handler,competitions_id:list):
             category = process_mssql_value(competition_info['category'])
             custom_name =process_mssql_value(competition_custom_name)
 
-            values.append(f'''('{wyId}', '{name}', '{area_id}', '{gender}',\
+            values_file.write(f'''('{wyId}', '{name}', '{area_id}', '{gender}',\
                          '{type}', '{format}', '{divisionLevel}', '{category}', '{custom_name}')''')
-            
-        c_i += 1
+            values_file.write(file_delimiter)
+        pbar_competitions.update(1)
+    values_file.close()
+    return file_name
+
+
+
+def populate_competitions(db_handler:Db_handler,competitions_id:list):
+    '''Populates competitions table in db'''
+    pbar_competitions.reset(total=len(competitions_id))
+    results = run_threaded_for(prepare_competitions_insert,competitions_id,log=True)
+    values_files = [file for file in results]
     key_parameters = ['idcompetitions']
     parameters = ['idcompetitions','name','area','gender','type','format','divisionLevel','category','custom_name']
 
-    db_handler.insert_or_update_many('competition',values,key_parameters=key_parameters,parameters=parameters)
+    for file in values_files:
+        db_handler.request_insert_or_update_many('competition',file,key_parameters=key_parameters,parameters=parameters)
+
+
+def prepare_competitions_seasons_insert(competitions_seasons_id:list):
+    '''Prepare seasons values for insert in db'''
+    file_name = f'{tmp_folder}/competitions_seasons_{time.time()}_{random.randint(0,10000)}.txt'
+    values_file = open(file_name,'w',encoding='utf-8')
+
+    for competition_season in competitions_seasons_id:
+        competition_season_info = get_season_info(competition_season)
+
+        competition_season_id = process_mssql_value(competition_season_info['wyId'])
+        competition_season_startDate = process_date(competition_season_info['startDate'])
+        competition_season_endDate = process_date(competition_season_info['endDate'])
+        competition_season_name = process_mssql_value(competition_season_info['name'])
+        competition_season_competitionId = process_mssql_value(competition_season_info['competitionId'])
+
+        values = f'''('{competition_season_id}', '{competition_season_startDate}', '{competition_season_endDate}', '{competition_season_name}', '{competition_season_competitionId}')'''
+        values_file.write(values)
+        values_file.write(file_delimiter)
+        pbar_seasons.update(1)
+    values_file.close()
+    return file_name
 
 
 def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
     '''Populates seasons table in db'''
-    s_i = 0
-    values = []
-    for season_id in seasons_id:
-        print(f'Requesting season {s_i}/{len(seasons_id)}')
-        season_info = get_season_info(season_id)
-        if season_info:
-            wyId = process_mssql_value(season_info['wyId'])
-            startDate = process_date(season_info['startDate'])
-            endDate = process_date(season_info['endDate'])
-            name = process_mssql_value(season_info['name'])
-            competitionId = process_mssql_value(season_info['competitionId'])
-
-            values.append(f'''('{wyId}', '{startDate}', '{endDate}', '{name}', '{competitionId}')''')
-        s_i += 1
-
+    pbar_seasons.reset(total=len(seasons_id))
+    results = run_threaded_for(prepare_competitions_seasons_insert,seasons_id,log=True)
+    values_files = [file for file in results]
     key_parameters = ['idcompetition_season']
     parameters = ['idcompetition_season','startDate','endDate','name','competition']
-    db_handler.insert_or_update_many('competition_season',values,key_parameters=key_parameters,parameters=parameters)
+    for file in values_files:
+        db_handler.request_insert_or_update_many('competition_season',file,key_parameters=key_parameters,parameters=parameters)
 
 
 def prepare_teams_insert(teams,season_id:int,round_id:int):
     '''Inserts team into db, as well as team_competition_season table'''
-
-    querys = []
+    # prepare values files
+    team_values_file_name = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,10000)}.txt'
+    team_values_file = open(team_values_file_name,'w',encoding='utf-8')
+    team_competition_season_values_file_name = f'{tmp_folder}/team_competition_season_{time.time()}_{random.randint(0,10000)}.txt'
+    team_competition_season_values_file = open(team_competition_season_values_file_name,'w',encoding='utf-8')
+    team_competition_season_round_values_file_name = f'{tmp_folder}/team_competition_season_round_{time.time()}_{random.randint(0,10000)}.txt'
+    team_competition_season_round_values_file = open(team_competition_season_round_values_file_name,'w',encoding='utf-8')
     for team in teams:
         team_info = team['team']
         if team_info:
@@ -268,7 +300,8 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
 
             values = f'''('{wyId}', '{name}', '{officialName}', '{imageDataURL}', '{gender}', '{type}',\
                         '{city}', '{category}', '{area_id}')'''
-            querys.append(('team',values,wyId))
+            team_values_file.write(values)
+            team_values_file.write(file_delimiter)
 
             totalDraws = process_mssql_number(team['gameDraw'])
             totalGoalsAgainst = process_mssql_number(team['goalAgainst'])
@@ -281,11 +314,18 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
 
             values_tcsr = f'''('{round_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
                         '{totalPlayed}','{totalPoints}','{totalWins}','{rank}')'''
+            team_competition_season_values_file.write(values_tcsr)
+            team_competition_season_values_file.write(file_delimiter)
             
             values_tcs = f'''('{season_id}', '{wyId}')'''
-            querys.append(('team_competition_season_round',values_tcsr))
-            querys.append(('team_competition_season',values_tcs,wyId))
-    return querys
+            team_competition_season_round_values_file.write(values_tcs)
+            team_competition_season_round_values_file.write(file_delimiter)
+        pbar_teams.update(1)
+    
+    team_values_file.close()
+    team_competition_season_values_file.close()
+    team_competition_season_round_values_file.close()
+    return [(team_values_file_name,'team'),(team_competition_season_values_file_name,'team_competition_season'),(team_competition_season_round_values_file_name,'team_competition_season_round')]
 
 
 
@@ -293,18 +333,33 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates teams table in db, as well as team_competition_season table'''    
     season_rounds = get_season_career(season_id)
 
-    rounds_queries = []
-    teams_queries = []
+    # rounds file
+    rounds_values_file_name = f'{tmp_folder}/rounds_{time.time()}_{random.randint(0,10000)}.txt'
+    rounds_values_file = open(rounds_values_file_name,'w',encoding='utf-8')
+    # teams info files list
+    teams_files = []
 
+    # update team pbar
+    teams = []
     for season_round in season_rounds:
+        groups = season_round['groups']
+        for group in groups:
+            teams_group = group['teams']
+            teams += teams_group
+    pbar_teams.reset(total=len(teams))
+
+    # iterate over rounds
+    for season_round in season_rounds:
+        #process round
         round = season_round['round']
         startDate = process_date(round['startDate'])
         endDate = process_date(round['endDate'])
         name = process_mssql_value(round['name'])
         round_id = process_mssql_value(round['wyId'])
         values = f'''('{round_id}','{season_id}','{startDate}', '{endDate}', '{name}' )'''
-        rounds_queries.append(values)
-        #process round
+        rounds_values_file.write(values)
+        rounds_values_file.write(file_delimiter)
+        # process round's teams
         groups = season_round['groups']
         teams = []
         for group in groups:
@@ -312,52 +367,67 @@ def populate_teams(db_handler:Db_handler,season_id:int):
             teams += teams_group
         
         result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id,round['wyId']])
-        teams_queries += [query for query_list in result for query in query_list]
+        teams_files += [file for files_list in result for file in files_list]
+
+    # close rounds file
+    rounds_values_file.close()
     
-    team_query_values = {} # dict to remove duplicates
-    team_competition_season_round_query_values = []
-    team_competition_season_query_values = {} # dict to remove duplicates
-    # separate querys
-    for query in teams_queries:
-        if query[0] == 'team':
-            team_query_values[query[2]] = query[1]
-        elif query[0] == 'team_competition_season':
-            team_competition_season_query_values[query[2]] = query[1]
-        elif query[0] == 'team_competition_season_round':
-            team_competition_season_round_query_values.append(query[1])
+    team_values_files = []
+    team_competition_season_round_values_files = []
+    team_competition_season_values_files = []
+    # separate files
+    for file,type in teams_files:
+        if type == 'team':
+            team_values_files.append(file)
+        elif type == 'team_competition_season':
+            team_competition_season_round_values_files.append(file)
+        elif type == 'team_competition_season_round':
+            team_competition_season_values_files.append(file)
 
     #insert rounds
     rounds_key_parameters = ['idcompetition_season_round']
     parameters = ['idcompetition_season_round','competition_season','startDate','endDate','name']
-    db_handler.insert_or_update_many('competition_season_round',rounds_queries,key_parameters=rounds_key_parameters,parameters=parameters)
+    db_handler.request_insert_or_update_many('competition_season_round',rounds_values_file_name,key_parameters=rounds_key_parameters,parameters=parameters)
     
     #insert teams
-    team_query_values = [value for value in team_query_values.values()]
     team_key_parameters = ['idteam']
     team_parameters = ['idteam','name','official_name','icon','gender','type','city','category','area']
-    db_handler.insert_or_update_many('team',team_query_values,key_parameters=team_key_parameters,parameters=team_parameters)
+    for file in team_values_files:
+        db_handler.request_insert_or_update_many('team',file,key_parameters=team_key_parameters,parameters=team_parameters)
 
     #insert teams competition season
-    team_competition_season_query_values = [value for value in team_competition_season_query_values.values()]
     team_competition_season_key_parameters = ['competition_season','team']
     team_competition_season_parameters = ['competition_season','team']
-    db_handler.insert_or_update_many('team_competition_season',team_competition_season_query_values,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
+    for file in team_competition_season_values_files:
+        db_handler.request_insert_or_update_many('team_competition_season',file,key_parameters=team_competition_season_key_parameters,parameters=team_competition_season_parameters)
     
     #insert teams competition season rounds
     team_competition_season_round_key_parameters = ['competition_season_round','team']
     team_competition_season_round_parameters = ['competition_season_round','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins','rank']
-    db_handler.insert_or_update_many('team_competition_season_round',team_competition_season_round_query_values,key_parameters=team_competition_season_round_key_parameters,parameters=team_competition_season_round_parameters)
+    for file in team_competition_season_round_values_files:
+        db_handler.request_insert_or_update_many('team_competition_season_round',file,key_parameters=team_competition_season_round_key_parameters,parameters=team_competition_season_round_parameters)
 
 def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
-    querys = []
+    '''Prepare players values for insert in db'''
+    # prepare values files
+    player_values_file_name = f'{tmp_folder}/players_{time.time()}_{random.randint(0,10000)}.txt'
+    player_values_file = open(player_values_file_name,'w',encoding='utf-8')
+    player_positions_values_file_name = f'{tmp_folder}/player_positions_{time.time()}_{random.randint(0,10000)}.txt'
+    player_positions_values_file = open(player_positions_values_file_name,'w',encoding='utf-8')
+    career_entry_values_file_name = f'{tmp_folder}/career_entry_{time.time()}_{random.randint(0,10000)}.txt'
+    career_entry_values_file = open(career_entry_values_file_name,'w',encoding='utf-8')
+
     for player in players:
         contractInfo = get_player_contract_info(player['wyId'])
-        contractExpiration = contractInfo['contractExpiration']
-        player_agencies = ""
-        if 'agencies' in contractInfo and len(contractInfo['agencies']) > 0:
-            player_agencies = contractInfo['agencies'][0]
-            for agencie in contractInfo['agencies'][1:]:
-                player_agencies+= ', ' + agencie
+        contractExpiration = ''
+        player_agencies = ''
+        if contractInfo:
+            contractExpiration = contractInfo['contractExpiration']
+            player_agencies = ""
+            if 'agencies' in contractInfo and len(contractInfo['agencies']) > 0:
+                player_agencies = contractInfo['agencies'][0]
+                for agencie in contractInfo['agencies'][1:]:
+                    player_agencies+= ', ' + agencie
 
         player_name = player['firstName'].strip() + ' ' + player['middleName'].strip() + ' ' + player['lastName'].strip()
         player_name = process_mssql_value(player_name)
@@ -383,7 +453,9 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                     '{height}','{weight}','{status}','{gender}',\
                     '{role_code2}', '{role_code3}', '{role_name}'\
                     ,'{contractExpiration}','{player_agencies}','{current_team}')'''
-        querys.append(('player',values))
+        player_values_file.write(values)
+        player_values_file.write(file_delimiter)
+
 
         # get player advanced stats
         if player_advanced_stats:
@@ -410,7 +482,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                             '{substituteOut}','{yellowCard}','{team}','{season}' 
                             FROM [scouting].[team_competition_season] 
                             WHERE [team]='{team}' AND [competition_season]='{season}' '''
-                querys.append(('career_entry',values))
+                career_entry_values_file.write(values)
+                career_entry_values_file.write(file_delimiter)
 
                 advanced_stats = get_player_advanced_stats(player['wyId'],competition,season)
                 if advanced_stats:
@@ -423,9 +496,13 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
 
                         values = f'''SELECT '{wyId}', '{position_percent}','{position_code}', '{position_name}',idteam_competition_season \
                                     FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
-                        querys.append(('player_positions',values))
+                        player_positions_values_file.write(values)
+                        player_positions_values_file.write(file_delimiter)
         pbar_players.update(1)
-    return querys
+    player_values_file.close()
+    player_positions_values_file.close()
+    career_entry_values_file.close()
+    return [(player_values_file_name,'player'),(player_positions_values_file_name,'player_positions'),(career_entry_values_file_name,'career_entry')]
         
     
 
@@ -435,40 +512,45 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     players = get_season_players(season_id)
     pbar_players.reset(total=len(players))
     result = run_threaded_for(prepare_players_insert,players,log=True,args=[season_id,player_advanced_stats],threads=12)
-    querys = [query for query_list in result for query in query_list]
-    player_querys_values = []
-    player_positions_querys_values = []
-    career_entry_querys_values = []
+    values_files = [file for file_list in result for file in file_list]
+
+    player_values_files = []
+    player_positions_values_files = []
+    career_entry_values_files = []
     # separate querys
-    for query in querys:
-        if query[0] == 'player':
-            player_querys_values.append(query[1])
-        elif query[0] == 'player_positions':
-            player_positions_querys_values.append(query[1])
-        elif query[0] == 'career_entry':
-            career_entry_querys_values.append(query[1])
+    for file,type in values_files:
+        if type == 'player':
+            player_values_files.append(file)
+        elif type == 'player_positions':
+            player_positions_values_files.append(file)
+        elif type == 'career_entry':
+            career_entry_values_files.append(file)
 
     player_key_parameters = ['idplayer']
     player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
                          'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
-    db_handler.insert_or_update_many('player',player_querys_values,key_parameters=player_key_parameters,parameters=player_parameters)
+    for file in player_values_files:
+        db_handler.request_insert_or_update_many('player',file,key_parameters=player_key_parameters,parameters=player_parameters)
 
     career_entry_key_parameters = ['player','team_competition_season']
     career_entry_parameters = ['player','team_competition_season','appearances','goal','minutesPlayed','penalties',
                                'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard','team','competition_season']
-    db_handler.insert_or_update_many('career_entry',career_entry_querys_values,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
+    for file in career_entry_values_files:
+        db_handler.request_insert_or_update_many('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
     
     if player_advanced_stats:
         player_positions_key_parameters = ['player','code','team_competition_season']
         player_positions_parameters = ['player','percent','code','name','team_competition_season']
-        db_handler.insert_or_update_many('player_positions',player_positions_querys_values,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
+        for file in player_positions_values_files:
+            db_handler.request_insert_or_update_many('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
 
 
-def prepare_match_players_stats_insert(match:int,players:bool=False):
+def prepare_match_players_stats_insert(match:int,get_players:bool=False):
     '''Prepare values for player_match_stats table in db'''
     querys = []
     players_list = []
-    match_players_stats = get_match_players_stats(match,players=players)
+
+    match_players_stats = get_match_players_stats(match,players=get_players)
     for player_stats in match_players_stats:
         player = process_mssql_value(player_stats['playerId'])
         offensive_duels = process_mssql_number(player_stats['total']['offensiveDuels'])
@@ -495,14 +577,14 @@ def prepare_match_players_stats_insert(match:int,players:bool=False):
                      '{successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
                      '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}')'''
 
-        querys.append(('player_match_stats',values))
-        if players:
+        querys.append(values)
+        if get_players:
             if player_stats['player']:
                 players_list.append(player_stats['player'])
-            # inconsistency (player is not registered in API), remove last query
+            # inconsistency (player is not registered in API), do not add this players stats
             else:
                 querys.pop()
-    if players:
+    if get_players:
         return querys,players_list
     return querys
     
@@ -510,7 +592,8 @@ def prepare_match_players_stats_insert(match:int,players:bool=False):
 
 def prepare_match_formation_insert(match:int,match_team_info:dict):
     '''Prepare values for match_formation table in db'''
-    querys = []
+    substitutes_querys = []
+    formation_querys = []
     for team,team_info in match_team_info.items():
         formation = team_info['formation']
         if formation:
@@ -524,7 +607,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 values = f'''('{match}', '{substitutes[player['playerIn']]['playerIn']}', \
                             '{substitutes[player['playerIn']]['playerOut']}', '{team_info['teamId']}',\
                             '{substitutes[player['playerIn']]['minute']}')'''
-                querys.append(('match_substitution',values))
+                substitutes_querys.append(values)
             # team initial lineup
             for player in formation['lineup']:
                 player_id = process_mssql_value(player['playerId'])
@@ -538,7 +621,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 type = 'lineup'
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}', \
                             '{shirt_number}', '{yellow_cards}', '{minute}', '{team_info['teamId']}', '{type}')'''
-                querys.append(('match_formation',values))
+                formation_querys.append(values)
             # team bench
             for player in formation['bench']:
                 player_id = process_mssql_value(player['playerId'])
@@ -555,15 +638,46 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                     type = 'substitution'
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}',\
                              '{shirt_number}', '{yellow_cards}', '{minute}', '{team_info['teamId']}', '{type}')'''
-                querys.append(('match_formation',values))
-    return querys
+                formation_querys.append(values)
+
+    return substitutes_querys,formation_querys
 
 
 
 
 def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanced_stats:bool=False):
-    querys = []
+    '''Prepare values for matches table in db'''
+
+    # prepare values files
+    matches_values_file_name = f'{tmp_folder}/matches_{time.time()}_{random.randint(0,10000)}.txt'
+    matches_values_file = open(matches_values_file_name,'w',encoding='utf-8')
+    match_lineup_values_file_name = f'{tmp_folder}/match_lineup_{time.time()}_{random.randint(0,10000)}.txt'
+    match_lineup_values_file = open(match_lineup_values_file_name,'w',encoding='utf-8')
+    match_lineup_player_position_values_file_name = f'{tmp_folder}/match_lineup_player_position_{time.time()}_{random.randint(0,10000)}.txt'
+    match_lineup_player_position_values_file = open(match_lineup_player_position_values_file_name,'w',encoding='utf-8')
+    match_event_pass_values_file_name = f'{tmp_folder}/match_event_pass_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_pass_values_file = open(match_event_pass_values_file_name,'w',encoding='utf-8')
+    match_event_shot_values_file_name = f'{tmp_folder}/match_event_shot_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_shot_values_file = open(match_event_shot_values_file_name,'w',encoding='utf-8')
+    match_event_infraction_values_file_name = f'{tmp_folder}/match_event_infraction_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_infraction_values_file = open(match_event_infraction_values_file_name,'w',encoding='utf-8')
+    match_event_carry_values_file_name = f'{tmp_folder}/match_event_carry_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_carry_values_file = open(match_event_carry_values_file_name,'w',encoding='utf-8')
+    match_event_other_values_file_name = f'{tmp_folder}/match_event_other_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_other_values_file = open(match_event_other_values_file_name,'w',encoding='utf-8')
+    match_substitution_values_file_name = f'{tmp_folder}/match_substitution_{time.time()}_{random.randint(0,10000)}.txt'
+    match_substitution_values_file = open(match_substitution_values_file_name,'w',encoding='utf-8')
+    match_formation_values_file_name = f'{tmp_folder}/match_formation_{time.time()}_{random.randint(0,10000)}.txt'
+    match_formation_values_file = open(match_formation_values_file_name,'w',encoding='utf-8')
+    match_player_stats_values_file_name = f'{tmp_folder}/match_player_stats_{time.time()}_{random.randint(0,10000)}.txt'
+    match_player_stats_values_file = open(match_player_stats_values_file_name,'w',encoding='utf-8')
+
+    # auxiliary values lists
+    match_substitution_values = []
+    match_formation_values = []
+    match_player_stats_values = []
     matches_players_list = []
+
     for match in matches:
         match_info = get_match_info(match['matchId'])
         # get match basic info
@@ -582,7 +696,8 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
             values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', '{dateutc}',\
             '{home_score}','{away_score}', '{winner}')'''
 
-            querys.append(('match',values))
+            matches_values_file.write(values)
+            matches_values_file.write(file_delimiter)
 
             # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
@@ -597,7 +712,9 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
             match_lineups = get_match_lineups(match['matchId'])
 
             # get team's match formation
-            querys += prepare_match_formation_insert(match['matchId'],match_info['teamsData'])
+            ms_values,mf_values = prepare_match_formation_insert(match['matchId'],match_info['teamsData'])
+            match_substitution_values += ms_values
+            match_formation_values += mf_values
             
             # get match lineups
             if match_lineups:
@@ -605,11 +722,12 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
                 for team in teams:
                     lineup_info = match_lineups[team]
                     for part,times in lineup_info.items():
-                        for time,lineups in times.items():
+                        for second,lineups in times.items():
                             for lineup in lineups:
                                 scheme = process_mssql_value(lineups[lineup]['scheme'])
-                                values = f'''('{match['matchId']}', '{team}', '{part}', '{time}','{scheme}')'''
-                                querys.append(('match_lineup',values))
+                                values = f'''('{match['matchId']}', '{team}', '{part}', '{second}','{scheme}')'''
+                                match_lineup_values_file.write(values)
+                                match_lineup_values_file.write(file_delimiter)
                                 players = lineups[lineup]['players']
                                 # players positions in lineup
                                 for playerdict in players:
@@ -617,13 +735,14 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
                                         position = process_mssql_value(playerdict[playerId]['position'])
                                         values = f'''SELECT match_lineup_id, '{playerId}','{position}' 
                                                     FROM [scouting].[match_lineup] 
-                                                    WHERE [match]='{match['matchId']}' AND [team]='{team}' AND [period]='{part}' AND [second]='{time}' '''
-                                        querys.append(('match_lineup_player_position',values))
+                                                    WHERE [match]='{match['matchId']}' AND [team]='{team}' AND [period]='{part}' AND [second]='{second}' '''
+                                        match_lineup_player_position_values_file.write(values)
+                                        match_lineup_player_position_values_file.write(file_delimiter)
 
             # get match advanced stats for each player
             if player_advanced_stats:
-                query_list,players_list = prepare_match_players_stats_insert(match['matchId'],players=True)
-                querys += query_list
+                query_list,players_list = prepare_match_players_stats_insert(match['matchId'],get_players=True)
+                match_player_stats_values += query_list
                 # get match players for populate (because of api inconsistency)
                 matches_players_list += players_list
                 
@@ -649,7 +768,8 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
                     endlocation_y = process_mssql_number(event['pass']['endLocation']['y'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                     , '{accurate}', '{recipient}', '{endlocation_x}', '{endlocation_y}')'''
-                    querys.append(('match_event_pass',values))
+                    match_event_pass_values_file.write(values)
+                    match_event_pass_values_file.write(file_delimiter)
 
                 elif event['shot'] != None:
                     isGoal = process_mssql_bool(event['shot']['isGoal'])
@@ -658,31 +778,69 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
                     postShotXg = process_mssql_number(event['shot']['postShotXg'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                     , '{isGoal}', '{onTarget}', '{xg}', '{postShotXg}')'''
-                    querys.append(('match_event_shot',values))
+                    match_event_shot_values_file.write(values)
+                    match_event_shot_values_file.write(file_delimiter)
 
                 elif event['infraction'] != None and (event['infraction']['yellowCard'] or event['infraction']['redCard']):
                     yellowCard = process_mssql_bool(event['infraction']['yellowCard'])
                     redCard = process_mssql_bool(event['infraction']['redCard'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                     , '{yellowCard}', '{redCard}')'''
-                    querys.append(('match_event_infraction',values))
+                    match_event_infraction_values_file.write(values)
+                    match_event_infraction_values_file.write(file_delimiter)
 
                 elif event['carry'] != None:    
                     endlocation_x = process_mssql_number(event['carry']['endLocation']['x'])
                     endlocation_y = process_mssql_number(event['carry']['endLocation']['y'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                     , '{endlocation_x}', '{endlocation_y}')'''
-                    querys.append(('match_event_carry',values))
+                    match_event_carry_values_file.write(values)
+                    match_event_carry_values_file.write(file_delimiter)
 
                 else:
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}')'''
-                    querys.append(('match_event_other',values))
+                    match_event_other_values_file.write(values)
+                    match_event_other_values_file.write(file_delimiter)
         pbar_matches.update(1)
+
+    matches_values_file.close()
+    match_lineup_values_file.close()
+    match_lineup_player_position_values_file.close()
+    match_event_pass_values_file.close()
+    match_event_shot_values_file.close()
+    match_event_infraction_values_file.close()
+    match_event_carry_values_file.close()
+    match_event_other_values_file.close()
+
+    for value in match_substitution_values:
+        match_substitution_values_file.write(value)
+        match_substitution_values_file.write(file_delimiter)
+    match_substitution_values_file.close()
+
+    for value in match_formation_values:
+        match_formation_values_file.write(value)
+        match_formation_values_file.write(file_delimiter)
+    match_formation_values_file.close()
+
+    for value in match_player_stats_values:
+        match_player_stats_values_file.write(value)
+        match_player_stats_values_file.write(file_delimiter)
+    match_player_stats_values_file.close()
+
     # prepare insert of non existent players
     matches_players_list = db_non_existent_players(matches_players_list,db_handler)
     results = prepare_players_insert(matches_players_list,season_id,player_advanced_stats=player_advanced_stats)
-    querys += results
-    return querys
+    player_values_file_name = results[0][0]
+    player_positions_values_file_name = results[1][0]
+    career_entry_values_file_name = results[2][0]
+
+    return [(matches_values_file_name,'match'),(player_values_file_name,'player'),(player_positions_values_file_name,'player_positions'),
+            (career_entry_values_file_name,'career_entry'),(match_lineup_values_file_name,'match_lineup'),
+            (match_lineup_player_position_values_file_name,'match_lineup_player_position'),(match_event_pass_values_file_name,'match_event_pass'),
+            (match_event_shot_values_file_name,'match_event_shot'),(match_event_infraction_values_file_name,'match_event_infraction'),
+            (match_event_carry_values_file_name,'match_event_carry'),(match_event_other_values_file_name,'match_event_other'),
+            (match_substitution_values_file_name,'match_substitution'),(match_formation_values_file_name,'match_formation'),
+            (match_player_stats_values_file_name,'player_match_stats')]
         
 
 
@@ -699,15 +857,17 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     pbar_matches.refresh()
     pbar_matches.reset()
     pbar_players.clear()
-    querys = [query for query_list in result for query in query_list]
-    match_query_values = []
-    player_query_values = []
-    player_match_stats_query_values = []
-    match_lineup_values = []
-    match_lineup_player_position_values = []
-    match_formation_values = []
-    match_substitution_values = []
-    match_events_values = {
+    values_files = [file for files_list in result for file in files_list]
+    match_values_files = []
+    player_values_files = []
+    career_entry_values_files = []
+    player_positions_values_files = []
+    player_match_stats_values_files = []
+    match_lineup_values_files = []
+    match_lineup_player_position_values_files = []
+    match_formation_values_files = []
+    match_substitution_values_files = []
+    match_events_values_files = {
         "pass" : [],
         "shot" : [],
         "infraction" : [],
@@ -715,42 +875,61 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         "other" : []
     }
     # separate querys
-    for query in querys:
-        if query[0] == 'match':
-            match_query_values.append(query[1])
-        elif query[0] == 'player':
-            player_query_values.append(query[1])
-        elif query[0] == 'player_match_stats':
-            player_match_stats_query_values.append(query[1])
-        elif query[0] == 'match_lineup':
-            match_lineup_values.append(query[1])
-        elif query[0] == 'match_lineup_player_position':
-            match_lineup_player_position_values.append(query[1])
-        elif query[0] == 'match_formation':
-            match_formation_values.append(query[1])
-        elif query[0] == 'match_substitution':
-            match_substitution_values.append(query[1])
-        elif query[0] == 'match_event_pass':
-            match_events_values['pass'].append(query[1])
-        elif query[0] == 'match_event_shot':
-            match_events_values['shot'].append(query[1])
-        elif query[0] == 'match_event_infraction':
-            match_events_values['infraction'].append(query[1])
-        elif query[0] == 'match_event_carry':
-            match_events_values['carry'].append(query[1])
-        elif query[0] == 'match_event_other':
-            match_events_values['other'].append(query[1])
+    for file,type in values_files:
+        if type == 'match':
+            match_values_files.append(file)
+        elif type == 'player':
+            player_values_files.append(file)
+        elif type == 'player_match_stats':
+            player_match_stats_values_files.append(file)
+        elif type == 'career_entry':
+            career_entry_values_files.append(file)
+        elif type == 'player_positions':
+            player_positions_values_files.append(file)
+        elif type == 'match_lineup':
+            match_lineup_values_files.append(file)
+        elif type == 'match_lineup_player_position':
+            match_lineup_player_position_values_files.append(file)
+        elif type == 'match_formation':
+            match_formation_values_files.append(file)
+        elif type == 'match_substitution':
+            match_substitution_values_files.append(file)
+        elif type == 'match_event_pass':
+            match_events_values_files['pass'].append(file)
+        elif type == 'match_event_shot':
+            match_events_values_files['shot'].append(file)
+        elif type == 'match_event_infraction':
+            match_events_values_files['infraction'].append(file)
+        elif type == 'match_event_carry':
+            match_events_values_files['carry'].append(file)
+        elif type == 'match_event_other':
+            match_events_values_files['other'].append(file)
 
     # # match table
     match_key_parameters = ['idmatch']
     match_parameters = ['idmatch', 'competition_season','round', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
-    db_handler.insert_or_update_many('match',match_query_values,key_parameters=match_key_parameters,parameters=match_parameters)
+    for file in match_values_files:
+        db_handler.request_insert_or_update_many('match',file,key_parameters=match_key_parameters,parameters=match_parameters)
 
     # player table
     player_key_parameters = ['idplayer']
     player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
                          'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
-    db_handler.insert_or_update_many('player',player_query_values,key_parameters=player_key_parameters,parameters=player_parameters)
+    for file in player_values_files:
+        db_handler.request_insert_or_update_many('player',file,key_parameters=player_key_parameters,parameters=player_parameters)
+
+    # career_entry table
+    career_entry_key_parameters = ['player','team_competition_season']
+    career_entry_parameters = ['player','team_competition_season','appearances','goal','minutesPlayed','penalties',
+                                 'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard','team','competition_season']
+    for file in career_entry_values_files:
+        db_handler.request_insert_or_update_many('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
+
+    # player_positions table
+    player_positions_key_parameters = ['player','code','team_competition_season']
+    player_positions_parameters = ['player','percent','code','name','team_competition_season']
+    for file in player_positions_values_files:
+        db_handler.request_insert_or_update_many('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
                          
 
     if player_advanced_stats:
@@ -760,50 +939,64 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
                                          'crosses', 'keyPasses', 'defensiveDuels', 'interceptions', 'recoveries',
                                         'successfulPasses', 'longPasses', 'aerialDuels', 'losses', 'ownHalfLosses', 
                                         'goalKicks', 'receivedPass', 'dribbles', 'touchInBox', 'opponentHalfRecoveries']
-        db_handler.insert_or_update_many('player_match_stats',player_match_stats_query_values,key_parameters=player_match_stats_key_parameters,parameters=player_match_stats_parameters)
+        for file in player_match_stats_values_files:
+            db_handler.request_insert_or_update_many('player_match_stats',file,key_parameters=player_match_stats_key_parameters,parameters=player_match_stats_parameters)
 
     # match_lineup table
     match_lineup_key_parameters = ['match', 'team', 'period', 'second']
     match_lineup_parameters = ['match', 'team', 'period', 'second', 'lineup']
-    db_handler.insert_or_update_many('match_lineup',match_lineup_values,key_parameters=match_lineup_key_parameters,parameters=match_lineup_parameters)
+    for file in match_lineup_values_files:
+        db_handler.request_insert_or_update_many('match_lineup',file,key_parameters=match_lineup_key_parameters,parameters=match_lineup_parameters)
 
     # match_lineup_player_position table
     match_lineup_player_position_key_parameters = ['match_lineup_id', 'player']
     match_lineup_player_position_parameters = ['match_lineup_id', 'player', 'position']
-    db_handler.insert_or_update_many('match_lineup_player_position',match_lineup_player_position_values,key_parameters=match_lineup_player_position_key_parameters,
+    for file in match_lineup_player_position_values_files:
+        db_handler.request_insert_or_update_many('match_lineup_player_position',file,key_parameters=match_lineup_player_position_key_parameters,
                                      parameters=match_lineup_player_position_parameters,delimiter=' UNION ALL ')
 
     # match_formation table
     match_formation_key_parameters = ['match', 'player']
     match_formation_parameters = ['match', 'player', 'assists', 'goals', 'ownGoals', 'redCards', 'shirtNumber', 'yellowCards', 'minute', 'team', 'type']
-    db_handler.insert_or_update_many('match_formation',match_formation_values,key_parameters=match_formation_key_parameters,parameters=match_formation_parameters)
+    for file in match_formation_values_files:
+        db_handler.request_insert_or_update_many('match_formation',file,key_parameters=match_formation_key_parameters,parameters=match_formation_parameters)
 
     # match_substitution table
     match_substitution_key_parameters = ['match', 'playerIn', 'playerOut']
     match_substitution_parameters = ['match', 'playerIn', 'playerOut', 'team', 'minute']
-    db_handler.insert_or_update_many('match_substitution',match_substitution_values,key_parameters=match_substitution_key_parameters,parameters=match_substitution_parameters,batch_size=3000)
+    for file in match_substitution_values_files:
+        db_handler.request_insert_or_update_many('match_substitution',file,key_parameters=match_substitution_key_parameters,parameters=match_substitution_parameters,batch_size=3000)
 
     # match_event table
     # other
     match_event_other_key_parameters = ['idmatch_event']
     match_event_other_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second']
-    db_handler.insert_or_update_many('match_event_other', match_events_values['other'], key_parameters=match_event_other_key_parameters, parameters=match_event_other_parameters,batch_size=3000)
+    for file in match_events_values_files['other']:
+        db_handler.request_insert_or_update_many('match_event_other',file,key_parameters=match_event_other_key_parameters,parameters=match_event_other_parameters,batch_size=3000)
+
     # pass
     match_event_pass_key_parameters = ['idmatch_event']
     match_event_pass_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'accurate', 'recipient', 'endlocation_x', 'endlocation_y']
-    db_handler.insert_or_update_many('match_event_pass', match_events_values['pass'], key_parameters=match_event_pass_key_parameters, parameters=match_event_pass_parameters,batch_size=3000)
+    for file in match_events_values_files['pass']:
+        db_handler.request_insert_or_update_many('match_event_pass',file,key_parameters=match_event_pass_key_parameters,parameters=match_event_pass_parameters,batch_size=3000)
+
     # shot
     match_event_shot_key_parameters = ['idmatch_event']
     match_event_shot_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'isGoal', 'onTarget', 'xg', 'postShotXg']
-    db_handler.insert_or_update_many('match_event_shot', match_events_values['shot'], key_parameters=match_event_shot_key_parameters, parameters=match_event_shot_parameters,batch_size=3000)
+    for file in match_events_values_files['shot']:
+        db_handler.request_insert_or_update_many('match_event_shot',file,key_parameters=match_event_shot_key_parameters,parameters=match_event_shot_parameters,batch_size=3000)
+
     # carry
     match_event_carry_key_parameters = ['idmatch_event']
     match_event_carry_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'endlocation_x', 'endlocation_y']
-    db_handler.insert_or_update_many('match_event_carry', match_events_values['carry'], key_parameters=match_event_carry_key_parameters, parameters=match_event_carry_parameters,batch_size=3000)
+    for file in match_events_values_files['carry']:
+        db_handler.request_insert_or_update_many('match_event_carry',file,key_parameters=match_event_carry_key_parameters,parameters=match_event_carry_parameters,batch_size=3000)
+
     # infraction
     match_event_infraction_key_parameters = ['idmatch_event']
     match_event_infraction_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'yellowCard', 'redCard']
-    db_handler.insert_or_update_many('match_event_infraction', match_events_values['infraction'], key_parameters=match_event_infraction_key_parameters, parameters=match_event_infraction_parameters,batch_size=3000)
+    for file in match_events_values_files['infraction']:
+        db_handler.request_insert_or_update_many('match_event_infraction',file,key_parameters=match_event_infraction_key_parameters,parameters=match_event_infraction_parameters,batch_size=3000)
     
 
         
@@ -852,6 +1045,16 @@ if __name__ == '__main__':
     args = parse_arguments()
 
     if args.db_config[0].endswith('.json'):
+        tmp_folder = f'{current_folder}/tmp'
+        file_delimiter = '|;|'
+        # data insert tmp folder
+        if not os.path.exists(tmp_folder):
+            os.mkdir(tmp_folder)
+        # clean folder
+        else:
+            for file in os.listdir(tmp_folder):
+                os.remove(f'{tmp_folder}/{file}')
+
         db_config_path = f'{current_folder}/{args.db_config[0]}'
         db_logger = None
         main_logger = None
@@ -863,8 +1066,18 @@ if __name__ == '__main__':
         db_handler = Db_handler(config_json=db_config_path,logger=db_logger)
         db_handler.create_connection()
         if db_handler.connection:
+            # db_handler run request handler loop
+            request_handler_thread = threading.Thread(target=db_handler.run_request_handler)
+            request_handler_thread.start()
+            # main function - get api data
             main(args,db_handler)
-            db_handler.close_connection()
+            
+            # close db connection
+            db_handler.request_close()
+            print('Waiting for db handler thread to finish...')
+            request_handler_thread.join()
+            print('DB handler thread finished.')
+
         else:
             print('DB connection failed to be established.')
     else:

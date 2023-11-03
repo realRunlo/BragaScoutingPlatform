@@ -9,12 +9,13 @@ import pymssql
 class Db_handler:
     '''Class to handle mySql database connections'''
 
-    db_config = None
-    connection = None
-    logger = None
-
     def __init__(self,config:dict=None,config_json:str=None,logger:logging.Logger=None) -> None:
+        self.db_config = None
+        self.connection = None
+        self.logger = None
+        self.request_queue = []
         self.db_lock = threading.Lock()
+        self.db_event = threading.Event()
         if logger:
             self.logger = logger
         if config:
@@ -29,11 +30,50 @@ class Db_handler:
             self.log('No config provided',logging.ERROR)
 
 
+    def run_request_handler(self,file_delimiter:str='|;|'):
+        '''Run request_handler loop
+        
+        Handles requests to the database
+        
+        Allows for other work to be done while waiting for query to be executed'''
+        if self.connection:
+            while self.connection:
+                if len(self.request_queue) > 0:
+                    request = self.request_queue.pop(0)
+                    values = ''
+                    if request['values_file']:
+                        values = open(request['values_file'],'r', encoding="utf-8").read()
+                        os.remove(request['values_file'])
+
+                    if request['type'] == 'insert':
+                        request['args']['values'] = values
+                        self.insert(**request['args'])
+                    elif request['type'] == 'update':
+                        request['args']['value'] = values
+                        self.update(**request['args'])
+                    elif request['type'] == 'insert_or_update':
+                        request['args']['values'] = values
+                        self.insert_or_update(**request['args'])
+                    elif request['type'] == 'insert_or_update_many':
+                        values = values.split(file_delimiter)
+                        values = [value for value in values if value != '']
+                        request['args']['values'] = values
+                        self.insert_or_update_many(**request['args'])
+                    elif request['type'] == 'close_connection':
+                        self.close_connection()
+                else:
+                    not_timeout = self.db_event.wait(timeout=1000)
+                    self.db_event.clear()
+                    if not not_timeout:
+                        self.close_connection()
+                        break
+                
+
+
 
     def create_connection(self):
         """Creates a connection to the MySQL database"""
         try:
-
             self.connection = pymssql.connect(**self.db_config)
             self.log('Connection to the database established')
         except Exception as e:
@@ -42,7 +82,28 @@ class Db_handler:
             self.log(e,logging.ERROR)
 
 
-    def insert(self,table:str, values:str,database:str='scouting'):
+    def close_connection(self):
+        """Closes the connection to the MySQL database"""
+        if self.connection:
+            self.connection.close()
+            self.db_event.set() # set event to wake up db_handler (in run method)
+            self.log('Connection to the database closed')
+
+
+    def request_close_connection(self):
+        """Request to close the connection to the MySQL database"""
+        if self.connection:
+            self.request_queue.append({'type':'close_connection'})
+            self.db_event.set()
+
+
+    def request_insert(self,table:str, values_file:str,database:str='scouting'):
+        """Reuqest insert values into a table"""
+        if self.connection:
+            self.request_queue.append({'type':'insert','args':{'table':table,'database':database},'values_file':values_file})
+            self.db_event.set()
+
+    def insert(self,table:str,values:str,database:str='scouting'):
         """Inserts values into a table"""
         if self.connection:
             self.log(f'''Query: INSERT INTO {database}.{table} VALUES {values}''')
@@ -54,6 +115,12 @@ class Db_handler:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
             cursor.close()
 
+    def request_update(self,table:str,parameter:str,values_file:str,where:str,database:str='scouting'):
+        """Reuqest update values into a table"""
+        if self.connection:
+            self.request_queue.append({'type':'update','args':{'table':table,'parameter':parameter,'where':where,'database':database},'values_file':values_file})
+            self.db_event.set()
+
     def update(self,table:str,parameter:str,value:str,where:str,database:str='scouting',log:bool=False):
         """Update values into a table"""
         if self.connection:
@@ -61,7 +128,7 @@ class Db_handler:
                 self.log(f'''Query: UPDATE {database}.{table} SET {parameter} = {value} {where}''')
             cursor = self.connection.cursor()
             try:
-                query = f'''UPDATE {database}.{table} SET {parameter} = {value} {where}'''
+                query = f'''UPDATE [{database}].[{table}] SET {parameter} = {value} {where}'''
                 cursor.execute(query)
             except Exception as e:
                 if log:
@@ -71,11 +138,15 @@ class Db_handler:
             self.connection.commit()
             cursor.close()
 
+    def request_insert_or_update(self,table:str, values_file:str,key_parameters:list[str],parameters:str,update:bool=True,database:str='scouting'):
+        """Reuqest insert/update values into a table"""
+        if self.connection:
+            self.request_queue.append({'type':'insert_or_update','args':{'table':table,'key_parameters':key_parameters,'parameters':parameters,'update':update,'database':database},'values_file':values_file})
+            self.db_event.set()
 
     def insert_or_update(self,table:str, values:str,key_parameters:list[str],parameters:str,update:bool=True,database:str='scouting'):
         """Inserts/updates values into a table"""
         if self.connection:
-            #print(f'''INSERT INTO scouting.{table} {parameters} VALUES {values} ON DUPLICATE KEY UPDATE {on_update}''')
             self.log(f'''Query: INSERT INTO {database}.{table} {parameters} VALUES {values}''')
             cursor = self.connection.cursor()
             try:
@@ -125,6 +196,17 @@ class Db_handler:
             self.connection.commit()
             cursor.close()
 
+    def request_insert_or_update_many(self,table:str, values_file:str,key_parameters:list[str],parameters:str,update:bool=True,batch_size:int=500,database:str='scouting',delimiter:str=','):
+        """Reuqest insert/update values into a table in batches using union all to connect values"""
+        if self.connection:
+            self.request_queue.append({'type':'insert_or_update_many',
+                                       'args':
+                                       {
+                                           'table':table,'key_parameters':key_parameters,'parameters':parameters,'update':update,'batch_size':batch_size,'database':database,'delimiter':delimiter
+                                        }
+                                        ,'values_file':values_file
+                                       })
+            self.db_event.set()
 
     
     def insert_or_update_many(self,table:str, values:list[str],key_parameters:list[str],parameters:str,update:bool=True,batch_size:int=500,database:str='scouting',delimiter:str=','):
@@ -211,11 +293,7 @@ class Db_handler:
                         self.log(f'Error selecting values from table {table}\n{e}',logging.ERROR)
                 cursor.close()
 
-    def close_connection(self):
-        """Closes the connection to the MySQL database"""
-        if self.connection:
-            self.connection.close()
-            self.log('Connection to the database closed')
+   
 
     def log(self, message:str,level=logging.INFO):
         """Logs a message"""
