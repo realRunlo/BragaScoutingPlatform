@@ -11,13 +11,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Get ssh key
-      run: |
-        cat ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/id_rsa
         
     - name: Delete Remote ETL Folder
       run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
     - name: Copy ETL Folder to Remote VM
       run: |
