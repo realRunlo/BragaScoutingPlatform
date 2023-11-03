@@ -1,4 +1,4 @@
-name: Deploy etl to VM
+name: Deploy ETL to VM
 
 on:
   workflow_dispatch: # Manual trigger
@@ -11,10 +11,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Delete Folder
+    - name: Get ssh key 
       run: |
-        ssh -i  ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+        echo "{{ secrets.SSH_PRIVATE_KEY }}"  > key
+        
+    - name: Delete Remote ETL Folder
+      run: |
+        ssh -i key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
-    - name: Copy Folder
+    - name: Copy ETL Folder to Remote VM
       run: |
-        scp -i  ${{ secrets.SSH_PRIVATE_KEY }} -r /etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
+        scp -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
