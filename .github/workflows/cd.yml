@@ -13,12 +13,12 @@ jobs:
 
     - name: Get ssh key 
       run: |
-        echo "{{ secrets.SSH_PRIVATE_KEY }}"  > ~/.ssh/id_rsa
+        echo "{{ secrets.SSH_PRIVATE_KEY }}"  > key
         
     - name: Delete Remote ETL Folder
       run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+        ssh -i key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
     - name: Copy ETL Folder to Remote VM
       run: |
-        scp -i ~/.ssh/id_rsa -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
+        scp -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
