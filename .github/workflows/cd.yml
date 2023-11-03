@@ -18,4 +18,4 @@ jobs:
 
     - name: Copy ETL Folder to Remote VM
       run: |
-        scp -i ~/.ssh/id_rsa -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
+        scp -i "${{ secrets.SSH_PRIVATE_KEY }}" -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
