@@ -210,6 +210,8 @@ def prepare_areas_insert(areas):
 def populate_areas(db_handler:Db_handler):
     '''Populates areas table in db'''
     areas = get_areas()
+    # append null area
+    areas.append({'id':0,'name':None,'alpha3code':None})
     query_values = prepare_areas_insert(areas)
     parameters = ['idareas', 'name', 'alpha3code']
     key_parameters = ['idareas']
