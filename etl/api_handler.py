@@ -9,7 +9,7 @@ api_url = 'https://apirest.wyscout.com/v3/'
 current_folder = os.path.dirname(__file__)
 
 # Preparing authentication
-authentication = json.load(open(f'{current_folder}/authentication.json'))
+authentication = json.load(open(f'{current_folder}/api_cred.json'))
 encoded_authentication = base64.b64encode(f'{authentication["username"]}:{authentication["password"]}'.encode('ascii'))
 encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 
@@ -19,7 +19,7 @@ def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=
     tries = 0
     while not ok_response and tries < retries:
         try:
-            response = requests.get(url, headers=headers,params=params,timeout=10)
+            response = requests.get(url, headers=headers,params=params,timeout=30)
             if response.status_code == 200:
                 ok_response = True
             # if too many requests, wait and retry

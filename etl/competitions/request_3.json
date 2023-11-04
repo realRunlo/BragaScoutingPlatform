@@ -1,0 +1,137 @@
+{
+    "competitions":[
+
+        {
+            "name": "Premier League",
+            "area": "XEN",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        },
+        {
+            "name": "Championship",
+            "area": "XEN",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        },
+        {
+            "name": "Ligue 1",
+            "area": "FRA",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        },
+        {
+            "name": "Serie A",
+            "area": "ITA",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        },
+        {
+            "name": "Bundesliga",
+            "area": "DEU",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        },
+        {
+            "name": "LaLiga",
+            "area": "ESP",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                },
+                {
+                    "start": "2020",
+                    "end": "2019"
+                }
+            ]
+        }
+    ]
+}

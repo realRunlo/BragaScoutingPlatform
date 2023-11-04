@@ -1,5 +1,6 @@
 api_requests/data/*
 authentication.json
+api_cred.json
 db_config.json
 db/db_config_azure.json
 db/DigiCertGlobalRootCA.crt.pem

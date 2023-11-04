@@ -12,10 +12,15 @@ from api_handler import *
 from tqdm import tqdm
 
 pbar_competitions = tqdm()
+pbar_competitions.desc = 'Competitions'
 pbar_seasons = tqdm()
+pbar_seasons.desc = 'Seasons'
 pbar_teams = tqdm()
+pbar_teams.desc = 'Teams'
 pbar_players = tqdm()
+pbar_players.desc = 'Players'
 pbar_matches = tqdm()
+pbar_matches.desc = 'Matches'
 
 
 
@@ -50,12 +55,16 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
             
 
     thread_args = [[x]+args if args else [x] for x in iterable_divided]
-    pool = ThreadPool(threads)
-    results = pool.starmap(func,thread_args)
-    pool.close()
-    pool.join()
-    if log:
-        print(f'Threaded: Finished {func.__name__} in {time.time()-start_time} seconds')
+    try:
+        pool = ThreadPool(threads)
+        results = pool.starmap(func,thread_args)
+        pool.close()
+        pool.join()
+        if log:
+            print(f'Threaded: Finished {func.__name__} in {time.time()-start_time} seconds')
+    except:
+        pool.terminate()
+        raise
     return results
 
 
@@ -108,27 +117,30 @@ def process_mssql_bool(value:str,default:str='0'):
     return bool
     
 
-def db_non_existent_players(players:list,db_handler:Db_handler):
+def db_non_existent_players(players:list):
     '''Returns list of players that are not in db'''
+    global db_connection
+
+    non_existent_players = []
     where_statement = 'where idplayer in ('
     #remove duplicates in players list
     unique_players = {}
     for player in players:
         if player['wyId'] not in unique_players:
             unique_players[player['wyId']]= player
+    if unique_players:
+        # create where statement
+        for player_id in unique_players:
+            where_statement += f"'{player_id}',"
+        where_statement = where_statement[:-1] + ')'
 
-    # create where statement
-    for player_id in unique_players:
-        where_statement += f"'{player_id}',"
-    where_statement = where_statement[:-1] + ')'
-
-    # get players from db
-    db_players = db_handler.select('player','*',where_statement)
-    if db_players:
-        db_players = [p[0] for p in db_players]
-
-    # get non existent players
-    non_existent_players = [p for p in unique_players.values() if p['wyId'] not in db_players]
+        # get players from db
+        db_players = db_connection.select('player','*',where_statement,log=True)
+        if db_players:
+            db_players = [p[0] for p in db_players]
+            # get non existent players
+            non_existent_players = [p for p in unique_players.values() if p['wyId'] not in db_players]
+            
     return non_existent_players
 
 
@@ -198,6 +210,8 @@ def prepare_areas_insert(areas):
 def populate_areas(db_handler:Db_handler):
     '''Populates areas table in db'''
     areas = get_areas()
+    # append null area
+    areas.append({'id':0,'name':None,'alpha3code':None})
     query_values = prepare_areas_insert(areas)
     parameters = ['idareas', 'name', 'alpha3code']
     key_parameters = ['idareas']
@@ -812,6 +826,7 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
     match_event_carry_values_file.close()
     match_event_other_values_file.close()
 
+
     for value in match_substitution_values:
         match_substitution_values_file.write(value)
         match_substitution_values_file.write(file_delimiter)
@@ -828,11 +843,12 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
     match_player_stats_values_file.close()
 
     # prepare insert of non existent players
-    matches_players_list = db_non_existent_players(matches_players_list,db_handler)
+    matches_players_list = db_non_existent_players(matches_players_list)
     results = prepare_players_insert(matches_players_list,season_id,player_advanced_stats=player_advanced_stats)
     player_values_file_name = results[0][0]
     player_positions_values_file_name = results[1][0]
     career_entry_values_file_name = results[2][0]
+
 
     return [(matches_values_file_name,'match'),(player_values_file_name,'player'),(player_positions_values_file_name,'player_positions'),
             (career_entry_values_file_name,'career_entry'),(match_lineup_values_file_name,'match_lineup'),
@@ -1063,21 +1079,35 @@ if __name__ == '__main__':
             db_logger = logging.getLogger('db_logger')
             main_logger = logging.getLogger('main_logger')
             main_logger.log(logging.INFO,'Logging active')
-        db_handler = Db_handler(config_json=db_config_path,logger=db_logger)
-        db_handler.create_connection()
-        if db_handler.connection:
+
+        # db request handler - for requests that are not time sensitive (can be done when available)
+        db_request_handler = Db_handler(config_json=db_config_path,logger=db_logger)
+        db_request_handler.create_connection()
+        # db connection - for requests that are time sensitive (must be done as soon as possible)
+        db_connection = Db_handler(config_json=db_config_path,logger=db_logger)
+        db_connection.create_connection()
+
+        if db_connection.connection and db_request_handler.connection:
             # db_handler run request handler loop
-            request_handler_thread = threading.Thread(target=db_handler.run_request_handler)
+            request_handler_thread = threading.Thread(target=db_request_handler.run_request_handler)
             request_handler_thread.start()
+
+            start_time = time.time()
             # main function - get api data
-            main(args,db_handler)
-            
+            main(args,db_request_handler)
+            end_request_time = time.time()
+            print(f'API requests finished in {end_request_time-start_time} seconds.')
+
             # close db connection
-            db_handler.request_close()
+            db_connection.close_connection()
+            db_request_handler.request_close_connection()
             print('Waiting for db handler thread to finish...')
             request_handler_thread.join()
+            end_time = time.time()
             print('DB handler thread finished.')
-
+            print(f'Program finished in {end_time-start_time} seconds.')
+            print(f'API requests finished in {end_request_time-start_time} seconds.')
+            print(f'DB requests finished in {end_time-end_request_time} seconds.')
         else:
             print('DB connection failed to be established.')
     else:

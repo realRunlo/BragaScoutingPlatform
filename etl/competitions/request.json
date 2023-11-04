@@ -1,0 +1,16 @@
+{
+    "competitions":[
+        {
+            "wyId": 707,
+            "name": "Primeira Liga",
+            "area": "PRT",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                }
+            ]
+        }
+    ]
+}
+
