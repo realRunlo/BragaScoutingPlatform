@@ -19,8 +19,8 @@ jobs:
     - name: Generate API&DB credentials file
       run: |
         cd etl/
-        python ../cloud/secrets/generate_api_cred.py ${{secrets.API_USER}} ${{secrets.API_PASSWORD}}
-        python ../cloud/secrets/generate_db_cred.py ${{secrets.DB_HOST}} ${{secrets.DB_USER}} ${{secrets.DB_PASSWORD}} ${{secrets.DB_DATABASE}}
+        python ../cloud/secrets/generate_api_cred.py "${{secrets.API_USER}}" "${{secrets.API_PASSWORD}}"
+        python ../cloud/secrets/generate_db_cred.py "${{secrets.DB_HOST}}" "${{secrets.DB_USER}}" "${{secrets.DB_PASSWORD}}" "${{secrets.DB_DATABASE}}"
         cd ..
         
     - name: Get ssh key 
