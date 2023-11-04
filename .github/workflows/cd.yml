@@ -10,6 +10,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      
+    - name: Create ~/.ssh directory
+      run: mkdir -p /.ssh
+
+    - name: Add remote host to known_hosts
+      run: |
+        ssh-keyscan -H -p 22 ${{ secrets.SSH_HOST }} >> /.ssh/known_hosts
 
     - name: Get ssh key 
       run: |
