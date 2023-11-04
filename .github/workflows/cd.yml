@@ -18,8 +18,8 @@ jobs:
         
     - name: Delete Remote ETL Folder
       run: |
-         ssh -i key ${{ secrets.SSH_USER }}@13.94.209.172 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+         ssh -o StrictHostKeyChecking=no -i key ${{ secrets.SSH_USER }}@13.94.209.172 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
     - name: Copy ETL Folder to Remote VM
       run: |
-         scp -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
+         scp -o StrictHostKeyChecking=no -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
