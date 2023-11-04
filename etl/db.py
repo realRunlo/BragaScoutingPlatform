@@ -98,6 +98,7 @@ class Db_handler:
         with self.db_lock:
             if self.connection:
                 self.connection.close()
+                self.connection = None
                 self.db_event.set() # set event to wake up db_handler (in run method)
                 self.log('Connection to the database closed')
 
