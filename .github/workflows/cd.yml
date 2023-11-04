@@ -20,7 +20,7 @@ jobs:
         
     - name: Delete Remote ETL Folder
       run: |
-        ssh -i key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+        ssh -i key ${{ secrets.SSH_USER }}@13.94.209.172 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
     - name: Copy ETL Folder to Remote VM
       run: |
