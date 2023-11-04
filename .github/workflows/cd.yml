@@ -6,7 +6,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -14,7 +14,6 @@ jobs:
     - name: Get ssh key 
       run: |
         echo "{{ secrets.SSH_PRIVATE_KEY }}"  > key
-        ssh-keyscan 13.94.209.172 >> ~/.ssh/known_hosts
         
     - name: Delete Remote ETL Folder
       run: |
