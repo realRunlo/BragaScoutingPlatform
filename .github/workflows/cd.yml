@@ -13,13 +13,12 @@ jobs:
 
     - name: Get ssh key 
       run: |
-        sudo echo "{{ secrets.SSH_PRIVATE_KEY }}"  > key
-        sudo cat key
+         echo {{ secrets.SSH_PRIVATE_KEY }} > key
         
     - name: Delete Remote ETL Folder
       run: |
-        sudo ssh -i key ${{ secrets.SSH_USER }}@13.94.209.172 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+         ssh -i key ${{ secrets.SSH_USER }}@13.94.209.172 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
 
     - name: Copy ETL Folder to Remote VM
       run: |
-        sudo scp -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
+         scp -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
