@@ -1,13 +1,11 @@
 # ETL deployment workflow
 name: Deploy ETL to VM
 
-#on:
-#  push:
- #   paths:
-  #    - 'etl/**' # This will trigger the workflow when changes are made in the 'etl' directory
 on:
-  workflow_dispatch:
-  
+  push:
+    paths:
+      - 'etl/**' # This will trigger the workflow when changes are made in the 'etl' directory
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
