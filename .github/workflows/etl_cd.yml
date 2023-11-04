@@ -1,0 +1,35 @@
+# ETL deployment workflow
+name: Deploy ETL to VM
+
+on:
+  push:
+    paths:
+      - 'etl/**' # This will trigger the workflow when changes are made in the 'etl' directory
+      
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Generate API&DB credentials file
+      run: |
+        cd etl/
+        python ../cloud/credentials_cd/generate_api_cred.py "${{secrets.API_USER}}" "${{secrets.API_PASSWORD}}"
+        python ../cloud/credentials_cd/generate_db_cred.py "${{secrets.DB_HOST}}" "${{secrets.DB_USER}}" "${{secrets.DB_PASSWORD}}" "${{secrets.DB_DATABASE}}"
+        cd ..
+        
+    - name: Get ssh key 
+      run: |
+         echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
+         chmod 600 key
+        
+    - name: Delete Remote ETL Folder
+      run: |
+         ssh -o StrictHostKeyChecking=no -i key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -rf /home/${{ secrets.SSH_USER }}/etl'
+
+    - name: Copy ETL Folder to Remote VM
+      run: |
+         scp -o StrictHostKeyChecking=no -i key -r ./etl ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}
