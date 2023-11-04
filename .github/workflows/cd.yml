@@ -13,7 +13,7 @@ jobs:
 
     - name: Get ssh key 
       run: |
-         echo ${{ secrets.SSH_PRIVATE_KEY }} > key
+         echo "${{ secrets.SSH_PRIVATE_KEY }}" > key
          cat key
         
     - name: Delete Remote ETL Folder
