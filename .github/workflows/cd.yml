@@ -14,9 +14,6 @@ jobs:
     - name: Get ssh key 
       run: |
         echo "{{ secrets.SSH_PRIVATE_KEY }}"  > key
-        chmod 600 key
-        ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-        chmod 644 ~/.ssh/known_hosts
         
     - name: Delete Remote ETL Folder
       run: |
