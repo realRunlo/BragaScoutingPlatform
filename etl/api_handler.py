@@ -19,7 +19,7 @@ def get_request_api(url,headers=None,params=None,retry:bool=True,sleep_time:int=
     tries = 0
     while not ok_response and tries < retries:
         try:
-            response = requests.get(url, headers=headers,params=params,timeout=10)
+            response = requests.get(url, headers=headers,params=params,timeout=30)
             if response.status_code == 200:
                 ok_response = True
             # if too many requests, wait and retry
