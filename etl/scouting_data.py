@@ -63,6 +63,7 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
         if log:
             print(f'Threaded: Finished {func.__name__} in {time.time()-start_time} seconds')
     except:
+        print(f'Threaded: Error running {func.__name__}')
         pool.terminate()
         raise
     return results
@@ -221,7 +222,7 @@ def populate_areas(db_handler:Db_handler):
 
 def prepare_competitions_insert(competitions_id:list):
     '''Prepare competitions values for insert in db'''
-    file_name = f'{tmp_folder}/competitions_names_{time.time()}_{random.randint(0,10000)}.txt'
+    file_name = f'{tmp_folder}/competitions_names_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     values_file = open(file_name,'w',encoding='utf-8')
     for competition_id,competition_custom_name in competitions_id:
         competition_info = get_competition_info(competition_id)
@@ -259,7 +260,7 @@ def populate_competitions(db_handler:Db_handler,competitions_id:list):
 
 def prepare_competitions_seasons_insert(competitions_seasons_id:list):
     '''Prepare seasons values for insert in db'''
-    file_name = f'{tmp_folder}/competitions_seasons_{time.time()}_{random.randint(0,10000)}.txt'
+    file_name = f'{tmp_folder}/competitions_seasons_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     values_file = open(file_name,'w',encoding='utf-8')
 
     for competition_season in competitions_seasons_id:
@@ -293,11 +294,11 @@ def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
 def prepare_teams_insert(teams,season_id:int,round_id:int):
     '''Inserts team into db, as well as team_competition_season table'''
     # prepare values files
-    team_values_file_name = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,10000)}.txt'
+    team_values_file_name = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     team_values_file = open(team_values_file_name,'w',encoding='utf-8')
-    team_competition_season_values_file_name = f'{tmp_folder}/team_competition_season_{time.time()}_{random.randint(0,10000)}.txt'
+    team_competition_season_values_file_name = f'{tmp_folder}/team_competition_season_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     team_competition_season_values_file = open(team_competition_season_values_file_name,'w',encoding='utf-8')
-    team_competition_season_round_values_file_name = f'{tmp_folder}/team_competition_season_round_{time.time()}_{random.randint(0,10000)}.txt'
+    team_competition_season_round_values_file_name = f'{tmp_folder}/team_competition_season_round_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     team_competition_season_round_values_file = open(team_competition_season_round_values_file_name,'w',encoding='utf-8')
     for team in teams:
         team_info = team['team']
@@ -325,9 +326,10 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
             totalPoints = process_mssql_number(team['points'])
             totalWins = process_mssql_number(team['gameWon'])
             rank = process_mssql_number(team['rank'])
+            group_id = process_mssql_value(team['groupId'])
 
             values_tcsr = f'''('{round_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
-                        '{totalPlayed}','{totalPoints}','{totalWins}','{rank}')'''
+                        '{totalPlayed}','{totalPoints}','{totalWins}','{rank}', {group_id})'''
             team_competition_season_values_file.write(values_tcsr)
             team_competition_season_values_file.write(file_delimiter)
             
@@ -347,9 +349,12 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates teams table in db, as well as team_competition_season table'''    
     season_rounds = get_season_career(season_id)
 
-    # rounds file
-    rounds_values_file_name = f'{tmp_folder}/rounds_{time.time()}_{random.randint(0,10000)}.txt'
+    # values files
+    rounds_values_file_name = f'{tmp_folder}/rounds_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     rounds_values_file = open(rounds_values_file_name,'w',encoding='utf-8')
+    groups_values_file_name = f'{tmp_folder}/groups_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    groups_values_file = open(groups_values_file_name,'w',encoding='utf-8')
+
     # teams info files list
     teams_files = []
 
@@ -366,11 +371,12 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     for season_round in season_rounds:
         #process round
         round = season_round['round']
+        round_id = process_mssql_value(round['wyId'])
         startDate = process_date(round['startDate'])
         endDate = process_date(round['endDate'])
         name = process_mssql_value(round['name'])
-        round_id = process_mssql_value(round['wyId'])
-        values = f'''('{round_id}','{season_id}','{startDate}', '{endDate}', '{name}' )'''
+        type = process_mssql_value(round['type'])
+        values = f'''('{round_id}','{season_id}','{startDate}', '{endDate}', '{name}', '{type}' )'''
         rounds_values_file.write(values)
         rounds_values_file.write(file_delimiter)
         # process round's teams
@@ -379,6 +385,14 @@ def populate_teams(db_handler:Db_handler,season_id:int):
         for group in groups:
             teams_group = group['teams']
             teams += teams_group
+            # process group
+            if teams_group:
+                t = teams_group[0]
+                group_id = process_mssql_value(t['groupId'])
+                group_name = process_mssql_value(t['groupName'])
+                values = f'''('{group_id}','{round_id}','{group_name}')'''
+                groups_values_file.write(values)
+                groups_values_file.write(file_delimiter)
         
         result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id,round['wyId']])
         teams_files += [file for files_list in result for file in files_list]
@@ -400,8 +414,13 @@ def populate_teams(db_handler:Db_handler,season_id:int):
 
     #insert rounds
     rounds_key_parameters = ['idcompetition_season_round']
-    parameters = ['idcompetition_season_round','competition_season','startDate','endDate','name']
+    parameters = ['idcompetition_season_round','competition_season','startDate','endDate','name','type']
     db_handler.request_insert_or_update_many('competition_season_round',rounds_values_file_name,key_parameters=rounds_key_parameters,parameters=parameters)
+
+    #insert groups
+    groups_key_parameters = ['idgroup']
+    parameters = ['idgroup','competition_season_round','group_name']
+    db_handler.request_insert_or_update_many('competition_season_round_group',groups_values_file_name,key_parameters=groups_key_parameters,parameters=parameters)
     
     #insert teams
     team_key_parameters = ['idteam']
@@ -417,18 +436,18 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     
     #insert teams competition season rounds
     team_competition_season_round_key_parameters = ['competition_season_round','team']
-    team_competition_season_round_parameters = ['competition_season_round','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins','rank']
+    team_competition_season_round_parameters = ['competition_season_round','team','totalDraws','totalGoalsAgainst','totalGoalsFor','totalLosses','totalPlayed','totalPoints','totalWins','rank','group_id']
     for file in team_competition_season_round_values_files:
         db_handler.request_insert_or_update_many('team_competition_season_round',file,key_parameters=team_competition_season_round_key_parameters,parameters=team_competition_season_round_parameters)
 
 def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
     '''Prepare players values for insert in db'''
     # prepare values files
-    player_values_file_name = f'{tmp_folder}/players_{time.time()}_{random.randint(0,10000)}.txt'
+    player_values_file_name = f'{tmp_folder}/players_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     player_values_file = open(player_values_file_name,'w',encoding='utf-8')
-    player_positions_values_file_name = f'{tmp_folder}/player_positions_{time.time()}_{random.randint(0,10000)}.txt'
+    player_positions_values_file_name = f'{tmp_folder}/player_positions_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     player_positions_values_file = open(player_positions_values_file_name,'w',encoding='utf-8')
-    career_entry_values_file_name = f'{tmp_folder}/career_entry_{time.time()}_{random.randint(0,10000)}.txt'
+    career_entry_values_file_name = f'{tmp_folder}/career_entry_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     career_entry_values_file = open(career_entry_values_file_name,'w',encoding='utf-8')
 
     for player in players:
@@ -663,27 +682,27 @@ def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanc
     '''Prepare values for matches table in db'''
 
     # prepare values files
-    matches_values_file_name = f'{tmp_folder}/matches_{time.time()}_{random.randint(0,10000)}.txt'
+    matches_values_file_name = f'{tmp_folder}/matches_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     matches_values_file = open(matches_values_file_name,'w',encoding='utf-8')
-    match_lineup_values_file_name = f'{tmp_folder}/match_lineup_{time.time()}_{random.randint(0,10000)}.txt'
+    match_lineup_values_file_name = f'{tmp_folder}/match_lineup_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_lineup_values_file = open(match_lineup_values_file_name,'w',encoding='utf-8')
-    match_lineup_player_position_values_file_name = f'{tmp_folder}/match_lineup_player_position_{time.time()}_{random.randint(0,10000)}.txt'
+    match_lineup_player_position_values_file_name = f'{tmp_folder}/match_lineup_player_position_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_lineup_player_position_values_file = open(match_lineup_player_position_values_file_name,'w',encoding='utf-8')
-    match_event_pass_values_file_name = f'{tmp_folder}/match_event_pass_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_pass_values_file_name = f'{tmp_folder}/match_event_pass_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_event_pass_values_file = open(match_event_pass_values_file_name,'w',encoding='utf-8')
-    match_event_shot_values_file_name = f'{tmp_folder}/match_event_shot_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_shot_values_file_name = f'{tmp_folder}/match_event_shot_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_event_shot_values_file = open(match_event_shot_values_file_name,'w',encoding='utf-8')
-    match_event_infraction_values_file_name = f'{tmp_folder}/match_event_infraction_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_infraction_values_file_name = f'{tmp_folder}/match_event_infraction_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_event_infraction_values_file = open(match_event_infraction_values_file_name,'w',encoding='utf-8')
-    match_event_carry_values_file_name = f'{tmp_folder}/match_event_carry_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_carry_values_file_name = f'{tmp_folder}/match_event_carry_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_event_carry_values_file = open(match_event_carry_values_file_name,'w',encoding='utf-8')
-    match_event_other_values_file_name = f'{tmp_folder}/match_event_other_{time.time()}_{random.randint(0,10000)}.txt'
+    match_event_other_values_file_name = f'{tmp_folder}/match_event_other_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_event_other_values_file = open(match_event_other_values_file_name,'w',encoding='utf-8')
-    match_substitution_values_file_name = f'{tmp_folder}/match_substitution_{time.time()}_{random.randint(0,10000)}.txt'
+    match_substitution_values_file_name = f'{tmp_folder}/match_substitution_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_substitution_values_file = open(match_substitution_values_file_name,'w',encoding='utf-8')
-    match_formation_values_file_name = f'{tmp_folder}/match_formation_{time.time()}_{random.randint(0,10000)}.txt'
+    match_formation_values_file_name = f'{tmp_folder}/match_formation_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_formation_values_file = open(match_formation_values_file_name,'w',encoding='utf-8')
-    match_player_stats_values_file_name = f'{tmp_folder}/match_player_stats_{time.time()}_{random.randint(0,10000)}.txt'
+    match_player_stats_values_file_name = f'{tmp_folder}/match_player_stats_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_player_stats_values_file = open(match_player_stats_values_file_name,'w',encoding='utf-8')
 
     # auxiliary values lists
@@ -1088,26 +1107,34 @@ if __name__ == '__main__':
         db_connection.create_connection()
 
         if db_connection.connection and db_request_handler.connection:
-            # db_handler run request handler loop
-            request_handler_thread = threading.Thread(target=db_request_handler.run_request_handler)
-            request_handler_thread.start()
+            try:
+                # db_handler run request handler loop
+                request_handler_thread = threading.Thread(target=db_request_handler.run_request_handler)
+                request_handler_thread.start()
 
-            start_time = time.time()
-            # main function - get api data
-            main(args,db_request_handler)
-            end_request_time = time.time()
-            print(f'API requests finished in {end_request_time-start_time} seconds.')
+                start_time = time.time()
+                # main function - get api data
+                main(args,db_request_handler)
+                end_request_time = time.time()
+                print(f'API requests finished in {end_request_time-start_time} seconds.')
 
-            # close db connection
-            db_connection.close_connection()
-            db_request_handler.request_close_connection()
-            print('Waiting for db handler thread to finish...')
-            request_handler_thread.join()
-            end_time = time.time()
-            print('DB handler thread finished.')
-            print(f'Program finished in {end_time-start_time} seconds.')
-            print(f'API requests finished in {end_request_time-start_time} seconds.')
-            print(f'DB requests finished in {end_time-end_request_time} seconds.')
+                # close db connection
+                db_connection.close_connection()
+                db_request_handler.request_close_connection()
+                print('Waiting for db handler thread to finish...')
+                request_handler_thread.join()
+                end_time = time.time()
+                print('DB handler thread finished.')
+                print(f'Program finished in {end_time-start_time} seconds.')
+                print(f'API requests finished in {end_request_time-start_time} seconds.')
+                print(f'DB requests finished in {end_time-end_request_time} seconds.')
+            except Exception as e:
+                print(e)
+                db_connection.close_connection()
+                db_request_handler.request_close_connection()
+                print('Waiting for db handler thread to finish...')
+                request_handler_thread.join()
+                print('DB handler thread finished.')
         else:
             print('DB connection failed to be established.')
     else:
