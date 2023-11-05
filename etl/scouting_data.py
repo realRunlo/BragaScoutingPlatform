@@ -1109,7 +1109,7 @@ if __name__ == '__main__':
         if db_connection.connection and db_request_handler.connection:
             try:
                 # db_handler run request handler loop
-                request_handler_thread = threading.Thread(target=db_request_handler.run_request_handler)
+                request_handler_thread = threading.Thread(target=db_request_handler.run_request_handler,daemon=True)
                 request_handler_thread.start()
 
                 start_time = time.time()
@@ -1131,9 +1131,9 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
                 db_connection.close_connection()
-                db_request_handler.request_close_connection()
+                db_request_handler.close_connection()
                 print('Waiting for db handler thread to finish...')
-                request_handler_thread.join()
+                request_handler_thread.join(timeout=1)
                 print('DB handler thread finished.')
         else:
             print('DB connection failed to be established.')
