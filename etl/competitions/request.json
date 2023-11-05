@@ -1,9 +1,42 @@
 {
     "competitions":[
         {
-            "wyId": 707,
-            "name": "Primeira Liga",
+            "wyId": 146,
+            "name": "Liga Profesional de Fútbol",
+            "area": "ARG",
+            "tm_code":"CDLP",
+            "seasons": [
+                {
+                    "start": "2019",
+                    "end": "2020"
+                }
+            ]
+        },
+        {
+            "wyId": 705,
+            "name": "Segunda Liga",
             "area": "PRT",
+            "tm_code":"PO2",
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2024"
+                },
+                {
+                    "start": "2022",
+                    "end": "2023"
+                },
+                {
+                    "start": "2021",
+                    "end": "2022"
+                }
+            ]
+        },
+        {
+            "wyId": 198,
+            "name": "First Division A",
+            "area": "BEL",
+            "tm_code":"BE1",
             "seasons": [
                 {
                     "start": "2023",
