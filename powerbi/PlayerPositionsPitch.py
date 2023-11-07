@@ -9,12 +9,12 @@ def write_text_on_labels_from_powerbi(positions, dataset, ax):
         
         if label in dataset['code'].values:
             percent_value = dataset[dataset['code'] == label]['percent'].values[0]
-            ax.scatter(x, y, color='red', s=200, zorder=2)
+            ax.scatter(x, y, color='red', s=500, zorder=2)
             ax.text(x, y + 4, f'{percent_value}%', color='white', ha='center', va='center', fontsize=12)
         else:
-            ax.scatter(x, y, color='red', s=200, zorder=2)
+            ax.scatter(x, y, color='red', s=500, zorder=2)
         
-        ax.text(x, y, str(i), color='white', ha='center', va='center', fontsize=12)
+        #ax.text(x, y, str(i), color='white', ha='center', va='center', fontsize=12)
         ax.text(x, y - 4, label, color='white', ha='center', va='center', fontsize=12)
 
 FIGWIDTH = 7
@@ -45,21 +45,28 @@ fig, ax = pitch.grid(figheight=FIGHEIGHT, grid_width=GRID_WIDTH,
 LINHA_GR = 1
 LINHA_DEFESAS_Y = 4
 LINHA_MDC_Y = 6
-LINHA_MC_Y = 7
-LINHA_MO_Y = 9
-LINHA_EXTREMOS_Y = 11
+LINHA_MC_Y = 8
+LINHA_MO_Y = 10
+LINHA_EXTREMOS_Y = 10
 LINHA_PL_Y = 13
 
 team_positions = [
                                                         (5.75, LINHA_GR, 'GR'),                                               # Posicao GR
-    (10.5, LINHA_DEFESAS_Y, 'DD'), (7.5, LINHA_DEFESAS_Y, 'DC_D'), (4, LINHA_DEFESAS_Y, 'DC_E'), (1, LINHA_DEFESAS_Y, 'DE'),  # Posicao Defesas
-                                   (7.5, LINHA_MDC_Y, 'MDC'),                                                                 # Posicao MDC
-                                                                   (4, LINHA_MC_Y, 'MC'),                                     # Posicao MC
+    (10.5, LINHA_DEFESAS_Y, 'DD'),                      (5.75, LINHA_DEFESAS_Y, 'DC'),           (1, LINHA_DEFESAS_Y, 'DE'),  # Posicao Defesas
+                                                        (5.75, LINHA_MDC_Y, 'MDC'),                                           # Posicao MDC
+                                                        (5.75, LINHA_MC_Y, 'MC'),                                             # Posicao MC
                                                         (5.75, LINHA_MO_Y, 'MO'),                                             # Posicao MO
                                                                                                  (1, LINHA_EXTREMOS_Y, 'EE'), # Posicao EE
                                                         (5.75, LINHA_PL_Y, 'PL'),                                             # Posicao PL
     (10.5, LINHA_EXTREMOS_Y, 'ED')                                                                                            # Posicao ED
 ]
+
+import pandas as pd
+
+data = {'code': ['GR', 'DD'],
+        'percent': [40, 50]}
+
+dataset = pd.DataFrame(data)
 
 write_text_on_labels_from_powerbi(team_positions, dataset, ax)
 
