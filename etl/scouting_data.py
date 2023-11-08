@@ -7,7 +7,7 @@ import time
 import logging
 from db import Db_handler
 from multiprocessing.pool import ThreadPool
-from utils import get_similar
+from utils import *
 from api_handler import *
 from tqdm import tqdm
 
@@ -44,6 +44,11 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
     if log:
         start_time = time.time()
         print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items ')
+    
+    # limit threads during working hours
+    if working_hours():
+        threads = 1
+
     iterable_divided = [None]*threads
     max_slice_size = len(iterable)//threads
     # divide work between threads
@@ -440,6 +445,37 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     for file in team_competition_season_round_values_files:
         db_handler.request_insert_or_update_many('team_competition_season_round',file,key_parameters=team_competition_season_round_key_parameters,parameters=team_competition_season_round_parameters)
 
+
+def map_player_position(position:str,name:str):
+    '''Maps player position and name to more generic values'''
+    if position in ['cb','rcb','lcb','lcb3','rcb3']:
+        position = 'cb'
+        name = 'Centre Back'
+    elif position in ['lb','lwb','lb5']:
+        position = 'lb'
+        name = 'Left Back'
+    elif position in ['rb','rwb','rb5']:
+        position = 'rb'
+        name = 'Right Back'
+    elif position in ['dmf','ldmf','rdmf']:
+        position = 'dmf'
+        name = 'Defensive Midfielder'
+    elif position in ['lcmf','lcmf3','rcmf','rcmf3']:
+        position = 'cmf'
+        name = 'Central Midfielder'
+    elif position in ['lamf','lwf','lw']:
+        position = 'lw'
+        name = 'Left Winger'
+    elif position in ['ramf','rwf','rw']:
+        position = 'rw'
+        name = 'Right Winger'
+    elif position in ['cf','ss']:
+        position = 'cf'
+        name = 'Striker'
+    return position,name
+
+
+
 def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
     '''Prepare players values for insert in db'''
     # prepare values files
@@ -522,15 +558,29 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 if advanced_stats:
                     # populate positions table
                     positions = advanced_stats['positions']
+                    unique_positions = {}
+                    # get unique positions in team season
                     for position in positions:
                         position_percent = process_mssql_value(position['percent'])
                         position_code = process_mssql_value(position['position']['code'])
                         position_name = process_mssql_value(position['position']['name'])
+                        position_code,position_name = map_player_position(position_code,position_name)
+                        if position_code not in unique_positions:
+                            unique_positions[position_code] = {
+                                'position_percent':position_percent,
+                                'position_code':position_code,
+                                'position_name':position_name
+                            }
+                        # if position already exists, sum position percent
+                        else:
+                            unique_positions[position_code]['position_percent'] += position_percent
 
-                        values = f'''SELECT '{wyId}', '{position_percent}','{position_code}', '{position_name}',idteam_competition_season \
+                    for position in unique_positions:
+                        values = f'''SELECT '{wyId}', '{position['position_percent']}','{position['position_code']}', '{position['position_name']}',idteam_competition_season \
                                     FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
                         player_positions_values_file.write(values)
                         player_positions_values_file.write(file_delimiter)
+
         pbar_players.update(1)
     player_values_file.close()
     player_positions_values_file.close()
@@ -678,7 +728,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 
 
 
-def prepare_matches_insert(matches,db_handler:Db_handler,season_id,player_advanced_stats:bool=False):
+def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     '''Prepare values for matches table in db'''
 
     # prepare values files
@@ -887,7 +937,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     matches = get_season_matches(season_id)
     pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
-    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[db_handler,season_id,player_advanced_stats],threads=10)
+    result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[season_id,player_advanced_stats],threads=10)
     pbar_players.disable = False
     pbar_matches.refresh()
     pbar_matches.reset()
