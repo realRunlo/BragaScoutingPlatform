@@ -2,6 +2,8 @@ from mplsoccer import VerticalPitch
 import matplotlib.pyplot as plt
 
 def write_text_on_labels_from_powerbi(positions, dataset, ax):
+    dataset['code'] = dataset['code'].str.upper()
+
     for i, position in enumerate(positions, 1):
         x = position[0] * FIGWIDTH
         y = position[1] * FIGHEIGHT
@@ -51,19 +53,20 @@ LINHA_EXTREMOS_Y = 10
 LINHA_PL_Y = 13
 
 team_positions = [
-                                                        (5.75, LINHA_GR, 'GR'),                                               # Posicao GR
-    (10.5, LINHA_DEFESAS_Y, 'DD'),                      (5.75, LINHA_DEFESAS_Y, 'DC'),           (1, LINHA_DEFESAS_Y, 'DE'),  # Posicao Defesas
-                                                        (5.75, LINHA_MDC_Y, 'MDC'),                                           # Posicao MDC
-                                                        (5.75, LINHA_MC_Y, 'MC'),                                             # Posicao MC
-                                                        (5.75, LINHA_MO_Y, 'MO'),                                             # Posicao MO
-                                                                                                 (1, LINHA_EXTREMOS_Y, 'EE'), # Posicao EE
-                                                        (5.75, LINHA_PL_Y, 'PL'),                                             # Posicao PL
-    (10.5, LINHA_EXTREMOS_Y, 'ED')                                                                                            # Posicao ED
+                                                        (5.75, LINHA_GR, 'GK'),                                               # Posicao GR
+    (10.5, LINHA_DEFESAS_Y, 'RB'),                      (5.75, LINHA_DEFESAS_Y, 'CB'),           (1, LINHA_DEFESAS_Y, 'LB'),  # Posicao Defesas
+                                                        (5.75, LINHA_MDC_Y, 'DMF'),                                           # Posicao MDC
+                                                        (5.75, LINHA_MC_Y, 'CMF'),                                            # Posicao MC
+                                                        (5.75, LINHA_MO_Y, 'AMF'),                                            # Posicao MO
+                                                                                                 (1, LINHA_EXTREMOS_Y, 'LW'), # Posicao EE
+                                                        (5.75, LINHA_PL_Y, 'CF'),                                             # Posicao PL
+    (10.5, LINHA_EXTREMOS_Y, 'RW')                                                                                            # Posicao ED
 ]
 
 import pandas as pd
 
-data = {'code': ['GR', 'DD'],
+#Dados de teste
+data = {'code': ['GK', 'RB'],
         'percent': [40, 50]}
 
 dataset = pd.DataFrame(data)
