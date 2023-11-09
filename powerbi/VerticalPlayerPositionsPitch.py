@@ -29,9 +29,10 @@ MAX_GRID = 1
 PAD_TOP = 2
 PAD_BOTTOM = 2
 PAD_SIDES = ((120 + PAD_TOP + PAD_BOTTOM) * FIGWIDTH / FIGHEIGHT - 80) / 2
-pitch = VerticalPitch(pad_top=PAD_TOP, pad_bottom=PAD_BOTTOM,
-                      pad_left=PAD_SIDES, pad_right=PAD_SIDES,
-                      pitch_color='grass', stripe=True, line_color='white')
+pitch = VerticalPitch(pitch_type="wyscout",
+              pad_top=PAD_TOP, pad_bottom=PAD_BOTTOM,
+              pad_left=PAD_SIDES, pad_right=PAD_SIDES,
+              pitch_color='grass', stripe=True, line_color='white')
 
 GRID_WIDTH, GRID_HEIGHT = pitch.grid_dimensions(figwidth=FIGWIDTH, figheight=FIGHEIGHT,
                                                 nrows=NROWS, ncols=NCOLS,
