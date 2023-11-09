@@ -5,6 +5,7 @@ import random
 import threading
 import time
 import logging
+import traceback
 from db import Db_handler
 from multiprocessing.pool import ThreadPool
 from utils import *
@@ -67,10 +68,12 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
         pool.join()
         if log:
             print(f'Threaded: Finished {func.__name__} in {time.time()-start_time} seconds')
-    except:
+    except Exception as e:
         print(f'Threaded: Error running {func.__name__}')
+        print(traceback.format_exc())
+        print(e)
         pool.terminate()
-        raise
+        raise e
     return results
 
 
@@ -575,7 +578,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                         else:
                             unique_positions[position_code]['position_percent'] += position_percent
 
-                    for position in unique_positions:
+                    for position in unique_positions.values():
                         values = f'''SELECT '{wyId}', '{position['position_percent']}','{position['position_code']}', '{position['position_name']}',idteam_competition_season \
                                     FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
                         player_positions_values_file.write(values)
@@ -703,7 +706,7 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 minute = 0
                 type = 'lineup'
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}', \
-                            '{shirt_number}', '{yellow_cards}', '{minute}', '{team_info['teamId']}', '{type}')'''
+                            '{shirt_number}', '{yellow_cards}', '{team_info['teamId']}', '{type}')'''
                 formation_querys.append(values)
             # team bench
             for player in formation['bench']:
@@ -717,10 +720,9 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 minute = 0
                 type = 'bench'
                 if player_id in substitutes:
-                    minute = substitutes[player_id]['minute']
                     type = 'substitution'
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}',\
-                             '{shirt_number}', '{yellow_cards}', '{minute}', '{team_info['teamId']}', '{type}')'''
+                             '{shirt_number}', '{yellow_cards}', '{team_info['teamId']}', '{type}')'''
                 formation_querys.append(values)
 
     return substitutes_querys,formation_querys
@@ -1042,7 +1044,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     # match_formation table
     match_formation_key_parameters = ['match', 'player']
-    match_formation_parameters = ['match', 'player', 'assists', 'goals', 'ownGoals', 'redCards', 'shirtNumber', 'yellowCards', 'minute', 'team', 'type']
+    match_formation_parameters = ['match', 'player', 'assists', 'goals', 'ownGoals', 'redCards', 'shirtNumber', 'yellowCards', 'team', 'type']
     for file in match_formation_values_files:
         db_handler.request_insert_or_update_many('match_formation',file,key_parameters=match_formation_key_parameters,parameters=match_formation_parameters)
 

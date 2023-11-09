@@ -1,0 +1,25 @@
+{
+    "competitions":[
+
+        {   
+            "name": "MLS",
+            "area": "USA",
+            "code": "MLS1",
+            "wyId": 869,
+            "seasons": [
+                {
+                    "start": "2023",
+                    "end": "2023"
+                },
+                {
+                    "start": "2022",
+                    "end": "2022"
+                },
+                {
+                    "start": "2021",
+                    "end": "2021"
+                }
+            ]
+        }
+    ]
+}
