@@ -158,15 +158,18 @@ def get_player_last_transfer(player,retry:bool=True):
         latest_time = None
         # get latest transfer
         for transfer in transfers_list:
-            if transfer['startDate']:
-                transfer_time = datetime.datetime.strptime(transfer['startDate'], '%Y-%m-%d')
-                if not last_transfer:
-                    last_transfer = transfer
-                    latest_time = transfer_time
-                else:
-                    if transfer_time > latest_time:
+            try:
+                if transfer['startDate']:
+                    transfer_time = datetime.datetime.strptime(transfer['startDate'], '%Y-%m-%d')
+                    if not last_transfer:
                         last_transfer = transfer
                         latest_time = transfer_time
+                    else:
+                        if transfer_time > latest_time:
+                            last_transfer = transfer
+                            latest_time = transfer_time
+            except:
+                pass
     return last_transfer
 
 
