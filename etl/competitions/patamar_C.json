@@ -4,7 +4,7 @@
         {   
             "name": "MLS",
             "area": "USA",
-            "code": "MLS1",
+            "tm_code": "MLS1",
             "wyId": 869,
             "seasons": [
                 {

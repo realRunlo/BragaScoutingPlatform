@@ -505,6 +505,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         player_name = process_mssql_value(player_name)
         wyId = process_mssql_value(player['wyId'])
         shortName = process_mssql_value(player['shortName'])
+        passportArea = process_mssql_value(player['passportArea']['id'])
         birthArea = process_mssql_value(player['birthArea']['id'])
         birthDate = process_date(player['birthDate'])
         imageDataURL = process_mssql_value(player['imageDataURL'])
@@ -519,12 +520,19 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         contractExpiration = process_date(contractExpiration)
         player_agencies = process_mssql_value(player_agencies)
         current_team = process_mssql_number(player['currentTeamId'])
+        market_value = 0
+        currency = 'EUR'
 
-        values = f'''('{wyId}', '{player_name}', '{shortName}', '{birthArea}', \
+        last_transfer = get_player_last_transfer(player['wyId'])
+        if last_transfer:
+            market_value = process_mssql_number(last_transfer["value"])
+            currency = process_mssql_value(last_transfer["currency"])
+
+        values = f'''('{wyId}', '{player_name}', '{shortName}','{passportArea}', '{birthArea}', \
                     '{birthDate}', '{imageDataURL}', '{foot}',\
                     '{height}','{weight}','{status}','{gender}',\
-                    '{role_code2}', '{role_code3}', '{role_name}'\
-                    ,'{contractExpiration}','{player_agencies}','{current_team}')'''
+                    '{role_code2}', '{role_code3}', '{role_name}','{market_value}',\
+                    '{contractExpiration}','{player_agencies}','{current_team}','{currency}')'''
         player_values_file.write(values)
         player_values_file.write(file_delimiter)
 
@@ -613,8 +621,9 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             career_entry_values_files.append(file)
 
     player_key_parameters = ['idplayer']
-    player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
-                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
+    player_parameters = ['idplayer','name','short_name','passport_area','birth_area','birth_date','image','foot','height','weight',
+                         'status','gender','role_code2','role_code3','role_name','market_value','contract_expiration','contract_agency',
+                         'current_team','currency']
     for file in player_values_files:
         db_handler.request_insert_or_update_many('player',file,key_parameters=player_key_parameters,parameters=player_parameters)
 
@@ -1118,8 +1127,8 @@ def main(args,db_handler:Db_handler):
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                     populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=True)
-                    populate_matches(db_handler,s_id,player_advanced_stats=True)
+                    populate_players(db_handler,s_id,player_advanced_stats=False)
+                    #populate_matches(db_handler,s_id,player_advanced_stats=True)
                     s_i += 1
 
         else:

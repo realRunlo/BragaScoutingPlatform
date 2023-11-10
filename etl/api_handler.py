@@ -147,6 +147,29 @@ def get_player_advanced_stats(player,competition,season=None,retry:bool=True):
     return player_advanced_stats
 
 
+def get_player_last_transfer(player,retry:bool=True):
+    '''Requests player last transfer from API'''
+    url = f'{api_url}players/{player}/transfers'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    last_transfer = None
+    if result:
+        transfers_list = result['transfer'] if result else []
+        latest_time = None
+        # get latest transfer
+        for transfer in transfers_list:
+            if transfer['startDate']:
+                transfer_time = datetime.datetime.strptime(transfer['startDate'], '%Y-%m-%d')
+                if not last_transfer:
+                    last_transfer = transfer
+                    latest_time = transfer_time
+                else:
+                    if transfer_time > latest_time:
+                        last_transfer = transfer
+                        latest_time = transfer_time
+    return last_transfer
+
+
 
 
 def get_season_info(season,retry:bool=True):
