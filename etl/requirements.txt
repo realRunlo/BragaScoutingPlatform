@@ -1,4 +1,4 @@
 pybase64
 jellyfish
-pymssql
+psycopg2
 tqdm

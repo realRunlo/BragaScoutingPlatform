@@ -79,7 +79,7 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
 
 def process_date(value:str):
     '''Process date string'''
-    date = ''
+    date = 'NULL'
     try:
         date = datetime.datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%d')
     except Exception as e:
@@ -276,11 +276,13 @@ def prepare_competitions_seasons_insert(competitions_seasons_id:list):
 
         competition_season_id = process_mssql_value(competition_season_info['wyId'])
         competition_season_startDate = process_date(competition_season_info['startDate'])
+        competition_season_startDate = f'\'{competition_season_startDate}\'' if competition_season_startDate != 'NULL' else 'NULL'
         competition_season_endDate = process_date(competition_season_info['endDate'])
+        competition_season_endDate = f'\'{competition_season_endDate}\'' if competition_season_endDate != 'NULL' else 'NULL'
         competition_season_name = process_mssql_value(competition_season_info['name'])
         competition_season_competitionId = process_mssql_value(competition_season_info['competitionId'])
 
-        values = f'''('{competition_season_id}', '{competition_season_startDate}', '{competition_season_endDate}', '{competition_season_name}', '{competition_season_competitionId}')'''
+        values = f'''('{competition_season_id}', {competition_season_startDate}, {competition_season_endDate}, '{competition_season_name}', '{competition_season_competitionId}')'''
         values_file.write(values)
         values_file.write(file_delimiter)
         pbar_seasons.update(1)
@@ -381,10 +383,12 @@ def populate_teams(db_handler:Db_handler,season_id:int):
         round = season_round['round']
         round_id = process_mssql_value(round['wyId'])
         startDate = process_date(round['startDate'])
+        startDate = f'\'{startDate}\'' if startDate != 'NULL' else 'NULL'
         endDate = process_date(round['endDate'])
+        endDate = f'\'{endDate}\'' if endDate != 'NULL' else 'NULL'
         name = process_mssql_value(round['name'])
         type = process_mssql_value(round['type'])
-        values = f'''('{round_id}','{season_id}','{startDate}', '{endDate}', '{name}', '{type}' )'''
+        values = f'''('{round_id}','{season_id}',{startDate}, {endDate}, '{name}', '{type}' )'''
         rounds_values_file.write(values)
         rounds_values_file.write(file_delimiter)
         # process round's teams
@@ -508,6 +512,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         passportArea = process_mssql_value(player['passportArea']['id'])
         birthArea = process_mssql_value(player['birthArea']['id'])
         birthDate = process_date(player['birthDate'])
+        birthDate = f'\'{birthDate}\'' if birthDate != 'NULL' else 'NULL'
         imageDataURL = process_mssql_value(player['imageDataURL'])
         foot = process_mssql_value(player['foot'])
         height = process_mssql_value(player['height'])
@@ -518,6 +523,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         role_code3 = process_mssql_value(player['role']['code3'])
         role_name = process_mssql_value(player['role']['name'])
         contractExpiration = process_date(contractExpiration)
+        contractExpiration = f'\'{contractExpiration}\'' if contractExpiration != 'NULL' else 'NULL'
         player_agencies = process_mssql_value(player_agencies)
         current_team = process_mssql_number(player['currentTeamId'])
         market_value = 0
@@ -529,10 +535,10 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
             currency = process_mssql_value(last_transfer["currency"])
 
         values = f'''('{wyId}', '{player_name}', '{shortName}','{passportArea}', '{birthArea}', \
-                    '{birthDate}', '{imageDataURL}', '{foot}',\
+                    {birthDate}, '{imageDataURL}', '{foot}',\
                     '{height}','{weight}','{status}','{gender}',\
                     '{role_code2}', '{role_code3}', '{role_name}','{market_value}',\
-                    '{contractExpiration}','{player_agencies}','{current_team}','{currency}')'''
+                    {contractExpiration},'{player_agencies}','{current_team}','{currency}')'''
         player_values_file.write(values)
         player_values_file.write(file_delimiter)
 
@@ -557,11 +563,11 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 substituteOut = process_mssql_number(entry['substituteOut'])
                 yellowCard = process_mssql_number(entry['yellowCard'])
 
-                values = f'''SELECT '{wyId}', idteam_competition_season, '{appearances}','{goal}','{minutesPlayed}',\
-                            '{penalties}','{redCards}','{shirtNumber}','{substituteIn}','{substituteOnBench}',\
-                            '{substituteOut}','{yellowCard}','{team}','{season}' 
-                            FROM [scouting].[team_competition_season] 
-                            WHERE [team]='{team}' AND [competition_season]='{season}' '''
+                values = f'''SELECT {wyId}, idteam_competition_season, {appearances},{goal},{minutesPlayed},\
+                            {penalties},{redCards},{shirtNumber},{substituteIn},{substituteOnBench},\
+                            {substituteOut},{yellowCard},{team},{season}
+                            FROM "scouting"."team_competition_season" 
+                            WHERE "team"={team} AND "competition_season"={season} '''
                 career_entry_values_file.write(values)
                 career_entry_values_file.write(file_delimiter)
 
@@ -587,8 +593,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                             unique_positions[position_code]['position_percent'] += position_percent
 
                     for position in unique_positions.values():
-                        values = f'''SELECT '{wyId}', '{position['position_percent']}','{position['position_code']}', '{position['position_name']}',idteam_competition_season \
-                                    FROM [scouting].[team_competition_season] WHERE [team]='{team}' AND [competition_season]='{season}' '''
+                        values = f'''SELECT {wyId}, {position['position_percent']},'{position['position_code']}', '{position['position_name']}',idteam_competition_season \
+                                    FROM "scouting"."team_competition_season" WHERE "team"={team} AND "competition_season"={season} '''
                         player_positions_values_file.write(values)
                         player_positions_values_file.write(file_delimiter)
 
@@ -631,13 +637,13 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     career_entry_parameters = ['player','team_competition_season','appearances','goal','minutesPlayed','penalties',
                                'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard','team','competition_season']
     for file in career_entry_values_files:
-        db_handler.request_insert_or_update_many('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
+        db_handler.request_insert_or_update_many_union('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters)
     
     if player_advanced_stats:
         player_positions_key_parameters = ['player','code','team_competition_season']
         player_positions_parameters = ['player','percent','code','name','team_competition_season']
         for file in player_positions_values_files:
-            db_handler.request_insert_or_update_many('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
+            db_handler.request_insert_or_update_many_union('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters)
 
 
 def prepare_match_players_stats_insert(match:int,get_players:bool=False):
@@ -784,11 +790,20 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             away_team = process_mssql_value(match_info['teamsData']['away']['teamId'])
             away_score = process_mssql_value(match_info['teamsData']['away']['score'])
             dateutc = process_date_utc(match_info['dateutc'])
+            dateutc = f'\'{dateutc}\'' if dateutc != 'NULL' else 'NULL'
             winner = process_mssql_value(match_info['winner'])
+            duration = process_mssql_value(match_info['duration'])
+            home_score_et = process_mssql_number(match_info['teamsData']['home']['scoreET'],default='0')
+            home_score_ht = process_mssql_number(match_info['teamsData']['home']['scoreHT'],default='0')
+            home_score_p = process_mssql_number(match_info['teamsData']['home']['scoreP'],default='0')
+            away_score_et = process_mssql_number(match_info['teamsData']['away']['scoreET'],default='0')
+            away_score_ht = process_mssql_number(match_info['teamsData']['away']['scoreHT'],default='0')
+            away_score_p = process_mssql_number(match_info['teamsData']['away']['scoreP'],default='0')
 
 
-            values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', '{dateutc}',\
-            '{home_score}','{away_score}', '{winner}')'''
+            values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', {dateutc},\
+                    '{home_score}','{away_score}', '{winner}', '{duration}', '{home_score_et}', '{home_score_ht}',\
+                    '{home_score_p}', '{away_score_et}', '{away_score_ht}', '{away_score_p}')'''
 
             matches_values_file.write(values)
             matches_values_file.write(file_delimiter)
@@ -827,9 +842,9 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                                 for playerdict in players:
                                     for playerId in playerdict:
                                         position = process_mssql_value(playerdict[playerId]['position'])
-                                        values = f'''SELECT match_lineup_id, '{playerId}','{position}' 
-                                                    FROM [scouting].[match_lineup] 
-                                                    WHERE [match]='{match['matchId']}' AND [team]='{team}' AND [period]='{part}' AND [second]='{second}' '''
+                                        values = f'''SELECT match_lineup_id, {playerId},'{position}' 
+                                                    FROM "scouting"."match_lineup"
+                                                    WHERE "match"='{match['matchId']}' AND "team"={team} AND "period"='{part}' AND "second"={second} '''
                                         match_lineup_player_position_values_file.write(values)
                                         match_lineup_player_position_values_file.write(file_delimiter)
 
@@ -1003,29 +1018,33 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     # # match table
     match_key_parameters = ['idmatch']
-    match_parameters = ['idmatch', 'competition_season','round', 'home_team', 'away_team', 'date', 'home_score', 'away_score', 'winner']
+    match_parameters = ['idmatch', 'competition_season','round', 'home_team', 'away_team', 'date', 'home_score',
+                         'away_score', 'winner', 'duration', 'home_score_et', 'home_score_ht', 'home_score_p',
+                         'away_score_et', 'away_score_ht', 'away_score_p']
     for file in match_values_files:
         db_handler.request_insert_or_update_many('match',file,key_parameters=match_key_parameters,parameters=match_parameters)
 
     # player table
     player_key_parameters = ['idplayer']
     player_parameters = ['idplayer','name','short_name','birth_area','birth_date','image','foot','height','weight',
-                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency','current_team']
+                         'status','gender','role_code2','role_code3','role_name','contract_expiration','contract_agency',
+                         'current_team']
     for file in player_values_files:
         db_handler.request_insert_or_update_many('player',file,key_parameters=player_key_parameters,parameters=player_parameters)
 
     # career_entry table
     career_entry_key_parameters = ['player','team_competition_season']
     career_entry_parameters = ['player','team_competition_season','appearances','goal','minutesPlayed','penalties',
-                                 'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard','team','competition_season']
+                                 'redCards','shirtNumber','substituteIn','substituteOnBench','substituteOut','yellowCard',
+                                 'team','competition_season']
     for file in career_entry_values_files:
-        db_handler.request_insert_or_update_many('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters,delimiter=' UNION ALL ')
+        db_handler.request_insert_or_update_many_union('career_entry',file,key_parameters=career_entry_key_parameters,parameters=career_entry_parameters)
 
     # player_positions table
     player_positions_key_parameters = ['player','code','team_competition_season']
     player_positions_parameters = ['player','percent','code','name','team_competition_season']
     for file in player_positions_values_files:
-        db_handler.request_insert_or_update_many('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters,delimiter=' UNION ALL ')
+        db_handler.request_insert_or_update_many_union('player_positions',file,key_parameters=player_positions_key_parameters,parameters=player_positions_parameters)
                          
 
     if player_advanced_stats:
@@ -1048,12 +1067,13 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     match_lineup_player_position_key_parameters = ['match_lineup_id', 'player']
     match_lineup_player_position_parameters = ['match_lineup_id', 'player', 'position']
     for file in match_lineup_player_position_values_files:
-        db_handler.request_insert_or_update_many('match_lineup_player_position',file,key_parameters=match_lineup_player_position_key_parameters,
-                                     parameters=match_lineup_player_position_parameters,delimiter=' UNION ALL ')
+        db_handler.request_insert_or_update_many_union('match_lineup_player_position',file,key_parameters=match_lineup_player_position_key_parameters,
+                                     parameters=match_lineup_player_position_parameters)
 
     # match_formation table
     match_formation_key_parameters = ['match', 'player']
-    match_formation_parameters = ['match', 'player', 'assists', 'goals', 'ownGoals', 'redCards', 'shirtNumber', 'yellowCards', 'team', 'type']
+    match_formation_parameters = ['match', 'player', 'assists', 'goals', 'ownGoals', 'redCards', 'shirtNumber',
+                                   'yellowCards', 'team', 'type']
     for file in match_formation_values_files:
         db_handler.request_insert_or_update_many('match_formation',file,key_parameters=match_formation_key_parameters,parameters=match_formation_parameters)
 
@@ -1072,25 +1092,29 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
     # pass
     match_event_pass_key_parameters = ['idmatch_event']
-    match_event_pass_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'accurate', 'recipient', 'endlocation_x', 'endlocation_y']
+    match_event_pass_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
+                                    'minute', 'second', 'accurate', 'recipient', 'endlocation_x', 'endlocation_y']
     for file in match_events_values_files['pass']:
         db_handler.request_insert_or_update_many('match_event_pass',file,key_parameters=match_event_pass_key_parameters,parameters=match_event_pass_parameters,batch_size=3000)
 
     # shot
     match_event_shot_key_parameters = ['idmatch_event']
-    match_event_shot_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'isGoal', 'onTarget', 'xg', 'postShotXg']
+    match_event_shot_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
+                                    'minute', 'second', 'isGoal', 'onTarget', 'xg', 'postShotXg']
     for file in match_events_values_files['shot']:
         db_handler.request_insert_or_update_many('match_event_shot',file,key_parameters=match_event_shot_key_parameters,parameters=match_event_shot_parameters,batch_size=3000)
 
     # carry
     match_event_carry_key_parameters = ['idmatch_event']
-    match_event_carry_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'endlocation_x', 'endlocation_y']
+    match_event_carry_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
+                                     'minute', 'second', 'endlocation_x', 'endlocation_y']
     for file in match_events_values_files['carry']:
         db_handler.request_insert_or_update_many('match_event_carry',file,key_parameters=match_event_carry_key_parameters,parameters=match_event_carry_parameters,batch_size=3000)
 
     # infraction
     match_event_infraction_key_parameters = ['idmatch_event']
-    match_event_infraction_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second', 'yellowCard', 'redCard']
+    match_event_infraction_parameters = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
+                                          'minute', 'second', 'yellowCard', 'redCard']
     for file in match_events_values_files['infraction']:
         db_handler.request_insert_or_update_many('match_event_infraction',file,key_parameters=match_event_infraction_key_parameters,parameters=match_event_infraction_parameters,batch_size=3000)
     
@@ -1127,8 +1151,8 @@ def main(args,db_handler:Db_handler):
                 for s_id in seasons_id:
                     print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                     populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=False)
-                    #populate_matches(db_handler,s_id,player_advanced_stats=True)
+                    populate_players(db_handler,s_id,player_advanced_stats=True)
+                    populate_matches(db_handler,s_id,player_advanced_stats=True)
                     s_i += 1
 
         else:
