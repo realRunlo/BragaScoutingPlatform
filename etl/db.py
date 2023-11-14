@@ -77,11 +77,8 @@ class Db_handler:
                     if 'values_file' in request:
                         os.remove(request['values_file'])
                 else:
-                    not_timeout = self.db_event.wait(timeout=1000)
+                    self.db_event.wait(timeout=600)
                     self.db_event.clear()
-                    if not not_timeout:
-                        self.close_connection()
-                        break
                 
 
 
@@ -230,6 +227,7 @@ class Db_handler:
             except Exception as e:
                 self.log(f'Error inserting/updating values {values} into table {table}\n{e}',logging.ERROR)
                 open('error.txt','w', encoding="utf-8").write(query)
+                print(e)
                 sys.exit()
             self.connection.commit()
             cursor.close()
@@ -317,6 +315,7 @@ class Db_handler:
                                 errors += 1
                                 time.sleep(1)
                             else:
+                                print(e)
                                 sys.exit()
                     self.log(f'Values inserted/updated into table {table}')
                     self.connection.commit()

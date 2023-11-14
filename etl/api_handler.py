@@ -154,7 +154,7 @@ def get_player_last_transfer(player,retry:bool=True):
     result = get_request_api(url,headers=headers,retry=retry)
     last_transfer = None
     if result:
-        transfers_list = result['transfer'] if result else []
+        transfers_list = result['transfer'] if 'transfer' in result else []
         latest_time = None
         # get latest transfer
         for transfer in transfers_list:
