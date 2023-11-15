@@ -226,7 +226,7 @@ def update_market_value(players_selected : list, assigned_players : list, player
     if(len(players_selected) == 1):
         #Dar update do valor de mercado
         assigned_players.append(players_selected[0][0])
-        db_handler.update("player", "market_value", player_market_value, f"WHERE idplayer = {players_selected[0][0]}")
+        db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {players_selected[0][0]}")
         return True
     elif(len(players_selected) > 0):
         #Comparar e ver qual deles é o real
@@ -239,7 +239,7 @@ def update_market_value(players_selected : list, assigned_players : list, player
                 found = True
                 #Dar update do valor de mercado
                 assigned_players.append(id)
-                db_handler.update("player", "market_value", player_market_value, f"WHERE idplayer = {id}")
+                db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {id}")
                 break
             elif actual_similarity > max_similarity:
                 actual_id = id
@@ -247,7 +247,7 @@ def update_market_value(players_selected : list, assigned_players : list, player
             #Escolher o com maior similiradidade de short name
             #Dar update do valor de mercado
             assigned_players.append(actual_id)
-            db_handler.update("player", "market_value", player_market_value, f"WHERE idplayer = {actual_id}")
+            db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {actual_id}")
         return True
     else:
         return False
