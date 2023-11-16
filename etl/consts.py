@@ -50,7 +50,16 @@ player_positions_parameters     = ['player','percent','code','name','team_compet
 match_key_parameters = ['idmatch']
 match_parameters     = ['idmatch', 'competition_season','round', 'home_team', 'away_team', 'date', 'home_score',
                         'away_score', 'winner', 'duration', 'home_score_et', 'home_score_ht', 'home_score_p',
-                        'away_score_et', 'away_score_ht', 'away_score_p']
+                        'away_score_et', 'away_score_ht', 'away_score_p','home_shots', 'away_shots',
+                        'home_shotsOnTarget', 'away_shotsOnTarget', 'home_xg', 'away_xg', 'home_attacks_total',
+                        'away_attacks_total', 'home_corners', 'away_corners', 'home_possessionPercent',
+                        'away_possessionPercent', 'home_fouls', 'away_fouls', 'home_pass_successful_percent',
+                        'away_pass_successful_percent', 'home_vertical_pass_successful_percent',
+                        'away_vertical_pass_successful_percent', 'home_offsides', 'away_offsides',
+                        'home_clearances', 'away_clearances', 'home_interceptions', 'away_interceptions',
+                        'home_tackles', 'away_tackles']
+
+
 
 player_match_stats_key_parameters = ['match', 'player']
 player_match_stats_parameters     = ['match', 'player', 'offensiveDuels', 'progressivePasses', 'forwardPasses', 
