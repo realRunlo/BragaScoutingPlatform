@@ -759,8 +759,9 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
 
     for match in matches:
         match_info = get_match_info(match['matchId'])
-        # get match basic info
+        match_advanced_stats = get_match_advanced_stats(match['matchId'])
         if match_info:
+            # get match basic info
             wyId = process_mssql_value(match_info['wyId'])
             seasonId = process_mssql_value(match_info['seasonId'])
             roundId = process_mssql_value(match_info['roundId'])
@@ -778,14 +779,77 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             away_score_et = process_mssql_number(match_info['teamsData']['away']['scoreET'],default='0')
             away_score_ht = process_mssql_number(match_info['teamsData']['away']['scoreHT'],default='0')
             away_score_p = process_mssql_number(match_info['teamsData']['away']['scoreP'],default='0')
+            # match advanced stats
+            home_shots = 0
+            away_shots = 0
+            home_shotsOnTarget = 0
+            away_shotsOnTarget = 0
+            home_xg = 0
+            away_xg = 0
+            home_attacks_total = 0
+            away_attacks_total = 0
+            home_corners = 0
+            away_corners = 0
+            home_possessionPercent = 0
+            away_possessionPercent = 0
+            home_fouls = 0
+            away_fouls = 0
+            home_pass_successful_percent = 0
+            away_pass_successful_percent = 0
+            home_vertical_pass_successful_percent = 0
+            away_vertical_pass_successful_percent = 0
+            home_offsides = 0
+            away_offsides = 0
+            home_clearances = 0
+            away_clearances = 0
+            home_interceptions = 0
+            away_interceptions = 0
+            home_tackles = 0
+            away_tackles = 0
+            if match_advanced_stats:
+                home_shots                            = process_mssql_number(match_advanced_stats['general']['home']['shots'])
+                away_shots                            = process_mssql_number(match_advanced_stats['general']['away']['shots'])
+                home_shotsOnTarget                    = process_mssql_number(match_advanced_stats['general']['home']['shotsOnTarget'])
+                away_shotsOnTarget                    = process_mssql_number(match_advanced_stats['general']['away']['shotsOnTarget'])
+                home_xg                               = process_mssql_number(match_advanced_stats['general']['home']['xg'])
+                away_xg                               = process_mssql_number(match_advanced_stats['general']['away']['xg'])
+                home_attacks_total                    = process_mssql_number(match_advanced_stats['attacks']['home']['total'])
+                away_attacks_total                    = process_mssql_number(match_advanced_stats['attacks']['away']['total'])
+                home_corners                          = process_mssql_number(match_advanced_stats['general']['home']['corners'])
+                away_corners                          = process_mssql_number(match_advanced_stats['general']['away']['corners'])
+                home_possessionPercent                = process_mssql_number(match_advanced_stats['possession']['home']['possessionPercent'])
+                away_possessionPercent                = process_mssql_number(match_advanced_stats['possession']['away']['possessionPercent'])
+                home_fouls                            = process_mssql_number(match_advanced_stats['general']['home']['fouls'])
+                away_fouls                            = process_mssql_number(match_advanced_stats['general']['away']['fouls'])
+                home_pass_successful_percent          = process_mssql_number((match_advanced_stats['passes']['home']['passesSuccessful']*100)/match_advanced_stats['passes']['home']['passes'])
+                away_pass_successful_percent          = process_mssql_number((match_advanced_stats['passes']['away']['passesSuccessful']*100)/match_advanced_stats['passes']['away']['passes'])
+                home_vertical_pass_successful_percent = process_mssql_number((match_advanced_stats['passes']['home']['verticalPassesSuccessful']*100)/match_advanced_stats['passes']['home']['verticalPasses'])
+                away_vertical_pass_successful_percent = process_mssql_number((match_advanced_stats['passes']['away']['verticalPassesSuccessful']*100)/match_advanced_stats['passes']['away']['verticalPasses'])
+                home_offsides                         = process_mssql_number(match_advanced_stats['general']['home']['offsides'])
+                away_offsides                         = process_mssql_number(match_advanced_stats['general']['away']['offsides'])
+                home_clearances                       = process_mssql_number(match_advanced_stats['defence']['home']['clearances'])
+                away_clearances                       = process_mssql_number(match_advanced_stats['defence']['away']['clearances'])
+                home_interceptions                    = process_mssql_number(match_advanced_stats['defence']['home']['interceptions'])
+                away_interceptions                    = process_mssql_number(match_advanced_stats['defence']['away']['interceptions'])
+                home_tackles                          = process_mssql_number(match_advanced_stats['defence']['home']['tackles'])
+                away_tackles                          = process_mssql_number(match_advanced_stats['defence']['away']['tackles'])
+
 
 
             values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', {dateutc},\
                     '{home_score}','{away_score}', '{winner}', '{duration}', '{home_score_et}', '{home_score_ht}',\
-                    '{home_score_p}', '{away_score_et}', '{away_score_ht}', '{away_score_p}')'''
+                    '{home_score_p}', '{away_score_et}', '{away_score_ht}', '{away_score_p}',\
+                    '{home_shots}', '{away_shots}', '{home_shotsOnTarget}', '{away_shotsOnTarget}',\
+                    '{home_xg}', '{away_xg}', '{home_attacks_total}', '{away_attacks_total}',\
+                    '{home_corners}', '{away_corners}', '{home_possessionPercent}', '{away_possessionPercent}',\
+                    '{home_fouls}', '{away_fouls}', '{home_pass_successful_percent}', '{away_pass_successful_percent}',\
+                    '{home_vertical_pass_successful_percent}', '{away_vertical_pass_successful_percent}',\
+                    '{home_offsides}', '{away_offsides}', '{home_clearances}', '{away_clearances}',\
+                    '{home_interceptions}', '{away_interceptions}', '{home_tackles}', '{away_tackles}')'''
 
             matches_values_file.write(values)
             matches_values_file.write(file_delimiter)
+
 
             # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
@@ -1074,7 +1138,6 @@ def main(args,db_handler:Db_handler):
             if 'competitions' in request_file:
                 competitions = request_file['competitions']
                 competitions_info = extract_competitions_info(competitions)
-                #print(competitions_info)
                 competitions_id = [(c['wyId'],c['custom_name']) for c in competitions_info]
                 # populate competitions
                 populate_competitions(db_handler,competitions_id)

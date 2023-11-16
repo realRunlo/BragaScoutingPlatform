@@ -124,6 +124,15 @@ def get_match_info(match,retry:bool=True):
     match_info = result if result else None
     return match_info 
 
+def get_match_advanced_stats(match,retry:bool=True):
+    '''Requests match advanced stats from API'''
+    url = f'{api_url}matches/{match}/advancedstats'
+    headers = {'Authorization': encoded_authentication}
+    params = {'useSides':'true','details':'match,teams'}
+    result = get_request_api(url,headers=headers,params=params,retry=retry)
+    match_advanced_stats = result if result else None
+    return match_advanced_stats
+
 
 def get_player_career(player,retry:bool=True):
     '''Requests player career from API'''
