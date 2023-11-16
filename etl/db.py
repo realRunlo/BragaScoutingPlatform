@@ -153,18 +153,23 @@ class Db_handler:
                      'values_file':values_file})
                 self.db_event.set()
 
-    def update(self,table:str,parameter:str,value:str,where:str,database:str='scouting',log:bool=False):
+    def update(self,table:str,parameters:[str],values:[str],where:str,database:str='scouting',log:bool=False):
         """Update values into a table"""
         if self.connection:
+            query = f'''UPDATE {database}.{table} SET {parameters[0]} = {values[0]}'''
+            for i in range(1,len(parameters)):
+                query+=f''', {parameters[i]} = {values[i]}'''
+                i += 1
+            query += f''' {where}'''
             if log:
-                self.log(f'''Query: UPDATE {database}.{table} SET {parameter} = {value} {where}''')
+                self.log(f'''Query: {query}''')
+                
             cursor = self.connection.cursor()
             try:
-                query = f'''UPDATE "{database}"."{table}" SET {parameter} = {value} {where}'''
                 cursor.execute(query)
             except Exception as e:
                 if log:
-                    self.log(f'Error updating value {value} on {parameter} into table {table}\n{e}',logging.ERROR)
+                    self.log(f'Error updating values {values} on {parameters} into table {table}\n{e}',logging.ERROR)
                 open('error.txt','w', encoding="utf-8").write(query)
                 sys.exit()
             self.connection.commit()
@@ -426,7 +431,7 @@ class Db_handler:
         with self.db_lock:
             if self.connection:
                 if log:
-                    self.log(f'''Query: SELECT {parameters} FROM "{database}"."{table}"''')
+                    self.log(f'''Query: SELECT {parameters} FROM "{database}"."{table}" {where}''')
                 tries = 0
                 while tries < 10:
                     cursor = self.connection.cursor()

@@ -9,6 +9,13 @@ import logging
 from utils import similarity
 from datetime import date
 import time
+from requests.exceptions import ChunkedEncodingError
+import sys
+
+
+max_retries = 30
+chunked_error_time_sleep = 3
+other_error_time_sleep = 60
 
 def parse_arguments():
     '''Define and parse arguments using argparse'''
@@ -79,7 +86,21 @@ def extract_p_tm_id(url):
     else:
         # Se não encontrar um ID, você pode retornar um valor padrão ou levantar uma exceção, conforme necessário
         return None
-
+    
+def safe_request(url, headers):
+    retries = 0
+    while retries < max_retries:
+        try:
+            return requests.get(url, headers=headers)
+        except ChunkedEncodingError as e:
+            print(f"Caught ChunkedEncodingError. Retrying ({retries + 1}/{max_retries})... sleeping {chunked_error_time_sleep}")
+            time.sleep(chunked_error_time_sleep)  # Add a delay before retrying
+            retries += 1
+        except e:
+            print(f"Caught {e}. Retrying ({retries + 1}/{max_retries})... sleeping {other_error_time_sleep}")
+            time.sleep(other_error_time_sleep)  # Add a delay before retrying
+            retries += 1
+        
 def scrap_player_name(tm_id):
     url = f"https://www.transfermarkt.pt/player/profil/spieler/{tm_id}"
     pageTree = requests.get(url, headers=headers)
@@ -175,7 +196,8 @@ def treat_name(name):
 def find_player_by_complete_name(p_tm_id : int, current_team:int):
     player_complete_name = scrap_player_name(p_tm_id)
     player_complete_name = player_complete_name.replace(" ","%")
-    select_players3 = db_handler.select("player","idplayer,birth_date,name",f"where {like('name',f'%{player_complete_name}%')} and current_team={current_team}")
+    player_complete_name = player_complete_name.replace("'","")
+    select_players3 = db_handler.select("player","idplayer,birth_date,name",f"where {like('name',f'%{player_complete_name}%')} and current_team={current_team}", log=True)
     players_selected = select_players3 if select_players3 else []
     return players_selected
 
@@ -191,7 +213,7 @@ def find_player_by_name(player_name : str, current_team : int):
         for n in player_names[1:]:
             comparation+= f"%{n}"
         comparation += "%"
-        select_players2 = db_handler.select("player","idplayer,birth_date,name",f"where {like('name',f'{comparation}')} and current_team={current_team}")
+        select_players2 = db_handler.select("player","idplayer,birth_date,name",f"where {like('name',f'{comparation}')} and current_team={current_team}", log=False)
         players_selected = select_players2 if select_players2 else []
     return players_selected
 
@@ -199,20 +221,20 @@ def find_player_by_short_name(player_name : str, current_team : int):
     player_name = treat_name(player_name)
     player_names = player_name.split(" ")
     if (len(player_names) == 1):
-        select_players = db_handler.select("player","idplayer,birth_date,short_name",f"where ({like('short_name',f'%{player_name}%')}) and current_team={current_team}")
+        select_players = db_handler.select("player",'idplayer,birth_date,short_name',f"where ({like('short_name',f'%{player_name}%')}) and current_team={current_team}", log=False)
         players_selected = select_players if select_players else []
     elif (len(player_names) == 2):
         player_name = f"{player_names[0]}%{player_names[1]}"
         player_name2 = f"{player_names[0][0]}.%{player_names[1]}"
         player_name3 = f"{player_names[1][0]}.%{player_names[0]}"
         player_name4 = f"{player_names[1]}%{player_names[0]}"
-        select_players = db_handler.select("player","idplayer,birth_date,short_name",f"where ({like_multiple('short_name',[f'%{player_name}%',f'%{player_name2}%',f'%{player_name3}%',f'%{player_name4}%'])}) and current_team={current_team}")
+        select_players = db_handler.select("player",'idplayer,birth_date,short_name',f"where ({like_multiple('short_name',[f'%{player_name}%',f'%{player_name2}%',f'%{player_name3}%',f'%{player_name4}%'])}) and current_team={current_team}", log=False)
         players_selected = select_players if select_players else []
     else:
         player_name2 = f"{player_names[0][0]}."
         for n in player_names[1:]:
             player_name2 += f" {n}"
-        select_players = db_handler.select("player","idplayer,birth_date,short_name",f"where ({like_multiple('short_name',[f'%{player_name}%',f'%{player_name2}%'])}) and current_team={current_team}")
+        select_players = db_handler.select("player",'idplayer,birth_date,short_name',f"where ({like_multiple('short_name',[f'%{player_name}%',f'%{player_name2}%'])}) and current_team={current_team}", log=False)
         players_selected = select_players if select_players else []
     return players_selected
 
@@ -222,11 +244,15 @@ def test_players_selected(players_selected : list, assigned_players : list, play
         if id in assigned_players or player_age != get_age(birth_date):
             players_selected.remove(player_select)
 
+def db_update_tmvalue(player_market_value, player_id):
+    db_handler.update("player", ["tm_market_value","tm_market_value_currency","tm_scrap"], [player_market_value,"'EUR'","'1'"], f"WHERE idplayer = {player_id}", log=False)
+
 def update_market_value(players_selected : list, assigned_players : list, player_market_value : int, player_name : str):
     if(len(players_selected) == 1):
         #Dar update do valor de mercado
         assigned_players.append(players_selected[0][0])
-        db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {players_selected[0][0]}")
+        db_update_tmvalue(player_market_value,players_selected[0][0])
+        print(f"{player_name} updated!")
         return True
     elif(len(players_selected) > 0):
         #Comparar e ver qual deles é o real
@@ -239,7 +265,8 @@ def update_market_value(players_selected : list, assigned_players : list, player
                 found = True
                 #Dar update do valor de mercado
                 assigned_players.append(id)
-                db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {id}")
+                db_update_tmvalue(player_market_value,id)
+                print(f"{player_name} updated!")
                 break
             elif actual_similarity > max_similarity:
                 actual_id = id
@@ -247,7 +274,8 @@ def update_market_value(players_selected : list, assigned_players : list, player
             #Escolher o com maior similiradidade de short name
             #Dar update do valor de mercado
             assigned_players.append(actual_id)
-            db_handler.update("player", "tm_market_value", player_market_value, f"WHERE idplayer = {actual_id}")
+            db_update_tmvalue(player_market_value,actual_id)
+            print(f"{player_name} updated!")
         return True
     else:
         return False
@@ -255,55 +283,115 @@ def update_market_value(players_selected : list, assigned_players : list, player
 def main(db_handler, cn : bool):
     start_time = time.time()
     #geting tm code of all competitions in bd
-    comp_codes = db_handler.select("competition","idcompetitions,custom_name", log=True)
-    #comp_codes = [(707, 'PO1')]
+    comp_codes = db_handler.select("competition","idcompetitions,custom_name", log=False)
+    #comp_codes = [(255, 'BRA1'),(146, 'CDLP')]
     not_found_players_file = open("nfp.txt","w+")
 
     for (comp_id,comp_code) in comp_codes:
         comp_info = scrap_comp_info(comp_code)
         #comp_info = json.load(open(f"test_{comp_code}.json"))
-        #if comp_info == None:
-        #    continue
+        if comp_info == None:
+            continue
         
         #Serializing json   
         #json_object = json.dumps(comp_info, indent = 4)  
         #f = open(f"test_{comp_code}.json", "w")
         #f.write(json_object)
         #f.close()
-        #return
        
-        select_competitions_seasons = db_handler.select("competition_season","top 1 idcompetition_season", f"where competition = {comp_id} order by startDate desc",log=False)
+        select_competitions_seasons = db_handler.select("competition_season","idcompetition_season", f'where "competition" = {comp_id} order by "competition_season"."startDate" desc limit 1',log=False)
         competition_season = select_competitions_seasons[0][0] if select_competitions_seasons else None
 
 
         if competition_season:
             select_teams_ids = db_handler.select("team_competition_season","team",f"where competition_season = {competition_season}", log=False)
-            teams_ids = [id_team for (id_team,) in select_teams_ids] if select_teams_ids else []
-            for team_id in teams_ids:
-                found_tm = False
+            teams_ids = {id_team:{} for (id_team,) in select_teams_ids} if select_teams_ids else {}
+            queue = list(teams_ids.keys())
+            for team_id in queue:
                 select_team_names = db_handler.select("team","name,official_name",f"where idteam = {team_id}", log=False)
                 bd_team_names = select_team_names[0] if select_team_names else None
                 if bd_team_names:
-                    max_similarity = 0
+                    bd_team_name, bd_team_official_name = bd_team_names
+                    teams_ids[team_id]['bd_team_name'] = bd_team_name
+                    teams_ids[team_id]['bd_team_official_name'] = bd_team_official_name
+            
+            next_queue = list(queue)
+            for team_id in next_queue:
+                for tm_team_name,tm_team_info in comp_info.items():
+                    if('id' in tm_team_info):
+                        continue
+                    bd_team_name = teams_ids[team_id]['bd_team_name']
+                    bd_team_official_name = teams_ids[team_id]['bd_team_official_name']
+                    tm_team_official_name = tm_team_info['official_name']
+                    actual_similarity = test_similarity(bd_team_name,bd_team_official_name,tm_team_name,tm_team_official_name)
+                    if actual_similarity == 1:
+                        tm_team_info["id"] = team_id
+                        tm_team_info["bd_name"] = bd_team_name
+                        queue.remove(team_id)
+                        break
+
+            
+            matches = True
+            while matches:
+                matches = False
+                next_queue = list(queue)
+                for team_id in next_queue:
+                    most_similarity = 0
                     actual_match = None
+                    bd_team_name = teams_ids[team_id]['bd_team_name']
+                    bd_team_official_name = teams_ids[team_id]['bd_team_official_name']
+                    name_split = bd_team_name.split(" ")
+                    name_split2 = bd_team_official_name.split(" ")
+                    match_names = set([name for name in name_split + name_split2 if len(name) > 2])
+                    possible_match_teams = list()
                     for tm_team_name,tm_team_info in comp_info.items():
-                        if('id' in tm_team_info):
+                        if('id' in tm_team_info and 'most_similarity' not in tm_team_info):
                             continue
-                        bd_team_name, bd_team_official_name = bd_team_names
                         tm_team_official_name = tm_team_info['official_name']
+                        for match_name in match_names:
+                            if match_name in tm_team_name or match_name in tm_team_official_name:
+                                possible_match_teams.append(tm_team_name)
+                                break
+
+                    for tm_team_name in possible_match_teams:
                         actual_similarity = test_similarity(bd_team_name,bd_team_official_name,tm_team_name,tm_team_official_name)
-                        if actual_similarity == 1.0:
-                            tm_team_info["id"] = team_id
-                            tm_team_info["bd_name"] = bd_team_name
-                            found_tm = True
-                            break
-                            
-                        elif actual_similarity > max_similarity:
+                        if actual_similarity > most_similarity and ('most_similarity' not in comp_info[tm_team_name] or comp_info[tm_team_name]['most_similarity'] < actual_similarity):
                             actual_match = tm_team_name
-                            max_similarity = actual_similarity
-                    if not found_tm:
-                        comp_info[actual_match]['id'] = team_id
-                        comp_info[actual_match]["bd_name"] = bd_team_name
+                            most_similarity = actual_similarity
+
+                    if actual_match is not None:
+                        if 'most_similarity' not in comp_info[actual_match]:
+                            comp_info[actual_match]['most_similarity'] = most_similarity
+                            comp_info[actual_match]['id'] = team_id
+                            comp_info[actual_match]["bd_name"] = bd_team_name
+                            queue.remove(team_id)
+                            matches = True
+                        elif comp_info[actual_match]['most_similarity'] < most_similarity:
+                            queue.append(comp_info[actual_match]['id'])
+                            comp_info[actual_match]['most_similarity'] = most_similarity
+                            comp_info[actual_match]['id'] = team_id
+                            comp_info[actual_match]["bd_name"] = bd_team_name
+                            matches = True
+                
+
+            next_queue = list(queue)
+            for team_id in next_queue:
+                most_similarity = 0
+                actual_match = None
+                bd_team_name = teams_ids[team_id]['bd_team_name']
+                bd_team_official_name = teams_ids[team_id]['bd_team_official_name']
+                for tm_team_name,tm_team_info in comp_info.items():
+                    if('id' in tm_team_info):
+                        continue
+                    tm_team_official_name = tm_team_info['official_name']
+                    actual_similarity = test_similarity(bd_team_name,bd_team_official_name,tm_team_name,tm_team_official_name)
+                    if actual_similarity > most_similarity:
+                        actual_match = tm_team_name
+                        most_similarity = actual_similarity
+                
+                if actual_match is not None:
+                    comp_info[actual_match]['id'] = team_id
+                    comp_info[actual_match]["bd_name"] = bd_team_name
 
             for tm_team_name,tm_team_info in comp_info.items():
                 players = tm_team_info['players']
@@ -329,7 +417,7 @@ def main(db_handler, cn : bool):
                                     not_found_players_file.write(f"{player_name} not found with club {tm_team_name}\n")
                             else:
                                 not_found_players_file.write(f"{player_name} not found with club {tm_team_name}\n")
-    print(f'Threaded: Finished in {time.time()-start_time} seconds')
+    print(f'Finished in {time.time()-start_time} seconds')
 
 if __name__ == '__main__':
     args = parse_arguments()
