@@ -154,57 +154,6 @@ def db_non_existent_players(players:list):
     return non_existent_players
 
 
-def extract_competitions_info(competitions:list):
-    '''Extracts competitions metadata (id, seasons) from json config file'''
-    competitions_info = {}
-    competition_list = []
-    area_competitions = []
-    competitions_names = []
-    last_area_code = None
-    for competition in competitions:
-        c_i = {
-            'wyId':None,
-            'seasons':[],
-            'custom_name' : None
-        }
-        if 'wyId' in competition:
-            c_i['wyId'] = competition['wyId']
-        else:
-            if 'area' in competition and 'name' in competition:
-                areaCode = competition['area']
-                competition_name = competition['name']
-                if areaCode != last_area_code: #Como ele recebe uma lista de competiçoes no ficheiro, se estas forem todas da mesma área é escusado estar sempre a ir buscar a informaçao a api para encontrar o id delas
-                    area_competitions = get_area_competitions(area=areaCode)
-                    competitions_names = [c['name'] for c in area_competitions]
-                else:
-                    last_area_code = areaCode
-                true_competition_name = get_similar(competitions_names,competition_name)
-                c_i['wyId'] = [c['wyId'] for c in area_competitions if c['name'] == true_competition_name][0]
-            else:
-                #ERROR
-                continue
-        if 'tm_code' in competition:
-            c_i['custom_name'] = competition['tm_code']
-        for season in competition['seasons']:
-            if 'wyId' in season and season['wyId'] not in c_i['seasons']:
-                c_i['seasons'].append(season['wyId'])
-            elif 'start' in season and 'end' in season:
-                start = season['start']
-                end = season['end']
-                seasons_list = get_seasons_competitions(c_i['wyId'])
-                seasonsId = [k for k,v in seasons_list.items() if v['startDate'][0:4] == start and v['endDate'][0:4] == end] #Neste momento so estamos a comparar os anos, se calhar deviamos ver isto melhor
-                for seasonId in seasonsId:
-                    if seasonId not in c_i['seasons']:
-                        c_i['seasons'].append(seasonId)
-            else:
-                #Error
-                continue
-        competitions_info[c_i['wyId']]=c_i
-        if c_i['wyId'] not in competition_list:
-            competition_list.append(c_i['wyId'])
-
-    return [competitions_info[c] for c in competition_list]
-
 def prepare_areas_insert(areas):
     '''Inserts area into db'''
     querys = []
@@ -1120,7 +1069,34 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         db_handler.request_insert_or_update_many('match_event_infraction',file,key_parameters=match_event_infraction_key_parameters,parameters=match_event_infraction_parameters,batch_size=3000)
     
 
-        
+def get_full_info(db_handler:Db_handler):
+    request_file_path = f'{current_folder}/{args.full_info[0]}'
+    if request_file_path.endswith('json') and os.path.exists(request_file_path):
+        request_file = json.load(open(request_file_path))
+        # populate areas
+        populate_areas(db_handler) 
+        if 'competitions' in request_file:
+            competitions = request_file['competitions']
+            competitions_info = extract_competitions_info(competitions)
+            competitions_id = [(c['wyId'],c['custom_name']) for c in competitions_info]
+            # populate competitions
+            populate_competitions(db_handler,competitions_id)
+
+            # populate seasons
+            seasons_id = [s for c in competitions_info for s in c['seasons']]
+            populate_competitions_seasons(db_handler,seasons_id)
+
+            s_i = 1
+            # populate teams, players, matches and stats
+            for s_id in seasons_id:
+                print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
+                populate_teams(db_handler,s_id)
+                populate_players(db_handler,s_id,player_advanced_stats=True)
+                populate_matches(db_handler,s_id,player_advanced_stats=True)
+                s_i += 1
+
+    else:
+        print('Invalid request file. Please provide a valid .json file.')
 
 
 def main(args,db_handler:Db_handler):
@@ -1130,33 +1106,8 @@ def main(args,db_handler:Db_handler):
 
     # get full info
     if args.full_info:
-        request_file_path = f'{current_folder}/{args.full_info[0]}'
-        if request_file_path.endswith('json') and os.path.exists(request_file_path):
-            request_file = json.load(open(request_file_path))
-            # populate areas
-            populate_areas(db_handler) 
-            if 'competitions' in request_file:
-                competitions = request_file['competitions']
-                competitions_info = extract_competitions_info(competitions)
-                competitions_id = [(c['wyId'],c['custom_name']) for c in competitions_info]
-                # populate competitions
-                populate_competitions(db_handler,competitions_id)
-
-                # populate seasons
-                seasons_id = [s for c in competitions_info for s in c['seasons']]
-                populate_competitions_seasons(db_handler,seasons_id)
-
-                s_i = 1
-                # populate teams, players, matches and stats
-                for s_id in seasons_id:
-                    print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                    populate_teams(db_handler,s_id)
-                    populate_players(db_handler,s_id,player_advanced_stats=True)
-                    populate_matches(db_handler,s_id,player_advanced_stats=True)
-                    s_i += 1
-
-        else:
-            print('Invalid request file. Please provide a valid .json file.')
+        get_full_info(db_handler)
+        
 
 
 
