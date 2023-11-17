@@ -1,31 +1,29 @@
 {
-    "competitions":[
-
-        {   
+    "competitions": [
+        {
+            "wyId": 869,
             "name": "MLS",
             "area": "USA",
+            "custom_name": "MLS1",
             "tm_code": "MLS1",
-            "wyId": 869,
             "seasons": [
                 {
-                    "start": "2023",
-                    "end": "2023"
+                    "wyId": "188653",
+                    "name": "2023",
+                    "start": "2023-02-25",
+                    "end": "2023-11-30"
                 },
                 {
-                    "start": "2022",
-                    "end": "2022"
+                    "wyId": "187935",
+                    "name": "2022",
+                    "start": "2022-02-26",
+                    "end": "2022-11-05"
                 },
                 {
-                    "start": "2021",
-                    "end": "2021"
-                },
-                {
-                    "start": "2020",
-                    "end": "2020"
-                },
-                {
-                    "start": "2019",
-                    "end": "2019"
+                    "wyId": "187064",
+                    "name": "2021",
+                    "start": "2021-04-17",
+                    "end": "2021-12-11"
                 }
             ]
         }

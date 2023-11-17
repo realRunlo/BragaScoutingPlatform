@@ -1,4 +1,4 @@
-resource "azurerm_network_security_group" "scouting-rg" {
+resource "azurerm_network_security_group" "default" {
     name                = "vm-nsg"
     location            = var.location 
     resource_group_name = var.rg
