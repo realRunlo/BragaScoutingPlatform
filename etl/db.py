@@ -432,22 +432,37 @@ class Db_handler:
             if self.connection:
                 if log:
                     self.log(f'''Query: SELECT {parameters} FROM "{database}"."{table}" {where}''')
-                tries = 0
-                while tries < 10:
-                    cursor = self.connection.cursor()
-                    try:
-                        cursor.execute(f'''SELECT {parameters} FROM "{database}"."{table}" {where}''')
-                        if log:
-                            self.log(f'Values selected from table {table}')
-                        return cursor.fetchall()
-                    except Exception as e:
-                        if log:
-                            self.log(f'Error selecting values from table {table}\n{e}',logging.ERROR)
-                        cursor.close()
-                        self.refresh_connection()
-                        tries += 1
+                
+                cursor = self.connection.cursor()
+                try:
+                    cursor.execute(f'''SELECT {parameters} FROM "{database}"."{table}" {where}''')
+                    if log:
+                        self.log(f'Values selected from table {table}')
+                    return cursor.fetchall()
+                except Exception as e:
+                    if log:
+                        self.log(f'Error selecting values from table {table}\n{e}',logging.ERROR)
+                    cursor.close()
         return []
 
+
+    def execute(self,query:str,log:bool=False):
+        """Executes a query"""
+        with self.db_lock:
+            if self.connection:
+                if log:
+                    self.log(f'''Executing query''')
+                cursor = self.connection.cursor()
+                try:
+                    cursor.execute(query)
+                    if log:
+                        self.log(f'Query executed')
+                    self.connection.commit()
+                except Exception as e:
+                    if log:
+                        self.log(f'Error executing query\n{e}',logging.ERROR)
+                    open('error.txt','w', encoding="utf-8").write(query)
+                    cursor.close()
    
 
     def log(self, message:str,level=logging.INFO):

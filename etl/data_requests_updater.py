@@ -6,7 +6,7 @@ import argparse
 import json
 import os
 from db import *
-from utils import *
+from api_handler import *
 
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +19,7 @@ def parse_arguments():
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--update_request_files','-urf' ,action='store_true'                                              , help='Updates the requests files (for the db populating)')
     parser.add_argument('--remove_old_seasons','-ros'   ,action='store_true'                                            , help='Removes from db deprecated data, making a backup of it in the specified path')
+    parser.add_argument('--fast_remove','-fr'           ,action='store_true'                                            , help='Removes from db deprecated data, disabling temporarily the foreign key checks (risky)')
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     return parser.parse_args()
 
@@ -75,6 +76,49 @@ def update_requests_files(db_handler:Db_handler):
         print(f'No competitions folder found in {current_folder}')
 
 
+def remove_old_seasons(db_handler:Db_handler,fast_remove=False):
+    '''Remove from db deprecated data, making a backup of it
+    
+    * for each competition in db, leaves only the latest `3` seasons;'''
+
+    # get competitions
+    competitions = db_handler.select('competition','idcompetitions',log=True)
+    print(f'Found {len(competitions)} competitions')
+    query_remove_competition_season = open(f'{current_folder}/querys/delete_competition_season.sql','r',encoding='utf-8-sig').read()
+    seasons_to_remove = []
+    for competition in competitions:
+        print(f'Processing competition {competition[0]}')
+        # get seasons for competition
+        seasons = db_handler.select('competition_season','"idcompetition_season","startDate"',where=f'where "competition"={competition[0]}',log=True)
+        if seasons:
+            # order seasons by start date
+            seasons_sorted = sorted(seasons,key=lambda x: x[1],reverse=True)
+            # leave only the latest 3 seasons
+            seasons_sorted = seasons_sorted[:3]
+            # get seasons to remove
+            seasons_to_remove += [season[0] for season in seasons if season[0] not in [s[0] for s in seasons_sorted]]
+    
+    print(f'Removing {len(seasons_to_remove)} seasons')
+    if seasons_to_remove:
+        # get query to remove seasons
+        query =  query_remove_competition_season.replace(r'(%replace%)','(' +','.join([str(s) for s in seasons_to_remove]) + ')')
+        # disable foreign key checks, risky
+        ## without this, the query will take a long time to execute (hours per season)
+        if fast_remove:
+            print('Fast remove - Disabling foreign key checks')
+            query = f'''
+            SET session_replication_role = 'replica';
+            {query}
+            SET session_replication_role = 'origin';
+'''
+
+        # remove seasons
+        db_handler.execute(query,log=True)
+
+
+
+
+
 def main(args,db_handler:Db_handler):
     '''Main function'''
 
@@ -82,6 +126,10 @@ def main(args,db_handler:Db_handler):
     if args.update_request_files:
         print('Updating requests files')
         update_requests_files(db_handler)
+
+    if args.remove_old_seasons:
+        print('Removing old seasons from db')
+        remove_old_seasons(db_handler,args.fast_remove)
         
 
         
