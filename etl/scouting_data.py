@@ -31,10 +31,6 @@ def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
-    parser.add_argument('--areas','-a'                  ,action='store_true'                                            , help='Request areas from API')
-    parser.add_argument('--area_competitions','-ac'     ,type=str, nargs='+'                                            , help="Request area's competitions from API")
-    parser.add_argument('--competition_info','-ci'      ,type=str, nargs='*'                                            , help="Request all info from competition from API")
-    parser.add_argument('--competition_players','-cp'   ,type=str, nargs='+'                                            , help="Request competition's players from API")
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     return parser.parse_args()
@@ -672,6 +668,34 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 
 
 
+def match_goal_assist(goal_event,match_events):
+    '''Check if goal event has assist
+    
+    Assist is a pass event that occurs with scorer as recipient and 
+    was done within the same minute as the goal'''
+
+    assist = None
+    potential_passes = []
+    for event in match_events:
+        if event['pass'] != None:
+            # pass is to the player and was done within the same minute as the goal
+            if event['pass']['recipient'] == goal_event['player']['id'] and event['minute'] <= goal_event['minute'] and event['minute'] >= goal_event['minute'] -1:
+                potential_passes.append(event)
+    
+    if potential_passes:
+        # get pass with closest time to goal
+        closest_pass = max(potential_passes, key=lambda x: x['minute']*60 + x['second'])
+        assist = {
+            'playerId':closest_pass['player']['id'],
+            'minute':closest_pass['minute'],
+            'second':closest_pass['second']
+        }
+    return assist
+
+
+    
+
+
 
 def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     '''Prepare values for matches table in db'''
@@ -699,6 +723,8 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     match_formation_values_file = open(match_formation_values_file_name,'w',encoding='utf-8')
     match_player_stats_values_file_name = f'{tmp_folder}/match_player_stats_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     match_player_stats_values_file = open(match_player_stats_values_file_name,'w',encoding='utf-8')
+    match_goals_values_file_name = f'{tmp_folder}/match_goals_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_goals_values_file = open(match_goals_values_file_name,'w',encoding='utf-8')
 
     # auxiliary values lists
     match_substitution_values = []
@@ -881,6 +907,19 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     , '{isGoal}', '{onTarget}', '{xg}', '{postShotXg}')'''
                     match_event_shot_values_file.write(values)
                     match_event_shot_values_file.write(file_delimiter)
+                    # if goal add to match_goals
+                    if isGoal == '1':
+                        assist = match_goal_assist(event,match_events)
+                        assistant = 'null'
+                        assist_minute = 'null'
+                        assist_second = 'null'
+                        if assist:
+                            assistant = f"'{process_mssql_value(assist['player'])}'"
+                            assist_minute = f"'{process_mssql_number(assist['minute'])}'"
+                            assist_second = f"'{process_mssql_number(assist['second'])}'"
+                        values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second})'''
+                        match_goals_values_file.write(values)
+                        match_goals_values_file.write(file_delimiter)
 
                 elif event['infraction'] != None and (event['infraction']['yellowCard'] or event['infraction']['redCard']):
                     yellowCard = process_mssql_bool(event['infraction']['yellowCard'])
@@ -943,7 +982,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             (match_event_shot_values_file_name,'match_event_shot'),(match_event_infraction_values_file_name,'match_event_infraction'),
             (match_event_carry_values_file_name,'match_event_carry'),(match_event_other_values_file_name,'match_event_other'),
             (match_substitution_values_file_name,'match_substitution'),(match_formation_values_file_name,'match_formation'),
-            (match_player_stats_values_file_name,'player_match_stats')]
+            (match_player_stats_values_file_name,'player_match_stats'),(match_goals_values_file_name,'match_goals')]
         
 
 
@@ -970,6 +1009,7 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     match_lineup_player_position_values_files = []
     match_formation_values_files = []
     match_substitution_values_files = []
+    match_goals_values_files = []
     match_events_values_files = {
         "pass" : [],
         "shot" : [],
@@ -1007,6 +1047,8 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
             match_events_values_files['carry'].append(file)
         elif type == 'match_event_other':
             match_events_values_files['other'].append(file)
+        elif type == 'match_goals':
+            match_goals_values_files.append(file)
 
     # # match table
     for file in match_values_files:
@@ -1060,6 +1102,10 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
     for file in match_events_values_files['shot']:
         db_handler.request_insert_or_update_many('match_event_shot',file,key_parameters=match_event_shot_key_parameters,parameters=match_event_shot_parameters,batch_size=3000)
 
+    # goals
+    for file in match_goals_values_files:
+        db_handler.request_insert_or_update_many('match_goals',file,key_parameters=match_goals_key_parameters,parameters=match_goals_parameters,batch_size=3000)
+
     # carry
     for file in match_events_values_files['carry']:
         db_handler.request_insert_or_update_many('match_event_carry',file,key_parameters=match_event_carry_key_parameters,parameters=match_event_carry_parameters,batch_size=3000)
@@ -1090,8 +1136,8 @@ def get_full_info(db_handler:Db_handler):
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                #populate_teams(db_handler,s_id)
-                #populate_players(db_handler,s_id,player_advanced_stats=True)
+                populate_teams(db_handler,s_id)
+                populate_players(db_handler,s_id,player_advanced_stats=True)
                 populate_matches(db_handler,s_id,player_advanced_stats=True)
                 s_i += 1
 

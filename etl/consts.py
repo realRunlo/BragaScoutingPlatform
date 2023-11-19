@@ -98,3 +98,6 @@ match_event_carry_parameters     = ['idmatch_event', 'match', 'player', 'matchPe
 match_event_infraction_key_parameters = ['idmatch_event']
 match_event_infraction_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
                                          'minute', 'second', 'yellowCard', 'redCard']
+
+match_goals_key_parameters = ['match_event']
+match_goals_parameters     = ['match_event', 'match','scorer','minute','second','assistant','assist_minute','assist_second']
