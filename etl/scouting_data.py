@@ -880,6 +880,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                 matchid = process_mssql_value(event['matchId'])
                 player = process_mssql_value(event['player']['id'])
                 matchPeriod = process_mssql_value(event['matchPeriod'])
+                team = process_mssql_value(event['team']['id'])
                 if event['location'] != None:
                     location_x = process_mssql_value(event['location']['x'])
                     location_y = process_mssql_value(event['location']['y'])
@@ -894,7 +895,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     endlocation_x = process_mssql_number(event['pass']['endLocation']['x'])
                     endlocation_y = process_mssql_number(event['pass']['endLocation']['y'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
-                    , '{accurate}', '{recipient}', '{endlocation_x}', '{endlocation_y}')'''
+                            , '{accurate}', '{recipient}', '{endlocation_x}', '{endlocation_y}', '{team}')'''
                     match_event_pass_values_file.write(values)
                     match_event_pass_values_file.write(file_delimiter)
 
@@ -904,7 +905,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     xg = process_mssql_number(event['shot']['xg'])
                     postShotXg = process_mssql_number(event['shot']['postShotXg'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
-                    , '{isGoal}', '{onTarget}', '{xg}', '{postShotXg}')'''
+                            , '{isGoal}', '{onTarget}', '{xg}', '{postShotXg}', '{team}')'''
                     match_event_shot_values_file.write(values)
                     match_event_shot_values_file.write(file_delimiter)
                     # if goal add to match_goals
@@ -917,7 +918,8 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                             assistant = f"'{process_mssql_value(assist['player'])}'"
                             assist_minute = f"'{process_mssql_number(assist['minute'])}'"
                             assist_second = f"'{process_mssql_number(assist['second'])}'"
-                        values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second})'''
+                        values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second},\
+                                '{team}')'''
                         match_goals_values_file.write(values)
                         match_goals_values_file.write(file_delimiter)
 
@@ -925,7 +927,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     yellowCard = process_mssql_bool(event['infraction']['yellowCard'])
                     redCard = process_mssql_bool(event['infraction']['redCard'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
-                    , '{yellowCard}', '{redCard}')'''
+                            , '{yellowCard}', '{redCard}', '{team}')'''
                     match_event_infraction_values_file.write(values)
                     match_event_infraction_values_file.write(file_delimiter)
 
@@ -933,12 +935,13 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     endlocation_x = process_mssql_number(event['carry']['endLocation']['x'])
                     endlocation_y = process_mssql_number(event['carry']['endLocation']['y'])
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
-                    , '{endlocation_x}', '{endlocation_y}')'''
+                            , '{endlocation_x}', '{endlocation_y}', '{team}')'''
                     match_event_carry_values_file.write(values)
                     match_event_carry_values_file.write(file_delimiter)
 
                 else:
-                    values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}')'''
+                    values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}',\
+                            '{team}')'''
                     match_event_other_values_file.write(values)
                     match_event_other_values_file.write(file_delimiter)
         pbar_matches.update(1)
