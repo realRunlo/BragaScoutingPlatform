@@ -81,23 +81,23 @@ match_substitution_key_parameters = ['match', 'playerIn', 'playerOut']
 match_substitution_parameters     = ['match', 'playerIn', 'playerOut', 'team', 'minute']
 
 match_event_other_key_parameters = ['idmatch_event']
-match_event_other_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second']
+match_event_other_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y', 'minute', 'second','team']
 
 match_event_pass_key_parameters = ['idmatch_event']
 match_event_pass_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
-                                   'minute', 'second', 'accurate', 'recipient', 'endlocation_x', 'endlocation_y']
+                                   'minute', 'second', 'accurate', 'recipient', 'endlocation_x', 'endlocation_y','team']
 
 match_event_shot_key_parameters = ['idmatch_event']
 match_event_shot_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
-                                   'minute', 'second', 'isGoal', 'onTarget', 'xg', 'postShotXg']
+                                   'minute', 'second', 'isGoal', 'onTarget', 'xg', 'postShotXg','team']
 
 match_event_carry_key_parameters = ['idmatch_event']
 match_event_carry_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
-                                    'minute', 'second', 'endlocation_x', 'endlocation_y']
+                                    'minute', 'second', 'endlocation_x', 'endlocation_y','team']
 
 match_event_infraction_key_parameters = ['idmatch_event']
 match_event_infraction_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
-                                         'minute', 'second', 'yellowCard', 'redCard']
+                                         'minute', 'second', 'yellowCard', 'redCard','team']
 
 match_goals_key_parameters = ['match_event']
-match_goals_parameters     = ['match_event', 'match','scorer','minute','second','assistant','assist_minute','assist_second']
+match_goals_parameters     = ['match_event', 'match','scorer','minute','second','assistant','assist_minute','assist_second','team']

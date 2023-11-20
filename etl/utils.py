@@ -10,4 +10,4 @@ def similarity(word : str, right_word : str):
 def working_hours():
     '''Returns True if current time is between 8h and 19h'''
     now = datetime.datetime.now()
-    return now.hour >= 8 and now.hour < 19
+    return now.hour >= 8 and now.hour < 20
