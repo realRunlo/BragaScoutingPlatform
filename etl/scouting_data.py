@@ -642,7 +642,6 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 red_cards = process_mssql_number(player['redCards'])
                 shirt_number = process_mssql_value(player['shirtNumber'])
                 yellow_cards = process_mssql_number(player['yellowCards'])
-                minute = 0
                 type = 'lineup'
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}', \
                             '{shirt_number}', '{yellow_cards}', '{team_info['teamId']}', '{type}')'''
@@ -656,7 +655,6 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 red_cards = process_mssql_number(player['redCards'])
                 shirt_number = process_mssql_number(player['shirtNumber'])
                 yellow_cards = process_mssql_number(player['yellowCards'])
-                minute = 0
                 type = 'bench'
                 if player_id in substitutes:
                     type = 'substitution'
@@ -679,7 +677,7 @@ def match_goal_assist(goal_event,match_events):
     for event in match_events:
         if event['pass'] != None:
             # pass is to the player and was done within the same minute as the goal
-            if event['pass']['recipient'] == goal_event['player']['id'] and event['minute'] <= goal_event['minute'] and event['minute'] >= goal_event['minute'] -1:
+            if event['pass']['recipient']['id'] == goal_event['player']['id'] and event['minute'] <= goal_event['minute'] and event['minute'] >= goal_event['minute'] -1:
                 potential_passes.append(event)
     
     if potential_passes:
@@ -826,7 +824,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             matches_values_file.write(file_delimiter)
 
 
-            # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
+            # # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
                 if match_info['teamsData'][team]['formation']:
                     for player in match_info['teamsData'][team]['formation']['lineup']:
@@ -873,7 +871,6 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                 # get match players for populate (because of api inconsistency)
                 matches_players_list += players_list
                 
-
             # # get match events
             for event in match_events:
                 id = process_mssql_value(event['id'])
@@ -885,8 +882,8 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     location_x = process_mssql_value(event['location']['x'])
                     location_y = process_mssql_value(event['location']['y'])
                 else:
-                    location_x = -1 #TODO: ver melhor isto
-                    location_y = -1 #TODO: ver melhor isto
+                    location_x = -1
+                    location_y = -1
                 minute = process_mssql_number(event['minute'])
                 second = process_mssql_number(event['second'])
                 if event['pass'] != None:
@@ -915,7 +912,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                         assist_minute = 'null'
                         assist_second = 'null'
                         if assist:
-                            assistant = f"'{process_mssql_value(assist['player'])}'"
+                            assistant = f"'{process_mssql_value(assist['playerId'])}'"
                             assist_minute = f"'{process_mssql_number(assist['minute'])}'"
                             assist_second = f"'{process_mssql_number(assist['second'])}'"
                         values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second},\
