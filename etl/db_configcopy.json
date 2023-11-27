@@ -1,0 +1,6 @@
+{
+    "host":"server12.postgres.database.azure.com",
+    "user":"dbadmin",
+    "password":"2020-Rockydb2020pw!",
+    "database":"postgres"
+}

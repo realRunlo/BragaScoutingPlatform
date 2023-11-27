@@ -32,6 +32,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs=2                                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00') and a type (STR like 'matches') ")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     return parser.parse_args()
 
@@ -39,10 +40,10 @@ def parse_arguments():
 
 def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6):
     '''Runs a function for each value in iterable'''
+
     if log:
         start_time = time.time()
         print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items ')
-    
     # limit threads during working hours
     if working_hours():
         threads = 1
@@ -122,6 +123,32 @@ def process_mssql_bool(value:str,default:str='0'):
             pass
     return bool
     
+
+def db_non_existent_players_tuple(players:list):
+    '''Returns list of players that are not in db'''
+    global db_connection
+
+    non_existent_players = []
+    where_statement = 'where idplayer in ('
+    #remove duplicates in players list
+    unique_players = {}
+    for s_id,player in players:
+        if player['wyId'] not in unique_players:
+            unique_players[player['wyId']]= s_id,player
+    if unique_players:
+        # create where statement
+        for player_id in unique_players:
+            where_statement += f"'{player_id}',"
+        where_statement = where_statement[:-1] + ')'
+
+        # get players from db
+        db_players = db_connection.select('player','*',where_statement)
+        if db_players:
+            db_players = [p[0] for p in db_players]
+            # get non existent players
+            non_existent_players = [(s_id,p) for (s_id,p) in unique_players.values() if p['wyId'] not in db_players]
+            
+    return non_existent_players
 
 def db_non_existent_players(players:list):
     '''Returns list of players that are not in db'''
@@ -423,6 +450,11 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
     career_entry_values_file_name = f'{tmp_folder}/career_entry_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
     career_entry_values_file = open(career_entry_values_file_name,'w',encoding='utf-8')
 
+    if season_id is None:
+        seasons = [s_id for s_id,p in players]
+        players = [p for s_id,p in players]
+        i = 0
+
     for player in players:
         contractInfo = get_player_contract_info(player['wyId'])
         contractExpiration = ''
@@ -476,7 +508,11 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
         # get player advanced stats
         if player_advanced_stats:
             career = get_player_career(player['wyId'])
-            entries = get_season_career_entries(career,int(season_id))
+            if season_id is not None:
+                entries = get_season_career_entries(career,int(season_id))
+            else:
+                entries = get_season_career_entries(career,int(seasons[i]))
+                i+=1
             # populate career table
             for entry in entries:
                 season = process_mssql_value(entry['seasonId'])
@@ -692,7 +728,11 @@ def match_goal_assist(goal_event,match_events):
 
 
     
+def exist_round_in_bd(roundId:int):
+    global db_connection
 
+    round = db_connection.select('competition_season_round','*',f'where idcompetition_season_round = {roundId}')
+    return round is not None and len(round) > 0
 
 
 def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
@@ -731,13 +771,20 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     matches_players_list = []
 
     for match in matches:
-        match_info = get_match_info(match['matchId'])
-        match_advanced_stats = get_match_advanced_stats(match['matchId'])
+        match_id = match['matchId'] if season_id is not None else match
+        match_info = get_match_info(match_id)
         if match_info:
             # get match basic info
+            roundId = process_mssql_value(match_info['roundId'])
+            if season_id is None:
+                if not exist_round_in_bd(roundId):
+                    pbar_matches.update(1)
+                    continue
+            match_advanced_stats = get_match_advanced_stats(match_id)
+            
+
             wyId = process_mssql_value(match_info['wyId'])
             seasonId = process_mssql_value(match_info['seasonId'])
-            roundId = process_mssql_value(match_info['roundId'])
             home_team = process_mssql_value(match_info['teamsData']['home']['teamId'])
             home_score = process_mssql_value(match_info['teamsData']['home']['score'])
             away_team = process_mssql_value(match_info['teamsData']['away']['teamId'])
@@ -824,20 +871,26 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             matches_values_file.write(file_delimiter)
 
 
-            # # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
+            # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
                 if match_info['teamsData'][team]['formation']:
                     for player in match_info['teamsData'][team]['formation']['lineup']:
-                        matches_players_list.append(player['player'])
+                        if season_id is None:
+                            matches_players_list.append((seasonId,player['player']))
+                        else:
+                            matches_players_list.append(player['player'])
                     for player in match_info['teamsData'][team]['formation']['bench']:
-                        matches_players_list.append(player['player'])
+                        if season_id is None:
+                            matches_players_list.append((seasonId,player['player']))
+                        else:
+                            matches_players_list.append(player['player'])
 
 
-            match_events = get_match_events(match['matchId'])
-            match_lineups = get_match_lineups(match['matchId'])
+            match_events = get_match_events(match_id)
+            match_lineups = get_match_lineups(match_id)
 
             # get team's match formation
-            ms_values,mf_values = prepare_match_formation_insert(match['matchId'],match_info['teamsData'])
+            ms_values,mf_values = prepare_match_formation_insert(match_id,match_info['teamsData'])
             match_substitution_values += ms_values
             match_formation_values += mf_values
             
@@ -850,7 +903,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                         for second,lineups in times.items():
                             for lineup in lineups:
                                 scheme = process_mssql_value(lineups[lineup]['scheme'])
-                                values = f'''('{match['matchId']}', '{team}', '{part}', '{second}','{scheme}')'''
+                                values = f'''('{match_id}', '{team}', '{part}', '{second}','{scheme}')'''
                                 match_lineup_values_file.write(values)
                                 match_lineup_values_file.write(file_delimiter)
                                 players = lineups[lineup]['players']
@@ -860,17 +913,21 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                                         position = process_mssql_value(playerdict[playerId]['position'])
                                         values = f'''SELECT match_lineup_id, {playerId},'{position}' 
                                                     FROM "scouting"."match_lineup"
-                                                    WHERE "match"='{match['matchId']}' AND "team"={team} AND "period"='{part}' AND "second"={second} '''
+                                                    WHERE "match"='{match_id}' AND "team"={team} AND "period"='{part}' AND "second"={second} '''
                                         match_lineup_player_position_values_file.write(values)
                                         match_lineup_player_position_values_file.write(file_delimiter)
 
             # get match advanced stats for each player
             if player_advanced_stats:
-                query_list,players_list = prepare_match_players_stats_insert(match['matchId'],get_players=True)
+                query_list,players_list = prepare_match_players_stats_insert(match_id,get_players=True)
                 match_player_stats_values += query_list
                 # get match players for populate (because of api inconsistency)
-                matches_players_list += players_list
-                
+                if season_id is None:
+                    for i in range(0,len(players_list)):
+                        matches_players_list.append((seasonId,players_list[i]))
+                else:
+                    matches_players_list += players_list
+
             # # get match events
             for event in match_events:
                 id = process_mssql_value(event['id'])
@@ -969,7 +1026,10 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     match_player_stats_values_file.close()
 
     # prepare insert of non existent players
-    matches_players_list = db_non_existent_players(matches_players_list)
+    if season_id is None:
+        matches_players_list = db_non_existent_players_tuple(matches_players_list)
+    else:
+        matches_players_list = db_non_existent_players(matches_players_list)
     results = prepare_players_insert(matches_players_list,season_id,player_advanced_stats=player_advanced_stats)
     player_values_file_name = results[0][0]
     player_positions_values_file_name = results[1][0]
@@ -987,11 +1047,18 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
 
 
 
-def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:bool=False):
+def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,player_advanced_stats:bool=False):
+    if date is None and season_id is None:
+        return
+
     '''Populates matches table in db, gathering matches from given season\n
     Can gather advanced stats from players in each match'''
     print(f'Populating matches from season {season_id}')
-    matches = get_season_matches(season_id)
+    if season_id is not None:
+        matches = get_season_matches(season_id)
+    else:
+        matches = get_update_matches(date)
+        matches = list(matches.keys())
     pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[season_id,player_advanced_stats],threads=10)
@@ -1115,6 +1182,12 @@ def populate_matches(db_handler:Db_handler,season_id:int,player_advanced_stats:b
         db_handler.request_insert_or_update_many('match_event_infraction',file,key_parameters=match_event_infraction_key_parameters,parameters=match_event_infraction_parameters,batch_size=3000)
     
 
+def get_update_info(db_handler:Db_handler):
+    date = args.update[0]
+    type = args.update[1]
+    if type == 'matches':
+        populate_matches(db_handler,date=date,player_advanced_stats=True)
+
 def get_full_info(db_handler:Db_handler):
     request_file_path = f'{current_folder}/{args.full_info[0]}'
     if request_file_path.endswith('json') and os.path.exists(request_file_path):
@@ -1138,7 +1211,7 @@ def get_full_info(db_handler:Db_handler):
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
                 populate_teams(db_handler,s_id)
                 populate_players(db_handler,s_id,player_advanced_stats=True)
-                populate_matches(db_handler,s_id,player_advanced_stats=True)
+                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
@@ -1151,7 +1224,9 @@ def main(args,db_handler:Db_handler):
     #TODO : treat other optional flags
 
     # get full info
-    if args.full_info:
+    if args.update:
+        get_update_info(db_handler)
+    elif args.full_info:
         get_full_info(db_handler)
         
 

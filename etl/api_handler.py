@@ -264,6 +264,17 @@ def get_season_matches(season,retry:bool=True):
     matches = result['matches'] if result else []
     return matches
 
+def get_update_matches(date,retry:bool=True):
+    '''Requests matches updateobjects from API'''
+    url = f'{api_url}/updatedobjects'
+    headers = {'Authorization': encoded_authentication}
+    params = {'updated_since':date,
+              'emptyPayload' : True,
+              'type' : 'matches'}
+    result = get_request_api(url,headers=headers,params=params,retry=retry)
+    matches = result['matches'] if result else []
+    return matches
+
 def get_match_players_stats(match,players:bool=False,retry:bool=True):
     '''Requests list of all players stats in a match from API'''
     url = f'{api_url}matches/{match}/advancedstats/players'
