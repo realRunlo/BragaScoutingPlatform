@@ -49,13 +49,18 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
         threads = 1
 
     iterable_divided = [None]*threads
-    max_slice_size = len(iterable)//threads
+    max_slice_size = round(len(iterable)/threads)
     # divide work between threads
     for i in range(threads):
         if i == threads-1:
             iterable_divided[i] = iterable[i*max_slice_size:]
         else:
             iterable_divided[i] = iterable[i*max_slice_size:(i+1)*max_slice_size]
+            
+    # if last threads has no work, remove it
+    if not iterable_divided[-1]:
+        iterable_divided = iterable_divided[:-1]
+        threads -= 1
             
 
     thread_args = [[x]+args if args else [x] for x in iterable_divided]
