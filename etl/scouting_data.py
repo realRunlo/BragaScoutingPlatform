@@ -32,7 +32,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
-    parser.add_argument('--update'   ,'-u'              ,type=str, nargs=2                                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00') and a type (STR like 'matches') ")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs=1                                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     return parser.parse_args()
 
@@ -1189,9 +1189,17 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
 
 def get_update_info(db_handler:Db_handler):
     date = args.update[0]
-    type = args.update[1]
-    if type == 'matches':
-        populate_matches(db_handler,date=date,player_advanced_stats=True)
+    
+    #get current seasons
+    seasons = db_handler.select('current_seasons','*',log=True)
+    seasons = [season for (season,) in seasons] if seasons and len(seasons) > 0 else []
+
+    for season in seasons:
+        populate_teams(db_handler,season)
+        populate_players(db_handler,season,player_advanced_stats=True)
+
+    #update matches by date
+    populate_matches(db_handler,date=date,player_advanced_stats=True)
 
 def get_full_info(db_handler:Db_handler):
     request_file_path = f'{current_folder}/{args.full_info[0]}'
