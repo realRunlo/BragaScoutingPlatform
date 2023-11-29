@@ -12,6 +12,7 @@ from utils import *
 from api_handler import *
 from tqdm import tqdm
 from consts import *
+from datetime import datetime, timedelta
 
 pbar_competitions = tqdm()
 pbar_competitions.desc = 'Competitions'
@@ -25,14 +26,18 @@ pbar_matches = tqdm()
 pbar_matches.desc = 'Matches'
 
             
+def yesterday():
+    yesterday = datetime.now() - timedelta(1)
+    yesterday = datetime.strftime(yesterday, '%Y-%m-%d %H:%M:%S')
 
+    return yesterday
 
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
-    parser.add_argument('--update'   ,'-u'              ,type=str, nargs=1                                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=yesterday()                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     return parser.parse_args()
 
@@ -1188,7 +1193,7 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
     
 
 def get_update_info(db_handler:Db_handler):
-    date = args.update[0]
+    date = args.update
     
     #get current seasons
     seasons = db_handler.select('current_seasons','*',log=True)
