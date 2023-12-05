@@ -89,18 +89,22 @@ def process_date(value:str):
     '''Process date string'''
     date = 'NULL'
     try:
-        date = datetime.datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%d')
+        date = datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%d')
     except Exception as e:
-        pass
+        # print(f'Error processing date {value}')
+        # print(traceback.format_exc())
+        date = 'NULL'
     return date
 
 def process_date_utc(value:str):
     '''Process dateutc string'''
-    date = ''
+    date = 'NULL'
     try:
-        date = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
+        date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
     except Exception as e:
-        pass
+        # print(f'Error processing date {value}')
+        # print(traceback.format_exc())
+        date = 'NULL'
     return date
 
 def process_mssql_value(value:str):
@@ -1206,6 +1210,8 @@ def get_update_info(db_handler:Db_handler):
 
     #update matches by date
     populate_matches(db_handler,date=date,player_advanced_stats=True)
+
+
 
 def get_full_info(db_handler:Db_handler):
     request_file_path = f'{current_folder}/{args.full_info[0]}'
