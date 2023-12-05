@@ -554,7 +554,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                     unique_positions = {}
                     # get unique positions in team season
                     for position in positions:
-                        position_percent = process_mssql_value(position['percent'])
+                        position_percent = int(position['percent'])
                         position_code = process_mssql_value(position['position']['code'])
                         position_name = process_mssql_value(position['position']['name'])
                         position_code,position_name = map_player_position(position_code,position_name)
@@ -569,7 +569,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                             unique_positions[position_code]['position_percent'] += position_percent
 
                     for position in unique_positions.values():
-                        values = f'''SELECT {wyId}, {position['position_percent']},'{position['position_code']}', '{position['position_name']}',idteam_competition_season \
+                        percent = process_mssql_number(position['position_percent'])
+                        values = f'''SELECT {wyId}, {percent},'{position['position_code']}', '{position['position_name']}',idteam_competition_season \
                                     FROM "scouting"."team_competition_season" WHERE "team"={team} AND "competition_season"={season} '''
                         player_positions_values_file.write(values)
                         player_positions_values_file.write(file_delimiter)
