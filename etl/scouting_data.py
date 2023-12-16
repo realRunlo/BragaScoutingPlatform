@@ -51,7 +51,7 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
         print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items ')
     # limit threads during working hours
     if working_hours():
-        threads = 1
+        threads = 2
 
     iterable_divided = [None]*threads
     max_slice_size = round(len(iterable)/threads)
@@ -647,11 +647,27 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
         dribbles = process_mssql_number(player_stats['total']['dribbles'])
         touch_in_box = process_mssql_number(player_stats['total']['touchInBox'])
         opponent_half_recoveries = process_mssql_number(player_stats['total']['opponentHalfRecoveries'])
+        position = None
+        greatest_percent = 0
+        positions = player_stats['positions']
+        # get player position with highest percent
+        for player_position in positions:
+            if player_position['percent'] > greatest_percent:
+                greatest_percent = player_position['percent']
+                position = player_position['position']['code']
+
+        if position:
+            position = map_player_position(position,'')[0]
+
+        position = process_mssql_value(position)
+
+
 
         values = f'''('{match}', '{player}', '{offensive_duels}', '{progressive_passes}', '{forward_passes}',\
                      '{crosses}', '{key_passes}', '{defensive_duels}', '{interceptions}', '{recoveries}',\
                      '{successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
-                     '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}')'''
+                     '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}',\
+                     '{position}')'''
 
         querys.append(values)
         if get_players:
