@@ -102,3 +102,14 @@ match_event_infraction_parameters     = ['idmatch_event', 'match', 'player', 'ma
 
 match_goals_key_parameters = ['match_event']
 match_goals_parameters     = ['match_event', 'match','scorer','minute','second','assistant','assist_minute','assist_second','team']
+
+
+### competition season extra tables
+
+#### scorers
+competition_season_scorers_key_parameters = ['competition_season','player','team']
+competition_season_scorers_parameters     = ['competition_season','player','team','goals']
+
+#### assists
+competition_season_assists_key_parameters = ['competition_season','player','team']
+competition_season_assists_parameters     = ['competition_season','player','team','assists']

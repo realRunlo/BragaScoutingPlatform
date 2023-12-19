@@ -362,3 +362,21 @@ def extract_competitions_info(competitions:list):
             competition_list.append(c_i['wyId'])
 
     return [competitions_info[c] for c in competition_list]
+
+
+def get_season_scorers(season:int,retry:bool=True):
+    '''Requests season's scorers from API'''
+    url = f'{api_url}seasons/{season}/scorers'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    scorers = result['players'] if result else []
+    return scorers
+
+
+def get_season_assistmen(season:int,retry:bool=True):
+    '''Requests season's assistmen from API'''
+    url = f'{api_url}seasons/{season}/assistmen'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    assistmen = result['players'] if result else []
+    return assistmen

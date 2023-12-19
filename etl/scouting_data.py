@@ -46,12 +46,12 @@ def parse_arguments():
 def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6):
     '''Runs a function for each value in iterable'''
 
-    if log:
-        start_time = time.time()
-        print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items ')
     # limit threads during working hours
     if working_hours():
         threads = 2
+    if log:
+        start_time = time.time()
+        print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items | {threads} threads')
 
     iterable_divided = [None]*threads
     max_slice_size = round(len(iterable)/threads)
@@ -337,7 +337,7 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
 
 
 def populate_teams(db_handler:Db_handler,season_id:int):
-    '''Populates teams table in db, as well as team_competition_season table'''    
+    '''Populates team's and round's tables in db, as well as team_competition_season table'''    
     season_rounds = get_season_career(season_id)
 
     # values files
@@ -1213,6 +1213,44 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
         db_handler.request_insert_or_update_many('match_event_infraction',file,key_parameters=match_event_infraction_key_parameters,parameters=match_event_infraction_parameters,batch_size=3000)
     
 
+
+def populate_competition_season_extra_info(db_handler:Db_handler,season_id:int):
+    '''Populates competition_season_extra_info table in db, gathering extra info from given season, such as scorers and assistmen'''
+    print(f'Populating extra info from season {season_id}')
+    scorers_values_file_name = f'{tmp_folder}/scorers_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    scorers_values_file = open(scorers_values_file_name,'w',encoding='utf-8')
+    assistmen_values_file_name = f'{tmp_folder}/assistmen_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    assistmen_values_file = open(assistmen_values_file_name,'w',encoding='utf-8')
+
+
+    scorers = get_season_scorers(season_id)
+    assistmen = get_season_assistmen(season_id)
+    for scorer in scorers:
+        player_id = process_mssql_value(scorer['playerId'])
+        team_id = process_mssql_value(scorer['teamId'])
+        if team_id and team_id not in ['0','null','NULL','None','none']:
+            goals = process_mssql_number(scorer['goals'])
+            values = f'''('{season_id}','{player_id}','{team_id}','{goals}')'''
+            scorers_values_file.write(values)
+            scorers_values_file.write(file_delimiter)
+
+    for assistman in assistmen:
+        player_id = process_mssql_value(assistman['playerId'])
+        team_id = process_mssql_value(assistman['teamId'])
+        if team_id and team_id not in ['0','null','NULL','None','none']:
+            assists = process_mssql_number(assistman['assists'])
+            values = f'''('{season_id}','{player_id}','{team_id}','{assists}')'''
+            assistmen_values_file.write(values)
+            assistmen_values_file.write(file_delimiter)
+
+    scorers_values_file.close()
+    assistmen_values_file.close()
+
+    db_handler.request_insert_or_update_many('competition_season_scorer',scorers_values_file_name,key_parameters=competition_season_scorers_key_parameters,parameters=competition_season_scorers_parameters)
+    
+    db_handler.request_insert_or_update_many('competition_season_assistman',assistmen_values_file_name,key_parameters=competition_season_assists_key_parameters,parameters=competition_season_assists_parameters)
+
+
 def get_update_info(db_handler:Db_handler):
     date = args.update
     
@@ -1223,6 +1261,7 @@ def get_update_info(db_handler:Db_handler):
     for season in seasons:
         populate_teams(db_handler,season)
         populate_players(db_handler,season,player_advanced_stats=True)
+        populate_competition_season_extra_info(db_handler,season)
 
     #update matches by date
     populate_matches(db_handler,date=date,player_advanced_stats=True)
@@ -1250,9 +1289,10 @@ def get_full_info(db_handler:Db_handler):
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                populate_teams(db_handler,s_id)
-                populate_players(db_handler,s_id,player_advanced_stats=True)
-                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
+                # populate_teams(db_handler,s_id)
+                # populate_players(db_handler,s_id,player_advanced_stats=True)
+                populate_competition_season_extra_info(db_handler,s_id)
+                # populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
