@@ -98,6 +98,22 @@ def get_competition_info(competition, retry:bool=True):
     competition_info = result if result else None
     return competition_info
 
+def get_season_info(season, retry:bool=True):
+    '''Request season info from API'''
+    url = f'{api_url}seasons/{season}'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    season_info = result if result else None
+    return season_info
+
+def get_seasons_info_competitions(competition,retry:bool=True):
+    '''Requests seasons list of a competition from API'''
+    url = f'{api_url}competitions/{competition}/seasons'
+    headers = {'Authorization': encoded_authentication}
+    result = get_request_api(url,headers=headers,retry=retry)
+    seasons_list = result if result else None
+    return seasons_list
+
 def get_seasons_competitions(competition,retry:bool=True):
     '''Requests seasons list of a competition from API'''
     url = f'{api_url}competitions/{competition}/seasons'
