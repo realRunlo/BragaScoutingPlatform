@@ -1290,10 +1290,10 @@ def get_full_info(db_handler:Db_handler):
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                # populate_teams(db_handler,s_id)
-                # populate_players(db_handler,s_id,player_advanced_stats=True)
+                populate_teams(db_handler,s_id)
+                populate_players(db_handler,s_id,player_advanced_stats=True)
                 populate_competition_season_extra_info(db_handler,s_id)
-                # populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
+                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
@@ -1303,7 +1303,6 @@ def get_full_info(db_handler:Db_handler):
 def main(args,db_handler:Db_handler):
     '''Main function'''
 
-    #TODO : treat other optional flags
 
     # get full info
     if args.update:
