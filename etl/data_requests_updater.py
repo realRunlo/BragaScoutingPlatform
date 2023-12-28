@@ -17,10 +17,10 @@ def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
-    parser.add_argument('--update_request_files','-urf' ,action='store_true'                                              , help='Updates the requests files (for the db populating)')
+    parser.add_argument('--update_request_files','-urf' ,action='store_true'                                            , help='Updates the requests files (for the db populating)')
     parser.add_argument('--remove_old_seasons','-ros'   ,action='store_true'                                            , help='Removes from db deprecated data, making a backup of it in the specified path')
     parser.add_argument('--fast_remove','-fr'           ,action='store_true'                                            , help='Removes from db deprecated data, disabling temporarily the foreign key checks (risky)')
-    parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
+    parser.add_argument('--log','-l'                    ,action='store_true'                                            , help='Activate logging, with optional log file path')
     return parser.parse_args()
 
 

@@ -37,8 +37,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
-    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=yesterday()                              , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=yesterday()                         , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
+    
     return parser.parse_args()
 
 
@@ -1289,10 +1290,10 @@ def get_full_info(db_handler:Db_handler):
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                # populate_teams(db_handler,s_id)
-                # populate_players(db_handler,s_id,player_advanced_stats=True)
+                populate_teams(db_handler,s_id)
+                populate_players(db_handler,s_id,player_advanced_stats=True)
                 populate_competition_season_extra_info(db_handler,s_id)
-                # populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
+                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
@@ -1302,7 +1303,6 @@ def get_full_info(db_handler:Db_handler):
 def main(args,db_handler:Db_handler):
     '''Main function'''
 
-    #TODO : treat other optional flags
 
     # get full info
     if args.update:
