@@ -16,16 +16,16 @@ if os.path.isdir(competitions_requests_folder):
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--request_file','-rf'            ,type=str, nargs=1      , help="")
-    parser.add_argument('--list','-list'                  ,action='store_true'    , help="")
-    parser.add_argument('--add','-add'                    ,action='store_true'    , help="")
-    parser.add_argument('--remove','-rem'                 ,action='store_true'    , help="")
-    parser.add_argument('--comp','-comp'                  ,type=str, nargs=1      , help="")
-    parser.add_argument('--comp_id','-comp_id'            ,type=str, nargs=1      , help="")
-    parser.add_argument('--season','-season'              ,type=str, nargs=1      , help="")
-    parser.add_argument('--season_id','-season_id'        ,type=str, nargs=1      , help="")
-    parser.add_argument('--custom_name', '-custom_name'   ,type=str, nargs=1      , help="")
-    parser.add_argument('--area', '-area'   ,type=str, nargs=1      , help="")
+    parser.add_argument('--request_file','-rf'            ,type=str, nargs=1      , help="Ficheiro request input")
+    parser.add_argument('--list','-list'                  ,action='store_true'    , help="Lista informação")
+    parser.add_argument('--add','-add'                    ,action='store_true'    , help="Adiciona informação")
+    parser.add_argument('--remove','-rem'                 ,action='store_true'    , help="Remove informação")
+    parser.add_argument('--comp','-comp'                  ,type=str, nargs=1      , help="Competição por nome")
+    parser.add_argument('--comp_id','-comp_id'            ,type=str, nargs=1      , help="Competição por id")
+    parser.add_argument('--season','-season'              ,type=str, nargs=1      , help="Season por nome/data")
+    parser.add_argument('--season_id','-season_id'        ,type=str, nargs=1      , help="Season por id")
+    parser.add_argument('--custom_name', '-custom_name'   ,type=str, nargs=1      , help="Custom name da competição")
+    parser.add_argument('--area', '-area'   ,type=str, nargs=1                    , help="Area da competição")
     return parser.parse_args()
 
 
