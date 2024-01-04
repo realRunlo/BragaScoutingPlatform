@@ -103,6 +103,12 @@ DELETE FROM scouting.career_entry
       where tcs.competition_season in (%replace%)
 );
 
+DELETE FROM scouting.competition_season_assistman
+  WHERE competition_season in (%replace%);
+
+DELETE FROM scouting.competition_season_scorer
+  WHERE competition_season in (%replace%);
+
 
 DELETE FROM scouting.team_competition_season
   WHERE competition_season in (%replace%);

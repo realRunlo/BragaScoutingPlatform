@@ -9,3 +9,4 @@ powerbi/dashboards_semdados.Dataset/.pbi/cache.abf
 powerbi/dashboards_semdados.Dataset/.pbi/unappliedChanges.json
 terraform.*
 etl/tmp/*
+db/archive_db_config.json

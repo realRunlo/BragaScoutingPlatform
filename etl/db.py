@@ -88,7 +88,7 @@ class Db_handler:
         with self.db_lock:
             try:
                 self.connection = psycopg2.connect(**self.db_config)
-                self.log('Connection to the database established')
+                self.log(f'Connection to the database {self.db_config["database"]} established')
             except Exception as e:
                 self.connection = None
                 self.log('Error creating connection to the database',logging.ERROR)
@@ -131,16 +131,22 @@ class Db_handler:
                      'values_file':values_file})
                 self.db_event.set()
 
-    def insert(self,table:str,values:str,database:str='scouting'):
+    def insert(self,table:str,values:str,ignore=False,database:str='scouting'):
         """Inserts values into a table"""
         if self.connection:
             self.log(f'''Query: INSERT INTO {database}.{table} VALUES {values}''')
             cursor = self.connection.cursor()
+            query = f'''INSERT INTO "{database}"."{table}" VALUES {values}'''
+            if ignore:
+                query += ' ON CONFLICT DO NOTHING'
             try:
-                cursor.execute(f"""INSERT INTO "{database}"."{table}" VALUES {values}""")
+                cursor.execute(query)
                 self.log(f'Values {values} inserted into table {table}')
             except Exception as e:
                 self.log(f'Error inserting values {values} into table {table}\n{e}',logging.ERROR)
+                open('error.txt','w', encoding="utf-8").write(query)
+                print(e)
+            self.connection.commit()
             cursor.close()
 
     def request_update(self,table:str,parameter:str,values_file:str,where:str,database:str='scouting'):
@@ -446,7 +452,7 @@ class Db_handler:
         return []
 
 
-    def execute(self,query:str,log:bool=False):
+    def execute(self,query:str,fetch:bool=False,log:bool=False):
         """Executes a query"""
         with self.db_lock:
             if self.connection:
@@ -458,6 +464,8 @@ class Db_handler:
                     if log:
                         self.log(f'Query executed')
                     self.connection.commit()
+                    if fetch:
+                        return cursor.fetchall()
                 except Exception as e:
                     if log:
                         self.log(f'Error executing query\n{e}',logging.ERROR)
