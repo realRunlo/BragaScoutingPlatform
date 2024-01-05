@@ -57,7 +57,7 @@ match_parameters     = ['idmatch', 'competition_season','round', 'home_team', 'a
                         'away_pass_successful_percent', 'home_vertical_pass_successful_percent',
                         'away_vertical_pass_successful_percent', 'home_offsides', 'away_offsides',
                         'home_clearances', 'away_clearances', 'home_interceptions', 'away_interceptions',
-                        'home_tackles', 'away_tackles']
+                        'home_tackles', 'away_tackles','1st_period_end','2nd_period_end','ex_period_end']
 
 
 
@@ -66,7 +66,7 @@ player_match_stats_parameters     = ['match', 'player', 'offensiveDuels', 'progr
                                      'crosses', 'keyPasses', 'defensiveDuels', 'interceptions', 'recoveries',
                                      'successfulPasses', 'longPasses', 'aerialDuels', 'losses', 'ownHalfLosses', 
                                      'goalKicks', 'receivedPass', 'dribbles', 'touchInBox', 'opponentHalfRecoveries',
-                                     'position']
+                                     'position','rating']
 
 match_lineup_key_parameters = ['match', 'team', 'period', 'second']
 match_lineup_parameters     = ['match', 'team', 'period', 'second', 'lineup']

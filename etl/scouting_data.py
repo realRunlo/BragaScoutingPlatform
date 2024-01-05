@@ -10,6 +10,7 @@ from db import Db_handler
 from multiprocessing.pool import ThreadPool
 from utils import *
 from api_handler import *
+from rating import *
 from tqdm import tqdm
 from consts import *
 from datetime import datetime, timedelta
@@ -196,8 +197,8 @@ def prepare_areas_insert(areas):
     '''Inserts area into db'''
     querys = []
     for area in areas:
-        area_id = process_mssql_value(area['id'])
-        area_name = process_mssql_value(area['name'])
+        area_id         = process_mssql_value(area['id'])
+        area_name       = process_mssql_value(area['name'])
         area_alpha3code = process_mssql_value(area['alpha3code'])
 
         values = f'''('{area_id}', '{area_name}', '{area_alpha3code}')'''
@@ -221,15 +222,15 @@ def prepare_competitions_insert(competitions_id:list):
     for competition_id,competition_custom_name in competitions_id:
         competition_info = get_competition_info(competition_id)
         if competition_info:
-            wyId = process_mssql_value(competition_info['wyId'])
-            name = process_mssql_value(competition_info['name'])
+            wyId    = process_mssql_value(competition_info['wyId'])
+            name    = process_mssql_value(competition_info['name'])
             area_id = process_mssql_value(competition_info['area']['id'])
-            gender = process_mssql_value(competition_info['gender'])
-            type = process_mssql_value(competition_info['type'])
-            format = process_mssql_value(competition_info['format'])
+            gender  = process_mssql_value(competition_info['gender'])
+            type    = process_mssql_value(competition_info['type'])
+            format  = process_mssql_value(competition_info['format'])
             divisionLevel = process_mssql_value(competition_info['divisionLevel'])
-            category = process_mssql_value(competition_info['category'])
-            custom_name =process_mssql_value(competition_custom_name)
+            category      = process_mssql_value(competition_info['category'])
+            custom_name   = process_mssql_value(competition_custom_name)
 
             values_file.write(f'''('{wyId}', '{name}', '{area_id}', '{gender}',\
                          '{type}', '{format}', '{divisionLevel}', '{category}', '{custom_name}')''')
@@ -258,15 +259,16 @@ def prepare_competitions_seasons_insert(competitions_seasons_id:list):
     for competition_season in competitions_seasons_id:
         competition_season_info = get_season_info(competition_season)
 
-        competition_season_id = process_mssql_value(competition_season_info['wyId'])
+        competition_season_id        = process_mssql_value(competition_season_info['wyId'])
         competition_season_startDate = process_date(competition_season_info['startDate'])
         competition_season_startDate = f'\'{competition_season_startDate}\'' if competition_season_startDate != 'NULL' else 'NULL'
-        competition_season_endDate = process_date(competition_season_info['endDate'])
-        competition_season_endDate = f'\'{competition_season_endDate}\'' if competition_season_endDate != 'NULL' else 'NULL'
-        competition_season_name = process_mssql_value(competition_season_info['name'])
+        competition_season_endDate   = process_date(competition_season_info['endDate'])
+        competition_season_endDate   = f'\'{competition_season_endDate}\'' if competition_season_endDate != 'NULL' else 'NULL'
+        competition_season_name      = process_mssql_value(competition_season_info['name'])
         competition_season_competitionId = process_mssql_value(competition_season_info['competitionId'])
 
-        values = f'''('{competition_season_id}', {competition_season_startDate}, {competition_season_endDate}, '{competition_season_name}', '{competition_season_competitionId}')'''
+        values = f'''('{competition_season_id}', {competition_season_startDate}, {competition_season_endDate},\
+                     '{competition_season_name}', '{competition_season_competitionId}')'''
         values_file.write(values)
         values_file.write(file_delimiter)
         pbar_seasons.update(1)
@@ -286,39 +288,39 @@ def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
 def prepare_teams_insert(teams,season_id:int,round_id:int):
     '''Inserts team into db, as well as team_competition_season table'''
     # prepare values files
-    team_values_file_name = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    team_values_file = open(team_values_file_name,'w',encoding='utf-8')
-    team_competition_season_values_file_name = f'{tmp_folder}/team_competition_season_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    team_competition_season_values_file = open(team_competition_season_values_file_name,'w',encoding='utf-8')
-    team_competition_season_round_values_file_name = f'{tmp_folder}/team_competition_season_round_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    team_competition_season_round_values_file = open(team_competition_season_round_values_file_name,'w',encoding='utf-8')
+    team_values_file_name                           = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    team_values_file                                = open(team_values_file_name,'w',encoding='utf-8')
+    team_competition_season_values_file_name        = f'{tmp_folder}/team_competition_season_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    team_competition_season_values_file             = open(team_competition_season_values_file_name,'w',encoding='utf-8')
+    team_competition_season_round_values_file_name  = f'{tmp_folder}/team_competition_season_round_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    team_competition_season_round_values_file       = open(team_competition_season_round_values_file_name,'w',encoding='utf-8')
     for team in teams:
         team_info = team['team']
         if team_info:
-            wyId = process_mssql_value(team_info['wyId'])
-            name = process_mssql_value(team_info['name'])
+            wyId         = process_mssql_value(team_info['wyId'])
+            name         = process_mssql_value(team_info['name'])
             officialName = process_mssql_value(team_info['officialName'])
             imageDataURL = process_mssql_value(team_info['imageDataURL'])
-            gender = process_mssql_value(team_info['gender'])
-            type = process_mssql_value(team_info['type'])
-            city = process_mssql_value(team_info['city'])
-            category = process_mssql_value(team_info['category'])
-            area_id = process_mssql_value(team_info['area']['id'])
+            gender       = process_mssql_value(team_info['gender'])
+            type         = process_mssql_value(team_info['type'])
+            city         = process_mssql_value(team_info['city'])
+            category     = process_mssql_value(team_info['category'])
+            area_id      = process_mssql_value(team_info['area']['id'])
 
             values = f'''('{wyId}', '{name}', '{officialName}', '{imageDataURL}', '{gender}', '{type}',\
                         '{city}', '{category}', '{area_id}')'''
             team_values_file.write(values)
             team_values_file.write(file_delimiter)
 
-            totalDraws = process_mssql_number(team['gameDraw'])
+            totalDraws        = process_mssql_number(team['gameDraw'])
             totalGoalsAgainst = process_mssql_number(team['goalAgainst'])
-            totalGoalsFor = process_mssql_number(team['goalPro'])
-            totalLosses = process_mssql_number(team['gameLost'])
-            totalPlayed = process_mssql_number(team['gameTotal'])
-            totalPoints = process_mssql_number(team['points'])
-            totalWins = process_mssql_number(team['gameWon'])
-            rank = process_mssql_number(team['rank'])
-            group_id = process_mssql_value(team['groupId'])
+            totalGoalsFor     = process_mssql_number(team['goalPro'])
+            totalLosses       = process_mssql_number(team['gameLost'])
+            totalPlayed       = process_mssql_number(team['gameTotal'])
+            totalPoints       = process_mssql_number(team['points'])
+            totalWins         = process_mssql_number(team['gameWon'])
+            rank              = process_mssql_number(team['rank'])
+            group_id          = process_mssql_value(team['groupId'])
 
             values_tcsr = f'''('{round_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
                         '{totalPlayed}','{totalPoints}','{totalWins}','{rank}', {group_id})'''
@@ -343,9 +345,9 @@ def populate_teams(db_handler:Db_handler,season_id:int):
 
     # values files
     rounds_values_file_name = f'{tmp_folder}/rounds_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    rounds_values_file = open(rounds_values_file_name,'w',encoding='utf-8')
+    rounds_values_file      = open(rounds_values_file_name,'w',encoding='utf-8')
     groups_values_file_name = f'{tmp_folder}/groups_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    groups_values_file = open(groups_values_file_name,'w',encoding='utf-8')
+    groups_values_file      = open(groups_values_file_name,'w',encoding='utf-8')
 
     # teams info files list
     teams_files = []
@@ -362,14 +364,15 @@ def populate_teams(db_handler:Db_handler,season_id:int):
     # iterate over rounds
     for season_round in season_rounds:
         #process round
-        round = season_round['round']
-        round_id = process_mssql_value(round['wyId'])
-        startDate = process_date(round['startDate'])
-        startDate = f'\'{startDate}\'' if startDate != 'NULL' else 'NULL'
-        endDate = process_date(round['endDate'])
-        endDate = f'\'{endDate}\'' if endDate != 'NULL' else 'NULL'
-        name = process_mssql_value(round['name'])
-        type = process_mssql_value(round['type'])
+        round       = season_round['round']
+        round_id    = process_mssql_value(round['wyId'])
+        startDate   = process_date(round['startDate'])
+        startDate   = f'\'{startDate}\'' if startDate != 'NULL' else 'NULL'
+        endDate     = process_date(round['endDate'])
+        endDate     = f'\'{endDate}\'' if endDate != 'NULL' else 'NULL'
+        name        = process_mssql_value(round['name'])
+        type        = process_mssql_value(round['type'])
+
         values = f'''('{round_id}','{season_id}',{startDate}, {endDate}, '{name}', '{type}' )'''
         rounds_values_file.write(values)
         rounds_values_file.write(file_delimiter)
@@ -482,29 +485,29 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 for agencie in contractInfo['agencies'][1:]:
                     player_agencies+= ', ' + agencie
 
-        player_name = player['firstName'].strip() + ' ' + player['middleName'].strip() + ' ' + player['lastName'].strip()
-        player_name = process_mssql_value(player_name)
-        wyId = process_mssql_value(player['wyId'])
-        shortName = process_mssql_value(player['shortName'])
-        passportArea = process_mssql_value(player['passportArea']['id'])
-        birthArea = process_mssql_value(player['birthArea']['id'])
-        birthDate = process_date(player['birthDate'])
-        birthDate = f'\'{birthDate}\'' if birthDate != 'NULL' else 'NULL'
-        imageDataURL = process_mssql_value(player['imageDataURL'])
-        foot = process_mssql_value(player['foot'])
-        height = process_mssql_value(player['height'])
-        weight = process_mssql_value(player['weight'])
-        status = process_mssql_value(player['status'])
-        gender = process_mssql_value(player['gender'])
-        role_code2 = process_mssql_value(player['role']['code2'])
-        role_code3 = process_mssql_value(player['role']['code3'])
-        role_name = process_mssql_value(player['role']['name'])
+        player_name     = player['firstName'].strip() + ' ' + player['middleName'].strip() + ' ' + player['lastName'].strip()
+        player_name     = process_mssql_value(player_name)
+        wyId            = process_mssql_value(player['wyId'])
+        shortName       = process_mssql_value(player['shortName'])
+        passportArea    = process_mssql_value(player['passportArea']['id'])
+        birthArea       = process_mssql_value(player['birthArea']['id'])
+        birthDate       = process_date(player['birthDate'])
+        birthDate       = f'\'{birthDate}\'' if birthDate != 'NULL' else 'NULL'
+        imageDataURL    = process_mssql_value(player['imageDataURL'])
+        foot            = process_mssql_value(player['foot'])
+        height          = process_mssql_value(player['height'])
+        weight          = process_mssql_value(player['weight'])
+        status          = process_mssql_value(player['status'])
+        gender          = process_mssql_value(player['gender'])
+        role_code2      = process_mssql_value(player['role']['code2'])
+        role_code3      = process_mssql_value(player['role']['code3'])
+        role_name       = process_mssql_value(player['role']['name'])
         contractExpiration = process_date(contractExpiration)
         contractExpiration = f'\'{contractExpiration}\'' if contractExpiration != 'NULL' else 'NULL'
         player_agencies = process_mssql_value(player_agencies)
-        current_team = process_mssql_number(player['currentTeamId'])
-        market_value = 0
-        currency = 'EUR'
+        current_team    = process_mssql_number(player['currentTeamId'])
+        market_value    = 0
+        currency        = 'EUR'
 
         last_transfer = get_player_last_transfer(player['wyId'])
         if last_transfer:
@@ -530,19 +533,19 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 i+=1
             # populate career table
             for entry in entries:
-                season = process_mssql_value(entry['seasonId'])
-                team = process_mssql_value(entry['teamId'])
-                competition = process_mssql_value(entry['competitionId'])
-                appearances = process_mssql_number(entry['appearances'])
-                goal = process_mssql_number(entry['goal'])
-                minutesPlayed = process_mssql_number(entry['minutesPlayed'])
-                penalties = process_mssql_number(entry['penalties'])
-                redCards = process_mssql_number(entry['redCards'])
-                shirtNumber = process_mssql_number(entry['shirtNumber'])
-                substituteIn = process_mssql_number(entry['substituteIn'])
+                season            = process_mssql_value(entry['seasonId'])
+                team              = process_mssql_value(entry['teamId'])
+                competition       = process_mssql_value(entry['competitionId'])
+                appearances       = process_mssql_number(entry['appearances'])
+                goal              = process_mssql_number(entry['goal'])
+                minutesPlayed     = process_mssql_number(entry['minutesPlayed'])
+                penalties         = process_mssql_number(entry['penalties'])
+                redCards          = process_mssql_number(entry['redCards'])
+                shirtNumber       = process_mssql_number(entry['shirtNumber'])
+                substituteIn      = process_mssql_number(entry['substituteIn'])
                 substituteOnBench = process_mssql_number(entry['substituteOnBench'])
-                substituteOut = process_mssql_number(entry['substituteOut'])
-                yellowCard = process_mssql_number(entry['yellowCard'])
+                substituteOut     = process_mssql_number(entry['substituteOut'])
+                yellowCard        = process_mssql_number(entry['yellowCard'])
 
                 values = f'''SELECT {wyId}, idteam_competition_season, {appearances},{goal},{minutesPlayed},\
                             {penalties},{redCards},{shirtNumber},{substituteIn},{substituteOnBench},\
@@ -560,8 +563,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                     # get unique positions in team season
                     for position in positions:
                         position_percent = int(position['percent'])
-                        position_code = process_mssql_value(position['position']['code'])
-                        position_name = process_mssql_value(position['position']['name'])
+                        position_code    = process_mssql_value(position['position']['code'])
+                        position_name    = process_mssql_value(position['position']['name'])
                         position_code,position_name = map_player_position(position_code,position_name)
                         if position_code not in unique_positions:
                             unique_positions[position_code] = {
@@ -575,6 +578,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
 
                     for position in unique_positions.values():
                         percent = process_mssql_number(position['position_percent'])
+
                         values = f'''SELECT {wyId}, {percent},'{position['position_code']}', '{position['position_name']}',idteam_competition_season \
                                     FROM "scouting"."team_competition_season" WHERE "team"={team} AND "competition_season"={season} '''
                         player_positions_values_file.write(values)
@@ -629,27 +633,27 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
 
     match_players_stats = get_match_players_stats(match,players=get_players)
     for player_stats in match_players_stats:
-        player = process_mssql_value(player_stats['playerId'])
-        offensive_duels = process_mssql_number(player_stats['total']['offensiveDuels'])
-        progressive_passes = process_mssql_number(player_stats['total']['progressivePasses'])
-        forward_passes = process_mssql_number(player_stats['total']['forwardPasses'])
-        crosses = process_mssql_number(player_stats['total']['crosses'])
-        key_passes = process_mssql_number(player_stats['total']['keyPasses'])
-        defensive_duels = process_mssql_number(player_stats['total']['defensiveDuels'])
-        interceptions = process_mssql_number(player_stats['total']['interceptions'])
-        recoveries = process_mssql_number(player_stats['total']['recoveries'])
-        successful_passes = process_mssql_number(player_stats['percent']['successfulPasses'])
-        long_passes = process_mssql_number(player_stats['total']['longPasses'])
-        aerial_duels = process_mssql_number(player_stats['total']['aerialDuels'])
-        losses = process_mssql_number(player_stats['total']['losses'])
-        own_half_losses = process_mssql_number(player_stats['total']['ownHalfLosses'])
-        goal_kicks = process_mssql_number(player_stats['total']['goalKicks'])
-        received_pass = process_mssql_number(player_stats['total']['receivedPass'])
-        dribbles = process_mssql_number(player_stats['total']['dribbles'])
-        touch_in_box = process_mssql_number(player_stats['total']['touchInBox'])
+        player              = process_mssql_value(player_stats['playerId'])
+        offensive_duels     = process_mssql_number(player_stats['total']['offensiveDuels'])
+        progressive_passes  = process_mssql_number(player_stats['total']['progressivePasses'])
+        forward_passes      = process_mssql_number(player_stats['total']['forwardPasses'])
+        crosses             = process_mssql_number(player_stats['total']['crosses'])
+        key_passes          = process_mssql_number(player_stats['total']['keyPasses'])
+        defensive_duels     = process_mssql_number(player_stats['total']['defensiveDuels'])
+        interceptions       = process_mssql_number(player_stats['total']['interceptions'])
+        recoveries          = process_mssql_number(player_stats['total']['recoveries'])
+        successful_passes   = process_mssql_number(player_stats['percent']['successfulPasses'])
+        long_passes         = process_mssql_number(player_stats['total']['longPasses'])
+        aerial_duels        = process_mssql_number(player_stats['total']['aerialDuels'])
+        losses              = process_mssql_number(player_stats['total']['losses'])
+        own_half_losses     = process_mssql_number(player_stats['total']['ownHalfLosses'])
+        goal_kicks          = process_mssql_number(player_stats['total']['goalKicks'])
+        received_pass       = process_mssql_number(player_stats['total']['receivedPass'])
+        dribbles            = process_mssql_number(player_stats['total']['dribbles'])
+        touch_in_box        = process_mssql_number(player_stats['total']['touchInBox'])
         opponent_half_recoveries = process_mssql_number(player_stats['total']['opponentHalfRecoveries'])
-        position = None
-        greatest_percent = 0
+        position            = None
+        greatest_percent    = 0
         positions = player_stats['positions']
         # get player position with highest percent
         for player_position in positions:
@@ -661,14 +665,16 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
             position = map_player_position(position,'')[0]
 
         position = process_mssql_value(position)
-
+        # calculate rating
+        rating   = calculate_rating(player_stats)
+        rating   = process_mssql_number(rating)
 
 
         values = f'''('{match}', '{player}', '{offensive_duels}', '{progressive_passes}', '{forward_passes}',\
                      '{crosses}', '{key_passes}', '{defensive_duels}', '{interceptions}', '{recoveries}',\
                      '{successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
                      '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}',\
-                     '{position}')'''
+                     '{position}', '{rating}')'''
 
         querys.append(values)
         if get_players:
@@ -703,29 +709,31 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
                 substitutes_querys.append(values)
             # team initial lineup
             for player in formation['lineup']:
-                player_id = process_mssql_value(player['playerId'])
-                assists = process_mssql_number(player['assists'])
-                goals = process_mssql_number(player['goals'])
-                own_goals = process_mssql_number(player['ownGoals'])
-                red_cards = process_mssql_number(player['redCards'])
+                player_id    = process_mssql_value(player['playerId'])
+                assists      = process_mssql_number(player['assists'])
+                goals        = process_mssql_number(player['goals'])
+                own_goals    = process_mssql_number(player['ownGoals'])
+                red_cards    = process_mssql_number(player['redCards'])
                 shirt_number = process_mssql_value(player['shirtNumber'])
                 yellow_cards = process_mssql_number(player['yellowCards'])
-                type = 'lineup'
+                type         = 'lineup'
+
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}', \
                             '{shirt_number}', '{yellow_cards}', '{team_info['teamId']}', '{type}')'''
                 formation_querys.append(values)
             # team bench
             for player in formation['bench']:
-                player_id = process_mssql_value(player['playerId'])
-                assists = process_mssql_number(player['assists'])
-                goals = process_mssql_number(player['goals'])
-                own_goals = process_mssql_number(player['ownGoals'])
-                red_cards = process_mssql_number(player['redCards'])
+                player_id    = process_mssql_value(player['playerId'])
+                assists      = process_mssql_number(player['assists'])
+                goals        = process_mssql_number(player['goals'])
+                own_goals    = process_mssql_number(player['ownGoals'])
+                red_cards    = process_mssql_number(player['redCards'])
                 shirt_number = process_mssql_number(player['shirtNumber'])
                 yellow_cards = process_mssql_number(player['yellowCards'])
-                type = 'bench'
+                type         = 'bench'
                 if player_id in substitutes:
                     type = 'substitution'
+                    
                 values = f'''('{match}', '{player_id}', '{assists}', '{goals}', '{own_goals}', '{red_cards}',\
                              '{shirt_number}', '{yellow_cards}', '{team_info['teamId']}', '{type}')'''
                 formation_querys.append(values)
@@ -741,20 +749,25 @@ def match_goal_assist(goal_event,match_events):
     was done within the same minute as the goal'''
 
     assist = None
-    potential_passes = []
+    potential_assist = None
     for event in match_events:
-        if event['pass'] != None:
-            # pass is to the player and was done within the same minute as the goal
-            if event['pass']['recipient']['id'] == goal_event['player']['id'] and event['minute'] <= goal_event['minute'] and event['minute'] >= goal_event['minute'] -1:
-                potential_passes.append(event)
+        # event secondary type has assist
+        if 'assist' in event['type']['secondary']:
+            # if event before goal
+            if event['minute'] <= goal_event['minute'] and event['second'] <= goal_event['second']:
+                potential_assist = event
+            else:
+                break
+        # if goal before current goal event, clean potential assist
+        elif event['type']['secondary'] == 'goal' and event['minute'] <= goal_event['minute'] and event['second'] <= goal_event['second'] and event['id'] != goal_event['id']:
+            potential_assist = None
     
-    if potential_passes:
+    if potential_assist:
         # get pass with closest time to goal
-        closest_pass = max(potential_passes, key=lambda x: x['minute']*60 + x['second'])
         assist = {
-            'playerId':closest_pass['player']['id'],
-            'minute':closest_pass['minute'],
-            'second':closest_pass['second']
+            'playerId':potential_assist['player']['id'],
+            'minute':potential_assist['minute'],
+            'second':potential_assist['second']
         }
     return assist
 
@@ -767,34 +780,65 @@ def exist_round_in_bd(roundId:int):
     return round is not None and len(round) > 0
 
 
+def calculate_match_periods(match_events:list):
+    '''Calculate match periods, 1st half end, 2nd half end and extra time end.
+    
+    If extra time is not played, extra time end is 120 by default'''
+
+    periods = {
+        '1st_period_end':45,
+        '2nd_period_end':90,
+        'extra_period_end':120
+    }
+
+    fst_period_events = [event for event in match_events if event['matchPeriod'] == '1H']
+    snd_period_events = [event for event in match_events if event['matchPeriod'] == '2H']
+    ex_period_events  = [event for event in match_events if event['matchPeriod'] == 'E1' or event['matchPeriod'] == 'E2']
+
+    if len(fst_period_events) > 0:
+        fst_period_events.sort(key=lambda x: x['minute'])
+        periods['1st_period_end'] = fst_period_events[-1]['minute']
+    if len(snd_period_events) > 0:
+        snd_period_events.sort(key=lambda x: x['minute'])
+        periods['2nd_period_end'] = snd_period_events[-1]['minute']
+    if len(ex_period_events) > 0:
+        ex_period_events.sort(key=lambda x: x['minute'])
+        periods['extra_period_end'] = ex_period_events[-1]['minute']
+        
+    return periods
+    
+
+
+
+
 def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
     '''Prepare values for matches table in db'''
 
     # prepare values files
-    matches_values_file_name = f'{tmp_folder}/matches_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    matches_values_file = open(matches_values_file_name,'w',encoding='utf-8')
-    match_lineup_values_file_name = f'{tmp_folder}/match_lineup_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_lineup_values_file = open(match_lineup_values_file_name,'w',encoding='utf-8')
+    matches_values_file_name            = f'{tmp_folder}/matches_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    matches_values_file                 = open(matches_values_file_name,'w',encoding='utf-8')
+    match_lineup_values_file_name       = f'{tmp_folder}/match_lineup_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_lineup_values_file            = open(match_lineup_values_file_name,'w',encoding='utf-8')
     match_lineup_player_position_values_file_name = f'{tmp_folder}/match_lineup_player_position_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_lineup_player_position_values_file = open(match_lineup_player_position_values_file_name,'w',encoding='utf-8')
-    match_event_pass_values_file_name = f'{tmp_folder}/match_event_pass_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_event_pass_values_file = open(match_event_pass_values_file_name,'w',encoding='utf-8')
-    match_event_shot_values_file_name = f'{tmp_folder}/match_event_shot_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_event_shot_values_file = open(match_event_shot_values_file_name,'w',encoding='utf-8')
+    match_lineup_player_position_values_file      = open(match_lineup_player_position_values_file_name,'w',encoding='utf-8')
+    match_event_pass_values_file_name   = f'{tmp_folder}/match_event_pass_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_event_pass_values_file        = open(match_event_pass_values_file_name,'w',encoding='utf-8')
+    match_event_shot_values_file_name   = f'{tmp_folder}/match_event_shot_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_event_shot_values_file        = open(match_event_shot_values_file_name,'w',encoding='utf-8')
     match_event_infraction_values_file_name = f'{tmp_folder}/match_event_infraction_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_event_infraction_values_file = open(match_event_infraction_values_file_name,'w',encoding='utf-8')
-    match_event_carry_values_file_name = f'{tmp_folder}/match_event_carry_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_event_carry_values_file = open(match_event_carry_values_file_name,'w',encoding='utf-8')
-    match_event_other_values_file_name = f'{tmp_folder}/match_event_other_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_event_other_values_file = open(match_event_other_values_file_name,'w',encoding='utf-8')
+    match_event_infraction_values_file      = open(match_event_infraction_values_file_name,'w',encoding='utf-8')
+    match_event_carry_values_file_name  = f'{tmp_folder}/match_event_carry_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_event_carry_values_file       = open(match_event_carry_values_file_name,'w',encoding='utf-8')
+    match_event_other_values_file_name  = f'{tmp_folder}/match_event_other_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_event_other_values_file       = open(match_event_other_values_file_name,'w',encoding='utf-8')
     match_substitution_values_file_name = f'{tmp_folder}/match_substitution_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_substitution_values_file = open(match_substitution_values_file_name,'w',encoding='utf-8')
-    match_formation_values_file_name = f'{tmp_folder}/match_formation_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_formation_values_file = open(match_formation_values_file_name,'w',encoding='utf-8')
+    match_substitution_values_file      = open(match_substitution_values_file_name,'w',encoding='utf-8')
+    match_formation_values_file_name    = f'{tmp_folder}/match_formation_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_formation_values_file         = open(match_formation_values_file_name,'w',encoding='utf-8')
     match_player_stats_values_file_name = f'{tmp_folder}/match_player_stats_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_player_stats_values_file = open(match_player_stats_values_file_name,'w',encoding='utf-8')
-    match_goals_values_file_name = f'{tmp_folder}/match_goals_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    match_goals_values_file = open(match_goals_values_file_name,'w',encoding='utf-8')
+    match_player_stats_values_file      = open(match_player_stats_values_file_name,'w',encoding='utf-8')
+    match_goals_values_file_name        = f'{tmp_folder}/match_goals_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    match_goals_values_file             = open(match_goals_values_file_name,'w',encoding='utf-8')
 
     # auxiliary values lists
     match_substitution_values = []
@@ -815,22 +859,22 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
             match_advanced_stats = get_match_advanced_stats(match_id)
             
 
-            wyId = process_mssql_value(match_info['wyId'])
-            seasonId = process_mssql_value(match_info['seasonId'])
-            home_team = process_mssql_value(match_info['teamsData']['home']['teamId'])
-            home_score = process_mssql_value(match_info['teamsData']['home']['score'])
-            away_team = process_mssql_value(match_info['teamsData']['away']['teamId'])
-            away_score = process_mssql_value(match_info['teamsData']['away']['score'])
-            dateutc = process_date_utc(match_info['dateutc'])
-            dateutc = f'\'{dateutc}\'' if dateutc != 'NULL' else 'NULL'
-            winner = process_mssql_value(match_info['winner'])
-            duration = process_mssql_value(match_info['duration'])
-            home_score_et = process_mssql_number(match_info['teamsData']['home']['scoreET'],default='0')
-            home_score_ht = process_mssql_number(match_info['teamsData']['home']['scoreHT'],default='0')
-            home_score_p = process_mssql_number(match_info['teamsData']['home']['scoreP'],default='0')
-            away_score_et = process_mssql_number(match_info['teamsData']['away']['scoreET'],default='0')
-            away_score_ht = process_mssql_number(match_info['teamsData']['away']['scoreHT'],default='0')
-            away_score_p = process_mssql_number(match_info['teamsData']['away']['scoreP'],default='0')
+            wyId            = process_mssql_value(match_info['wyId'])
+            seasonId        = process_mssql_value(match_info['seasonId'])
+            home_team       = process_mssql_value(match_info['teamsData']['home']['teamId'])
+            home_score      = process_mssql_value(match_info['teamsData']['home']['score'])
+            away_team       = process_mssql_value(match_info['teamsData']['away']['teamId'])
+            away_score      = process_mssql_value(match_info['teamsData']['away']['score'])
+            dateutc         = process_date_utc(match_info['dateutc'])
+            dateutc         = f'\'{dateutc}\'' if dateutc != 'NULL' else 'NULL'
+            winner          = process_mssql_value(match_info['winner'])
+            duration        = process_mssql_value(match_info['duration'])
+            home_score_et   = process_mssql_number(match_info['teamsData']['home']['scoreET'],default='0')
+            home_score_ht   = process_mssql_number(match_info['teamsData']['home']['scoreHT'],default='0')
+            home_score_p    = process_mssql_number(match_info['teamsData']['home']['scoreP'],default='0')
+            away_score_et   = process_mssql_number(match_info['teamsData']['away']['scoreET'],default='0')
+            away_score_ht   = process_mssql_number(match_info['teamsData']['away']['scoreHT'],default='0')
+            away_score_p    = process_mssql_number(match_info['teamsData']['away']['scoreP'],default='0')
             # match advanced stats
             home_shots = 0
             away_shots = 0
@@ -887,22 +931,6 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                 away_tackles                          = process_mssql_number(match_advanced_stats['defence']['away']['tackles'])
 
 
-
-            values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', {dateutc},\
-                    '{home_score}','{away_score}', '{winner}', '{duration}', '{home_score_et}', '{home_score_ht}',\
-                    '{home_score_p}', '{away_score_et}', '{away_score_ht}', '{away_score_p}',\
-                    '{home_shots}', '{away_shots}', '{home_shotsOnTarget}', '{away_shotsOnTarget}',\
-                    '{home_xg}', '{away_xg}', '{home_attacks_total}', '{away_attacks_total}',\
-                    '{home_corners}', '{away_corners}', '{home_possessionPercent}', '{away_possessionPercent}',\
-                    '{home_fouls}', '{away_fouls}', '{home_pass_successful_percent}', '{away_pass_successful_percent}',\
-                    '{home_vertical_pass_successful_percent}', '{away_vertical_pass_successful_percent}',\
-                    '{home_offsides}', '{away_offsides}', '{home_clearances}', '{away_clearances}',\
-                    '{home_interceptions}', '{away_interceptions}', '{home_tackles}', '{away_tackles}')'''
-
-            matches_values_file.write(values)
-            matches_values_file.write(file_delimiter)
-
-
             # get match players and populate player table with non existent players to avoid errors (because of api inconsistency)
             for team in match_info['teamsData']:
                 if match_info['teamsData'][team]['formation']:
@@ -919,6 +947,28 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
 
 
             match_events = get_match_events(match_id)
+
+            match_periods    = calculate_match_periods(match_events)
+            fst_period_end   = process_mssql_number(match_periods['1st_period_end'])
+            snd_period_end   = process_mssql_number(match_periods['2nd_period_end'])
+            extra_period_end = process_mssql_number(match_periods['extra_period_end'])
+
+            values = f'''('{wyId}','{seasonId}','{roundId}', '{home_team}', '{away_team}', {dateutc},\
+                    '{home_score}','{away_score}', '{winner}', '{duration}', '{home_score_et}', '{home_score_ht}',\
+                    '{home_score_p}', '{away_score_et}', '{away_score_ht}', '{away_score_p}',\
+                    '{home_shots}', '{away_shots}', '{home_shotsOnTarget}', '{away_shotsOnTarget}',\
+                    '{home_xg}', '{away_xg}', '{home_attacks_total}', '{away_attacks_total}',\
+                    '{home_corners}', '{away_corners}', '{home_possessionPercent}', '{away_possessionPercent}',\
+                    '{home_fouls}', '{away_fouls}', '{home_pass_successful_percent}', '{away_pass_successful_percent}',\
+                    '{home_vertical_pass_successful_percent}', '{away_vertical_pass_successful_percent}',\
+                    '{home_offsides}', '{away_offsides}', '{home_clearances}', '{away_clearances}',\
+                    '{home_interceptions}', '{away_interceptions}', '{home_tackles}', '{away_tackles}',\
+                        '{fst_period_end}', '{snd_period_end}', '{extra_period_end}')'''
+
+            matches_values_file.write(values)
+            matches_values_file.write(file_delimiter)
+
+
             match_lineups = get_match_lineups(match_id)
 
             # get team's match formation
@@ -962,11 +1012,11 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
 
             # # get match events
             for event in match_events:
-                id = process_mssql_value(event['id'])
-                matchid = process_mssql_value(event['matchId'])
-                player = process_mssql_value(event['player']['id'])
+                id          = process_mssql_value(event['id'])
+                matchid     = process_mssql_value(event['matchId'])
+                player      = process_mssql_value(event['player']['id'])
                 matchPeriod = process_mssql_value(event['matchPeriod'])
-                team = process_mssql_value(event['team']['id'])
+                team        = process_mssql_value(event['team']['id'])
                 if event['location'] != None:
                     location_x = process_mssql_value(event['location']['x'])
                     location_y = process_mssql_value(event['location']['y'])
@@ -976,20 +1026,22 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                 minute = process_mssql_number(event['minute'])
                 second = process_mssql_number(event['second'])
                 if event['pass'] != None:
-                    accurate = process_mssql_bool(event['pass']['accurate'])
-                    recipient = process_mssql_value(event['pass']['recipient']['id'])
+                    accurate      = process_mssql_bool(event['pass']['accurate'])
+                    recipient     = process_mssql_value(event['pass']['recipient']['id'])
                     endlocation_x = process_mssql_number(event['pass']['endLocation']['x'])
                     endlocation_y = process_mssql_number(event['pass']['endLocation']['y'])
+
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                             , '{accurate}', '{recipient}', '{endlocation_x}', '{endlocation_y}', '{team}')'''
                     match_event_pass_values_file.write(values)
                     match_event_pass_values_file.write(file_delimiter)
 
                 elif event['shot'] != None:
-                    isGoal = process_mssql_bool(event['shot']['isGoal'])
-                    onTarget = process_mssql_bool(event['shot']['onTarget'])
-                    xg = process_mssql_number(event['shot']['xg'])
-                    postShotXg = process_mssql_number(event['shot']['postShotXg'])
+                    isGoal      = process_mssql_bool(event['shot']['isGoal'])
+                    onTarget    = process_mssql_bool(event['shot']['onTarget'])
+                    xg          = process_mssql_number(event['shot']['xg'])
+                    postShotXg  = process_mssql_number(event['shot']['postShotXg'])
+
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                             , '{isGoal}', '{onTarget}', '{xg}', '{postShotXg}', '{team}')'''
                     match_event_shot_values_file.write(values)
@@ -997,13 +1049,14 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                     # if goal add to match_goals
                     if isGoal == '1':
                         assist = match_goal_assist(event,match_events)
-                        assistant = 'null'
+                        assistant     = 'null'
                         assist_minute = 'null'
                         assist_second = 'null'
                         if assist:
-                            assistant = f"'{process_mssql_value(assist['playerId'])}'"
+                            assistant     = f"'{process_mssql_value(assist['playerId'])}'"
                             assist_minute = f"'{process_mssql_number(assist['minute'])}'"
                             assist_second = f"'{process_mssql_number(assist['second'])}'"
+
                         values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second},\
                                 '{team}')'''
                         match_goals_values_file.write(values)
@@ -1011,7 +1064,8 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
 
                 elif event['infraction'] != None and (event['infraction']['yellowCard'] or event['infraction']['redCard']):
                     yellowCard = process_mssql_bool(event['infraction']['yellowCard'])
-                    redCard = process_mssql_bool(event['infraction']['redCard'])
+                    redCard    = process_mssql_bool(event['infraction']['redCard'])
+
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                             , '{yellowCard}', '{redCard}', '{team}')'''
                     match_event_infraction_values_file.write(values)
@@ -1020,6 +1074,7 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                 elif event['carry'] != None:    
                     endlocation_x = process_mssql_number(event['carry']['endLocation']['x'])
                     endlocation_y = process_mssql_number(event['carry']['endLocation']['y'])
+
                     values = f'''('{id}', '{matchid}', '{player}', '{matchPeriod}', '{location_x}', '{location_y}', '{minute}', '{second}'
                             , '{endlocation_x}', '{endlocation_y}', '{team}')'''
                     match_event_carry_values_file.write(values)
@@ -1098,17 +1153,18 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
     pbar_matches.refresh()
     pbar_matches.reset()
     pbar_players.clear()
+    
     values_files = [file for files_list in result for file in files_list]
-    match_values_files = []
-    player_values_files = []
-    career_entry_values_files = []
-    player_positions_values_files = []
+    match_values_files              = []
+    player_values_files             = []
+    career_entry_values_files       = []
+    player_positions_values_files   = []
     player_match_stats_values_files = []
-    match_lineup_values_files = []
+    match_lineup_values_files       = []
     match_lineup_player_position_values_files = []
-    match_formation_values_files = []
+    match_formation_values_files    = []
     match_substitution_values_files = []
-    match_goals_values_files = []
+    match_goals_values_files        = []
     match_events_values_files = {
         "pass" : [],
         "shot" : [],
@@ -1218,28 +1274,30 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
 def populate_competition_season_extra_info(db_handler:Db_handler,season_id:int):
     '''Populates competition_season_extra_info table in db, gathering extra info from given season, such as scorers and assistmen'''
     print(f'Populating extra info from season {season_id}')
-    scorers_values_file_name = f'{tmp_folder}/scorers_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    scorers_values_file = open(scorers_values_file_name,'w',encoding='utf-8')
-    assistmen_values_file_name = f'{tmp_folder}/assistmen_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
-    assistmen_values_file = open(assistmen_values_file_name,'w',encoding='utf-8')
+    scorers_values_file_name    = f'{tmp_folder}/scorers_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    scorers_values_file         = open(scorers_values_file_name,'w',encoding='utf-8')
+    assistmen_values_file_name  = f'{tmp_folder}/assistmen_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
+    assistmen_values_file       = open(assistmen_values_file_name,'w',encoding='utf-8')
 
 
-    scorers = get_season_scorers(season_id)
-    assistmen = get_season_assistmen(season_id)
+    scorers     = get_season_scorers(season_id)
+    assistmen   = get_season_assistmen(season_id)
     for scorer in scorers:
         player_id = process_mssql_value(scorer['playerId'])
-        team_id = process_mssql_value(scorer['teamId'])
+        team_id   = process_mssql_value(scorer['teamId'])
         if team_id and team_id not in ['0','null','NULL','None','none']:
-            goals = process_mssql_number(scorer['goals'])
+            goals  = process_mssql_number(scorer['goals'])
+
             values = f'''('{season_id}','{player_id}','{team_id}','{goals}')'''
             scorers_values_file.write(values)
             scorers_values_file.write(file_delimiter)
 
     for assistman in assistmen:
-        player_id = process_mssql_value(assistman['playerId'])
-        team_id = process_mssql_value(assistman['teamId'])
+        player_id   = process_mssql_value(assistman['playerId'])
+        team_id     = process_mssql_value(assistman['teamId'])
         if team_id and team_id not in ['0','null','NULL','None','none']:
             assists = process_mssql_number(assistman['assists'])
+
             values = f'''('{season_id}','{player_id}','{team_id}','{assists}')'''
             assistmen_values_file.write(values)
             assistmen_values_file.write(file_delimiter)
@@ -1276,9 +1334,9 @@ def get_full_info(db_handler:Db_handler):
         # populate areas
         populate_areas(db_handler) 
         if 'competitions' in request_file:
-            competitions = request_file['competitions']
+            competitions      = request_file['competitions']
             competitions_info = extract_competitions_info(competitions)
-            competitions_id = [(c['wyId'],c['custom_name']) for c in competitions_info]
+            competitions_id   = [(c['wyId'],c['custom_name']) for c in competitions_info]
             # populate competitions
             populate_competitions(db_handler,competitions_id)
 
@@ -1318,7 +1376,7 @@ if __name__ == '__main__':
     args = parse_arguments()
 
     if args.db_config[0].endswith('.json'):
-        tmp_folder = f'{current_folder}/tmp'
+        tmp_folder  = f'{current_folder}/tmp'
         file_delimiter = '|;|'
         # data insert tmp folder
         if not os.path.exists(tmp_folder):
@@ -1329,11 +1387,11 @@ if __name__ == '__main__':
                 os.remove(f'{tmp_folder}/{file}')
 
         db_config_path = f'{current_folder}/{args.db_config[0]}'
-        db_logger = None
+        db_logger   = None
         main_logger = None
         if args.log:
             logging.basicConfig(level=logging.INFO)
-            db_logger = logging.getLogger('db_logger')
+            db_logger   = logging.getLogger('db_logger')
             main_logger = logging.getLogger('main_logger')
             main_logger.log(logging.INFO,'Logging active')
 
