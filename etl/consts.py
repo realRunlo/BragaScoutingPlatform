@@ -62,11 +62,11 @@ match_parameters     = ['idmatch', 'competition_season','round', 'home_team', 'a
 
 
 player_match_stats_key_parameters = ['match', 'player']
-player_match_stats_parameters     = ['match', 'player', 'offensiveDuels', 'progressivePasses', 'forwardPasses', 
+player_match_stats_parameters     = ['match', 'player','team', 'offensiveDuels', 'progressivePasses', 'forwardPasses', 
                                      'crosses', 'keyPasses', 'defensiveDuels', 'interceptions', 'recoveries',
                                      'successfulPasses', 'longPasses', 'aerialDuels', 'losses', 'ownHalfLosses', 
                                      'goalKicks', 'receivedPass', 'dribbles', 'touchInBox', 'opponentHalfRecoveries',
-                                     'position','rating']
+                                     'position','rating','minutesPlayed']
 
 match_lineup_key_parameters = ['match', 'team', 'period', 'second']
 match_lineup_parameters     = ['match', 'team', 'period', 'second', 'lineup']
@@ -100,8 +100,8 @@ match_event_infraction_key_parameters = ['idmatch_event']
 match_event_infraction_parameters     = ['idmatch_event', 'match', 'player', 'matchPeriod', 'location_x', 'location_y',
                                          'minute', 'second', 'yellowCard', 'redCard','team']
 
-match_goals_key_parameters = ['match_event']
-match_goals_parameters     = ['match_event', 'match','scorer','minute','second','assistant','assist_minute','assist_second','team']
+match_goals_key_parameters = ['match','scorer','minute','second']
+match_goals_parameters     = [ 'match','scorer','minute','second','assistant','assist_minute','assist_second','team']
 
 
 ### competition season extra tables

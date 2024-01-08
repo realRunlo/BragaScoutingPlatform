@@ -627,7 +627,9 @@ def populate_players(db_handler:Db_handler,season_id:int,player_advanced_stats:b
 
 
 def prepare_match_players_stats_insert(match:int,get_players:bool=False):
-    '''Prepare values for player_match_stats table in db'''
+    '''Prepare values for player_match_stats table in db
+    
+    Get players: if True, returns a list of players with stats (can be used to populate unknown players)'''
     querys = []
     players_list = []
 
@@ -652,6 +654,7 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
         dribbles            = process_mssql_number(player_stats['total']['dribbles'])
         touch_in_box        = process_mssql_number(player_stats['total']['touchInBox'])
         opponent_half_recoveries = process_mssql_number(player_stats['total']['opponentHalfRecoveries'])
+        minutes_played      = process_mssql_number(player_stats['total']['minutesOnField'])
         position            = None
         greatest_percent    = 0
         positions = player_stats['positions']
@@ -669,12 +672,36 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
         rating   = calculate_rating(player_stats)
         rating   = process_mssql_number(rating)
 
+        # find player team
+        ## inside match teams data
+        ### for each team check if player in formation
+        team = None
+        teams_data = player_stats['match']['teamsData']
+        for team_id,team_data in teams_data.items():
+            if team_data['hasFormation']:
+                # check if player in lineup
+                for player_in_lineup in team_data['formation']['lineup']:
+                    if player_in_lineup['playerId'] == player:
+                        team = team_id
+                        break
+                if not team:
+                    # check if player in bench
+                    for player_in_bench in team_data['formation']['bench']:
+                        if player_in_bench['playerId'] == player:
+                            team = team_id
+                            break
+                if team:
+                    break
+        ## if no team found (inconsistency), skip this player
+        if not team:
+            continue
+        team = process_mssql_value(team)
 
-        values = f'''('{match}', '{player}', '{offensive_duels}', '{progressive_passes}', '{forward_passes}',\
+        values = f'''('{match}', '{player}','{team}', '{offensive_duels}', '{progressive_passes}', '{forward_passes}',\
                      '{crosses}', '{key_passes}', '{defensive_duels}', '{interceptions}', '{recoveries}',\
                      '{successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
                      '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}',\
-                     '{position}', '{rating}')'''
+                     '{position}', '{rating}','{minutes_played}')'''
 
         querys.append(values)
         if get_players:
@@ -747,14 +774,15 @@ def match_goal_assist(goal_event,match_events):
     
     Assist is a pass event that occurs with scorer as recipient and 
     was done within the same minute as the goal'''
-
     assist = None
     potential_assist = None
     for event in match_events:
         # event secondary type has assist
         if 'assist' in event['type']['secondary']:
             # if event before goal
-            if event['minute'] <= goal_event['minute'] and event['second'] <= goal_event['second']:
+            if event['minute'] < goal_event['minute']:
+                potential_assist = event
+            elif event['minute'] == goal_event['minute'] and event['second'] <= goal_event['second']:
                 potential_assist = event
             else:
                 break
@@ -1057,8 +1085,8 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                             assist_minute = f"'{process_mssql_number(assist['minute'])}'"
                             assist_second = f"'{process_mssql_number(assist['second'])}'"
 
-                        values = f'''('{id}', '{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second},\
-                                '{team}')'''
+                        values = f'''('{matchid}', '{player}', '{minute}', '{second}', {assistant}, {assist_minute}, {assist_second},\
+                                    '{team}')'''
                         match_goals_values_file.write(values)
                         match_goals_values_file.write(file_delimiter)
 
@@ -1146,6 +1174,7 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
     else:
         matches = get_update_matches(date)
         matches = list(matches.keys())
+        
     pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[season_id,player_advanced_stats],threads=10)

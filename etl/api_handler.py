@@ -297,7 +297,7 @@ def get_match_players_stats(match,players:bool=False,retry:bool=True):
     headers = {'Authorization': encoded_authentication}
     params = None
     if players:
-        params = {'details':'player'}
+        params = {'details':'player','fetch':'match'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
     players_stats = result['players'] if result else []
     return players_stats
