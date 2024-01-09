@@ -66,7 +66,7 @@ player_match_stats_parameters     = ['match', 'player','team', 'offensiveDuels',
                                      'crosses', 'keyPasses', 'defensiveDuels', 'interceptions', 'recoveries',
                                      'successfulPasses', 'longPasses', 'aerialDuels', 'losses', 'ownHalfLosses', 
                                      'goalKicks', 'receivedPass', 'dribbles', 'touchInBox', 'opponentHalfRecoveries',
-                                     'position','rating','minutesPlayed']
+                                     'position','rating','minutes_played']
 
 match_lineup_key_parameters = ['match', 'team', 'period', 'second']
 match_lineup_parameters     = ['match', 'team', 'period', 'second', 'lineup']
