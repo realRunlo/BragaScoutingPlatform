@@ -10,7 +10,7 @@ api_url = 'https://apirest.wyscout.com/v3/'
 current_folder = os.path.dirname(__file__)
 
 # Preparing authentication
-authentication = json.load(open(f'{current_folder}/config/api_cred.json'))
+authentication = json.load(open(f'{current_folder}/api_cred.json'))
 encoded_authentication = base64.b64encode(f'{authentication["username"]}:{authentication["password"]}'.encode('ascii'))
 encoded_authentication = f'Basic {encoded_authentication.decode("ascii")}'
 
