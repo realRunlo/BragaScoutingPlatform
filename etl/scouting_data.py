@@ -681,13 +681,13 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
             if team_data['hasFormation']:
                 # check if player in lineup
                 for player_in_lineup in team_data['formation']['lineup']:
-                    if player_in_lineup['playerId'] == player:
+                    if player_in_lineup['playerId'] == player_stats['playerId']:
                         team = team_id
                         break
                 if not team:
                     # check if player in bench
                     for player_in_bench in team_data['formation']['bench']:
-                        if player_in_bench['playerId'] == player:
+                        if player_in_bench['playerId'] == player_stats['playerId']:
                             team = team_id
                             break
                 if team:
@@ -710,6 +710,7 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
             # inconsistency (player is not registered in API), do not add this players stats
             else:
                 querys.pop()
+
     if get_players:
         return querys,players_list
     return querys
