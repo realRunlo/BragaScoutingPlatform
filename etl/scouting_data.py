@@ -686,11 +686,12 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
         progressive_passes  = process_mssql_number(player_stats['total']['progressivePasses'])
         forward_passes      = process_mssql_number(player_stats['total']['forwardPasses'])
         crosses             = process_mssql_number(player_stats['total']['crosses'])
+        passes              = process_mssql_number(player_stats['total']['passes'])
+        successful_passes   = process_mssql_number(player_stats['total']['successfulPasses'])
         key_passes          = process_mssql_number(player_stats['total']['keyPasses'])
         defensive_duels     = process_mssql_number(player_stats['total']['defensiveDuels'])
         interceptions       = process_mssql_number(player_stats['total']['interceptions'])
         recoveries          = process_mssql_number(player_stats['total']['recoveries'])
-        successful_passes   = process_mssql_number(player_stats['percent']['successfulPasses'])
         long_passes         = process_mssql_number(player_stats['total']['longPasses'])
         aerial_duels        = process_mssql_number(player_stats['total']['aerialDuels'])
         losses              = process_mssql_number(player_stats['total']['losses'])
@@ -699,8 +700,9 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
         received_pass       = process_mssql_number(player_stats['total']['receivedPass'])
         dribbles            = process_mssql_number(player_stats['total']['dribbles'])
         touch_in_box        = process_mssql_number(player_stats['total']['touchInBox'])
-        opponent_half_recoveries = process_mssql_number(player_stats['total']['opponentHalfRecoveries'])
         minutes_played      = process_mssql_number(player_stats['total']['minutesOnField'])
+        opponent_half_recoveries    = process_mssql_number(player_stats['total']['opponentHalfRecoveries'])
+        percent_successful_passes   = process_mssql_number(player_stats['percent']['successfulPasses'])
         position            = None
         greatest_percent    = 0
         positions = player_stats['positions']
@@ -745,9 +747,9 @@ def prepare_match_players_stats_insert(match:int,get_players:bool=False):
 
         values = f'''('{match}', '{player}','{team}', '{offensive_duels}', '{progressive_passes}', '{forward_passes}',\
                      '{crosses}', '{key_passes}', '{defensive_duels}', '{interceptions}', '{recoveries}',\
-                     '{successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
+                     '{percent_successful_passes}', '{long_passes}', '{aerial_duels}', '{losses}', '{own_half_losses}',\
                      '{goal_kicks}', '{received_pass}', '{dribbles}', '{touch_in_box}', '{opponent_half_recoveries}',\
-                     '{position}', '{rating}','{minutes_played}')'''
+                     '{position}', '{rating}','{minutes_played}','{passes}','{successful_passes}')'''
 
         querys.append(values)
         if get_players:
