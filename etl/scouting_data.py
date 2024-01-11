@@ -50,7 +50,7 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
 
     # limit threads during working hours
     if working_hours():
-        threads = 2
+        threads = 1
     if log:
         start_time = time.time()
         print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items | {threads} threads')
@@ -285,7 +285,7 @@ def populate_competitions_seasons(db_handler:Db_handler,seasons_id:list):
         db_handler.request_insert_or_update_many('competition_season',file,key_parameters=competition_season_key_parameters,parameters=competition_season_parameters)
 
 
-def prepare_teams_insert(teams,season_id:int,round_id:int):
+def prepare_teams_insert(teams,season_id:int,round_id:int,competition_id:int):
     '''Inserts team into db, as well as team_competition_season table'''
     # prepare values files
     team_values_file_name                           = f'{tmp_folder}/teams_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
@@ -322,12 +322,53 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
             rank              = process_mssql_number(team['rank'])
             group_id          = process_mssql_value(team['groupId'])
 
+
             values_tcsr = f'''('{round_id}', '{wyId}','{totalDraws}','{totalGoalsAgainst}','{totalGoalsFor}','{totalLosses}',\
                         '{totalPlayed}','{totalPoints}','{totalWins}','{rank}', {group_id})'''
             team_competition_season_values_file.write(values_tcsr)
             team_competition_season_values_file.write(file_delimiter)
+
+             # get team competition advanced stats
+            team_adv_stats = get_team_season_advanced_stats(team_info['wyId'],competition_id,season_id)
+            average_passes          = 0
+            total_goals             = 0
+            total_conceded_goals    = 0
+            total_clean_sheets      = 0
+            total_matches           = 0
+            xg_shot                 = 0
+            xg_shot_against         = 0
+            total_crosses           = 0
+            total_through_passes    = 0
+            total_fouls             = 0
+            total_red_cards         = 0
+            total_shots             = 0
+            total_shots_against     = 0
+            total_yellow_cards      = 0
+            total_progressive_run   = 0
+            percent_shots_on_target = 0
+
+            if team_adv_stats:
+                average_passes          = process_mssql_number(team_adv_stats['average']['passes'])
+                total_goals             = process_mssql_number(team_adv_stats['total']['goals'])
+                total_conceded_goals    = process_mssql_number(team_adv_stats['total']['concededGoals'])
+                total_clean_sheets      = process_mssql_number(team_adv_stats['total']['cleanSheets'])
+                total_matches           = process_mssql_number(team_adv_stats['total']['matches'])
+                xg_shot                 = process_mssql_number(team_adv_stats['total']['xgShot'])
+                xg_shot_against         = process_mssql_number(team_adv_stats['total']['xgShotAgainst'])
+                total_crosses           = process_mssql_number(team_adv_stats['total']['crosses'])
+                total_through_passes    = process_mssql_number(team_adv_stats['total']['throughPasses'])
+                total_fouls             = process_mssql_number(team_adv_stats['total']['fouls'])
+                total_red_cards         = process_mssql_number(team_adv_stats['total']['redCards'])
+                total_shots             = process_mssql_number(team_adv_stats['total']['shots'])
+                total_shots_against     = process_mssql_number(team_adv_stats['total']['shotsAgainst'])
+                total_yellow_cards      = process_mssql_number(team_adv_stats['total']['yellowCards'])
+                total_progressive_run   = process_mssql_number(team_adv_stats['total']['progressiveRun'])
+                percent_shots_on_target = process_mssql_number(team_adv_stats['percent']['shotsOnTarget'])
             
-            values_tcs = f'''('{season_id}', '{wyId}')'''
+            values_tcs = f'''('{season_id}', '{wyId}','{average_passes}','{total_goals}','{total_conceded_goals}','{total_clean_sheets}',\
+                              '{total_matches}','{xg_shot}','{xg_shot_against}','{total_crosses}','{total_through_passes}',\
+                              '{total_fouls}','{total_red_cards}','{total_shots}','{total_shots_against}','{total_yellow_cards}',\
+                              '{total_progressive_run}','{percent_shots_on_target}')'''
             team_competition_season_round_values_file.write(values_tcs)
             team_competition_season_round_values_file.write(file_delimiter)
         pbar_teams.update(1)
@@ -341,7 +382,12 @@ def prepare_teams_insert(teams,season_id:int,round_id:int):
 
 def populate_teams(db_handler:Db_handler,season_id:int):
     '''Populates team's and round's tables in db, as well as team_competition_season table'''    
-    season_rounds = get_season_career(season_id)
+    season_career = get_season_career(season_id)
+    if not season_career:
+        print(f'No career found for season {season_id}')
+        return
+    competition_id = season_career['competition']['wyId']
+    season_rounds = season_career['rounds']
 
     # values files
     rounds_values_file_name = f'{tmp_folder}/rounds_{time.time()}_{random.randint(0,100000)}_{random.randint(0,100000)}.txt'
@@ -391,7 +437,7 @@ def populate_teams(db_handler:Db_handler,season_id:int):
                 groups_values_file.write(values)
                 groups_values_file.write(file_delimiter)
         
-        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id,round['wyId']])
+        result = run_threaded_for(prepare_teams_insert,teams,log=True,args=[season_id,round['wyId'],competition_id])
         teams_files += [file for files_list in result for file in files_list]
 
     # close rounds file
@@ -1456,6 +1502,7 @@ if __name__ == '__main__':
                 print(f'DB requests finished in {end_time-end_request_time} seconds.')
             except Exception as e:
                 print(e)
+                print(traceback.format_exc())
                 db_connection.close_connection()
                 db_request_handler.close_connection()
                 print('Waiting for db handler thread to finish...')

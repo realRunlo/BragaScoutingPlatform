@@ -24,8 +24,13 @@ competition_season_round_group_parameters     = ['idgroup','competition_season_r
 team_key_parameters = ['idteam']
 team_parameters     = ['idteam','name','official_name','icon','gender','type','city','category','area']
 
+
 team_competition_season_key_parameters = ['competition_season','team']
-team_competition_season_parameters     = ['competition_season','team']
+team_competition_season_parameters     = ['competition_season','team','average_passes','total_goals','total_conceded_goals',
+                                          'total_clean_sheets','total_matches','xg_shot','xg_shot_against','total_crosses',
+                                          'total_through_passes','total_fouls','total_red_cards','total_shots',
+                                          'total_shots_against','total_yellow_cards','total_progressive_run',
+                                          'percent_shots_on_target']
 
 team_competition_season_round_key_parameters = ['competition_season_round','team']
 team_competition_season_round_parameters     = ['competition_season_round','team','totalDraws','totalGoalsAgainst',

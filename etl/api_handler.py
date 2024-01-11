@@ -131,6 +131,15 @@ def get_team_info(team,retry:bool=True):
     return team_info
 
 
+def get_team_season_advanced_stats(team,competition,season,retry:bool=True):
+    '''Requests team season advanced stats from API'''
+    url = f'{api_url}teams/{team}/advancedstats'
+    headers = {'Authorization': encoded_authentication}
+    params = {'compId':competition,'seasonId':season}
+    result = get_request_api(url,headers=headers,params=params,retry=retry)
+    team_season_advanced_stats = result if result else None
+    return team_season_advanced_stats
+
 
 def get_match_info(match,retry:bool=True):
     '''Requests match info from API'''
@@ -239,9 +248,9 @@ def get_season_career(season,retry:bool=True):
     '''Requests general performance information about all the teams for the given season from API'''
     url = f'{api_url}seasons/{season}/career'
     headers = {'Authorization': encoded_authentication}
-    params = {'details':'round,team'}
+    params = {'details':'round,team','fetch':'competition'}
     result = get_request_api(url,headers=headers,params=params,retry=retry)
-    season_career = result['rounds'] if result else []
+    season_career = result if result else None
     return season_career
 
 
