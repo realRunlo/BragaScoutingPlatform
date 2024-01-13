@@ -821,23 +821,39 @@ def prepare_match_formation_insert(match:int,match_team_info:dict):
 def match_goal_assist(goal_event,match_events):
     '''Check if goal event has assist
     
-    Assist is a pass event that occurs with scorer as recipient and 
-    was done within the same minute as the goal'''
+    Searches for event with secondary type assist before goal event
+    
+    Assumes sorted match events by minute and second'''
     assist = None
     potential_assist = None
     for event in match_events:
+        new_assist = False
+        if event['id'] == goal_event['id']:
+            break
+
         # event secondary type has assist
-        if 'assist' in event['type']['secondary']:
+        if 'assist' in event['type']['secondary'] and event['team']['id'] == goal_event['team']['id']:
             # if event before goal
             if event['minute'] < goal_event['minute']:
+                new_assist = True
+            elif event['minute'] == goal_event['minute'] and event['second'] < goal_event['second']:
+                new_assist = True
+
+        if new_assist:
+            if not potential_assist:
                 potential_assist = event
-            elif event['minute'] == goal_event['minute'] and event['second'] <= goal_event['second']:
+            elif event['minute'] > potential_assist['minute']:
                 potential_assist = event
-            else:
-                break
-        # if goal before current goal event, clean potential assist
-        elif event['type']['secondary'] == 'goal' and event['minute'] <= goal_event['minute'] and event['second'] <= goal_event['second'] and event['id'] != goal_event['id']:
-            potential_assist = None
+            elif event['minute'] == potential_assist['minute'] and event['second'] > potential_assist['second']:
+                potential_assist = event
+
+        # other goal before assist, reset assist
+        if potential_assist:
+            if event['shot'] != None and event['shot']['isGoal'] == 1 and event['team']['id'] == goal_event['team']['id'] and event['id'] != goal_event['id']:
+                if event['minute'] < goal_event['minute']:
+                    potential_assist = None
+                elif event['minute'] == goal_event['minute'] and event['second'] < goal_event['second']:
+                    potential_assist = None
     
     if potential_assist:
         # get pass with closest time to goal
@@ -1086,6 +1102,9 @@ def prepare_matches_insert(matches,season_id,player_advanced_stats:bool=False):
                         matches_players_list.append((seasonId,players_list[i]))
                 else:
                     matches_players_list += players_list
+            
+            # sort match events by time
+            match_events.sort(key=lambda x: (x['minute'],x['second']))
 
             # # get match events
             for event in match_events:
@@ -1223,7 +1242,7 @@ def populate_matches(db_handler:Db_handler,date:str=None,season_id:int=None,play
     else:
         matches = get_update_matches(date)
         matches = list(matches.keys())
-        
+
     pbar_matches.reset(total=len(matches))
     pbar_players.disable = True
     result = run_threaded_for(prepare_matches_insert,matches,log=True,args=[season_id,player_advanced_stats],threads=10)
