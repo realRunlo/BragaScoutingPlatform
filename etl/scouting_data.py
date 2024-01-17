@@ -27,18 +27,33 @@ pbar_matches = tqdm()
 pbar_matches.desc = 'Matches'
 
             
-def yesterday():
-    yesterday = datetime.now() - timedelta(1)
-    yesterday = datetime.strftime(yesterday, '%Y-%m-%d %H:%M:%S')
+def last_update():
+    format = '%Y-%m-%d %H:%M:%S'
+    today_time = datetime.now()
+    today = datetime.strftime(today_time, format)
+    last_update = None
+    if os.path.exists("last_update.txt"):
+        file = open("last_update.txt","r")
+        last_update = file.readline()
+        file.close()
+    
+    if last_update != None:
+        last_update = datetime.strptime(last_update, format)
+        if today_time - last_update > timedelta(5):
+            last_update = None
 
-    return yesterday
+    file = open("last_update.txt","w+")
+    file.write(today)
+    #yesterday = datetime.now() - timedelta(1)
+    #yesterday = datetime.strftime(yesterday, format)
+    return last_update
 
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
     parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
-    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=yesterday()                         , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                         , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
     
     return parser.parse_args()
@@ -1418,9 +1433,12 @@ def get_update_info(db_handler:Db_handler):
         populate_teams(db_handler,season)
         populate_players(db_handler,season,player_advanced_stats=True)
         populate_competition_season_extra_info(db_handler,season)
+        if date == None:
+            populate_matches(db_handler,season_id=season,player_advanced_stats=True)
 
     #update matches by date
-    populate_matches(db_handler,date=date,player_advanced_stats=True)
+    if date != None:
+        populate_matches(db_handler,date=date,player_advanced_stats=True)
 
 
 
