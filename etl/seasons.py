@@ -143,27 +143,32 @@ def print_menu(stdscr,menu,select_row_id):
 
     stdscr.refresh()
 
-def list_seasons(filename, comp_name):
+def list_seasons(filename, menu_name):
+    comp_name = menu_name.split("(")[0][:-1]
     dict = json.load(open(filename))
-    string = f"""Seasons
-------------------------"""
+    string = f"""Seasons de {menu_name}
+---------------------------------------------
+  ID   |    NAME   |    START   |     END 
+---------------------------------------------"""
     comps = dict['competitions']
     seasons = []
     for comp in comps:
         if comp['name'] == comp_name:
             seasons = comp['seasons']
     for season in seasons:
+            if len(season['name'])  == 4 :
+                season['name'] = "   " + season['name'] + "  "
             string += f"""
-ID: {season['wyId']} | NAME: {season['name']} | START: {season['start']} | END: {season['end']}"""
+{season['wyId']} | {season['name']} | {season['start']} | {season['end']}"""
     return string
 
 
-def add_seasons(stdscr, request_file, comp_name,comp_id):
+def add_seasons(stdscr, request_file, menu_name,comp_name,comp_id):
     filename = competitions_requests_folder + "/" + request_file
     dict = json.load(open(filename))
 
     current_row_id = 1
-    menu = [f'[Adicionar] Seasons de {comp_name} de {request_file}']
+    menu = [f'[Adicionar] Seasons de {menu_name} de {request_file}']
     menu.append("Adicionar season nova por nome")
     menu.append("Adicionar season nova por id")
     menu.append("Voltar")
@@ -173,10 +178,16 @@ def add_seasons(stdscr, request_file, comp_name,comp_id):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #Voltar
                 break
@@ -222,7 +233,7 @@ def add_seasons(stdscr, request_file, comp_name,comp_id):
 
 
 
-def remove_seasons(stdscr, request_file, comp_name):
+def remove_seasons(stdscr, request_file, menu_name, comp_name):
     filename = competitions_requests_folder + "/" + request_file
     dict = json.load(open(filename))
     comps = dict['competitions']
@@ -231,7 +242,7 @@ def remove_seasons(stdscr, request_file, comp_name):
         if comp['name'] == comp_name:
             seasons = comp['seasons']
     current_row_id = 1
-    menu = [f'[Remover] Seasons de {comp_name} de {request_file}']
+    menu = [f'[Remover] Seasons de {menu_name} de {request_file}']
     menu += [season['name'] for season in seasons]
     menu.append("Remover todas")
     menu.append("Voltar")
@@ -241,10 +252,16 @@ def remove_seasons(stdscr, request_file, comp_name):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #Voltar
                 break
@@ -266,7 +283,7 @@ def remove_comps(stdscr, request_file):
     comps = dict['competitions']
     current_row_id = 1
     menu = [f'Competições de {request_file}']
-    menu += [comp['name'] for comp in comps]
+    menu += [f'{comp["name"] + " (" + comp["area"] + ")"}' for comp in comps]
     menu.append("Voltar")
     print_menu(stdscr, menu, current_row_id)
 
@@ -274,15 +291,22 @@ def remove_comps(stdscr, request_file):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
             else:
-                remove_seasons(stdscr,request_file, menu[current_row_id])
+                comp_name = menu[current_row_id].split("(")[0][:-1]
+                remove_seasons(stdscr,request_file, menu[current_row_id],comp_name)
                 break
 
         print_menu(stdscr, menu, current_row_id)
@@ -294,7 +318,7 @@ def add_comps(stdscr, request_file):
     comps = dict['competitions']
     current_row_id = 1
     menu = [f'Competições de {request_file}']
-    menu += [comp['name'] for comp in comps]
+    menu += [f'{comp["name"] + " (" + comp["area"] + ")"}' for comp in comps]
     menu.append("Adicionar nova competição por id")
     menu.append("Adicionar nova competição por nome")
     menu.append("Voltar")
@@ -304,10 +328,16 @@ def add_comps(stdscr, request_file):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
@@ -365,10 +395,11 @@ def add_comps(stdscr, request_file):
                 break
             else:
                 comp_id = ""
+                comp_name = menu[current_row_id].split("(")[0][:-1]
                 for comp in comps:
-                    if comp['name'] == menu[current_row_id]:
+                    if comp['name'] == comp_name:
                         comp_id = comp['wyId']
-                add_seasons(stdscr, request_file, menu[current_row_id],comp_id)
+                add_seasons(stdscr, request_file, menu[current_row_id],comp_name,comp_id)
                 break
 
         print_menu(stdscr, menu, current_row_id)
@@ -381,7 +412,7 @@ def list_comps(stdscr, request_file):
     comps = dict['competitions']
     current_row_id = 1
     menu = [f'Competições de {request_file}']
-    menu += [comp['name'] for comp in comps]
+    menu += [f'{comp["name"] + " (" + comp["area"] + ")"}' for comp in comps]
     menu.append("Voltar")
     print_menu(stdscr, menu, current_row_id)
 
@@ -389,10 +420,16 @@ def list_comps(stdscr, request_file):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
@@ -418,10 +455,16 @@ def list_menu(stdscr):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
@@ -442,10 +485,16 @@ def remove_menu(stdscr):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
@@ -467,10 +516,16 @@ def add_menu(stdscr):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break
@@ -494,10 +549,16 @@ def main_menu(stdscr):
         key = stdscr.getch()
         stdscr.clear()
 
-        if key == curses.KEY_UP and current_row_id > 1:
-            current_row_id -= 1
-        elif key == curses.KEY_DOWN and current_row_id < len(menu) - 1:
-            current_row_id += 1
+        if key == curses.KEY_UP:
+            if current_row_id > 1:
+                current_row_id -= 1
+            elif current_row_id == 1:
+                current_row_id = len(menu) - 1
+        elif key == curses.KEY_DOWN:
+            if current_row_id < len(menu) - 1:
+                current_row_id += 1
+            elif  current_row_id == len(menu) - 1:
+                current_row_id = 1
         elif key == curses.KEY_ENTER or key in [10,13]:
             if current_row_id == len(menu)-1: #EXIT
                 break

@@ -83,7 +83,7 @@
         },
         {
             "wyId": 146,
-            "name": "Liga Profesional de F\u00c3\u00batbol",
+            "name": "Liga Profesional de F\u00fatbol",
             "area": "ARG",
             "custom_name": "CDLP",
             "tm_code": "CDLP",
@@ -110,7 +110,7 @@
         },
         {
             "wyId": 797,
-            "name": "Segunda Divisi\u00c3\u00b3n",
+            "name": "Segunda Divisi\u00f3n",
             "area": "ESP",
             "custom_name": "ES2",
             "tm_code": "ES2",
@@ -164,7 +164,7 @@
         },
         {
             "wyId": 423,
-            "name": "2. Bundeslig",
+            "name": "2. Bundesliga",
             "area": "DEU",
             "custom_name": "L2",
             "tm_code": "L2",
@@ -272,7 +272,7 @@
         },
         {
             "wyId": 852,
-            "name": "S\u00c3\u00bcper Lig",
+            "name": "S\u00fcper Lig",
             "area": "TUR",
             "custom_name": "TR1",
             "tm_code": "TR1",

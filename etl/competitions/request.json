@@ -2,7 +2,7 @@
     "competitions": [
         {
             "wyId": 146,
-            "name": "Liga Profesional de F\u00c3\u00batbol",
+            "name": "Liga Profesional de F\u00fatbol",
             "area": "ARG",
             "custom_name": "CDLP",
             "tm_code": "CDLP",
@@ -51,33 +51,6 @@
                     "name": "2021/2022",
                     "start": "2021-08-07",
                     "end": "2022-05-15"
-                }
-            ]
-        },
-        {
-            "wyId": 198,
-            "name": "First Division A",
-            "area": "BEL",
-            "custom_name": "BE1",
-            "tm_code": "BE1",
-            "seasons": [
-                {
-                    "wyId": "188982",
-                    "name": "2023/2024",
-                    "start": "2023-07-28",
-                    "end": "2024-05-31"
-                },
-                {
-                    "wyId": "188049",
-                    "name": "2022/2023",
-                    "start": "2022-07-22",
-                    "end": "2023-06-04"
-                },
-                {
-                    "wyId": "187389",
-                    "name": "2021/2022",
-                    "start": "2021-07-23",
-                    "end": "2022-05-22"
                 }
             ]
         }
