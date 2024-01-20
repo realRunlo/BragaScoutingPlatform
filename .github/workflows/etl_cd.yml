@@ -21,7 +21,14 @@ jobs:
         cd etl/
         python ../cloud/credentials_cd/generate_api_cred.py '${{secrets.API_USER}}' '${{secrets.API_PASSWORD}}'
         python ../cloud/credentials_cd/generate_db_cred.py '${{secrets.DB_HOST}}' '${{secrets.DB_USER}}' '${{secrets.DB_PASSWORD}}' '${{secrets.DB_DATABASE}}'
-        cd ..
+   
+    - name: Create exec python files
+      run: | 
+        mv scouting_data.py scouting_data
+        mv seasons.py seasons
+        mv tm_script.py tm
+        mv data_requests_updater.py data_requests_updater
+        chmod a+x scouting_data seasons tm data_requests_updater
         
     - name: Get ssh key 
       run: |
