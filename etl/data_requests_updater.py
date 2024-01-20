@@ -1,3 +1,5 @@
+#!/usr/bin/python3.10
+
 '''Module that updates the requests files (for the db populating) and removes from db deprecated data'''
 
 
@@ -96,7 +98,8 @@ def insert_values(db_handler:Db_handler,table:str,values:list):
                     if v  in ['NULL','null','None',None]:
                         values_str += 'NULL,'
                     else:
-                        values_str += f"'{str(v).replace("\'","\'\'")}',"
+                        clean_value = str(v).replace('\'','\'\'')
+                        values_str += f"'{clean_value}',"
                 values_str = values_str[:-1]
                 values_str += '),'
             values_str = values_str[:-1]
