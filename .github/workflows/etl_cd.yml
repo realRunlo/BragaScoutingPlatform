@@ -24,6 +24,7 @@ jobs:
    
     - name: Create exec python files
       run: | 
+        cd etl/
         mv scouting_data.py scouting_data
         mv seasons.py seasons
         mv tm_script.py tm
