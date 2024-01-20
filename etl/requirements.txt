@@ -2,3 +2,4 @@ pybase64
 jellyfish
 psycopg2
 tqdm
+bs4
