@@ -19,8 +19,11 @@ jobs:
     - name: Generate API&DB credentials file
       run: |
         cd etl/
-        python ../cloud/credentials_cd/generate_api_cred.py '${{secrets.API_USER}}' '${{secrets.API_PASSWORD}}'
-        python ../cloud/credentials_cd/generate_db_cred.py '${{secrets.DB_HOST}}' '${{secrets.DB_USER}}' '${{secrets.DB_PASSWORD}}' '${{secrets.DB_DATABASE}}'
+        mkdir config
+        cd config/
+        python ../../cloud/credentials_cd/generate_api_cred.py '${{secrets.API_USER}}' '${{secrets.API_PASSWORD}}'
+        python ../../cloud/credentials_cd/generate_db_cred.py '${{secrets.DB_HOST}}' '${{secrets.DB_USER}}' '${{secrets.DB_PASSWORD}}' '${{secrets.DB_DATABASE}}'
+        python ../../cloud/credentials_cd/generate_db_cred.py '${{secrets.DB_HOST}}' '${{secrets.DB_USER}}' '${{secrets.DB_PASSWORD}}' '${{secrets.DB_OLD_DATABASE}}'
    
     - name: Create exec python files
       run: | 
