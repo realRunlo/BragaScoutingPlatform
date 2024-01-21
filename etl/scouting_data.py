@@ -612,8 +612,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 yellowCard        = process_mssql_number(entry['yellowCard'])
 
                 aerial_duels_won_percent        = 0
-                successful_dribles_percent      = 0
-                succesful_crosses_percent       = 0
+                successful_dribbles_percent     = 0
+                successful_crosses_percent      = 0
                 successful_passes_percent       = 0
                 successful_long_passes_percent  = 0
                 defensive_duels_won_percent     = 0
@@ -670,8 +670,8 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                         player_positions_values_file.write(file_delimiter)
 
                     aerial_duels_won_percent        = process_mssql_number(advanced_stats['percent']['aerialDuelsWon'])
-                    successful_dribbles_percent      = process_mssql_number(advanced_stats['percent']['successfulDribbles'])
-                    successful_crosses_percent       = process_mssql_number(advanced_stats['percent']['successfulCrosses'])
+                    successful_dribbles_percent     = process_mssql_number(advanced_stats['percent']['successfulDribbles'])
+                    successful_crosses_percent      = process_mssql_number(advanced_stats['percent']['successfulCrosses'])
                     successful_passes_percent       = process_mssql_number(advanced_stats['percent']['successfulPasses'])
                     successful_long_passes_percent  = process_mssql_number(advanced_stats['percent']['successfulLongPasses'])
                     defensive_duels_won_percent     = process_mssql_number(advanced_stats['percent']['defensiveDuelsWon'])
