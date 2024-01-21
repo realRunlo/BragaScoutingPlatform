@@ -53,7 +53,7 @@ def last_update():
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const=['db_cred.json']                     ,help='Db config json file path')
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const=['config/db_cred.json'],required=True,help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              ,help="Request all info from API, according to json file provided")
     parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                       ,help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--max_threads','-mt'           ,action='store_true'                                            ,help="Activates max threads mode. Use to overwrite working hours thread reduction.")
