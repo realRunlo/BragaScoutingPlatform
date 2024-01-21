@@ -53,7 +53,7 @@ def last_update():
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                ,help='Db config json file path')
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True,default='db_cred.json'         ,help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              ,help="Request all info from API, according to json file provided")
     parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                       ,help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--max_threads','-mt'           ,action='store_true'                                            ,help="Activates max threads mode. Use to overwrite working hours thread reduction.")
@@ -1527,16 +1527,16 @@ def get_full_info(db_handler:Db_handler):
 
             # populate seasons
             seasons_id = [s for c in competitions_info for s in c['seasons']]
-            #populate_competitions_seasons(db_handler,seasons_id)
+            populate_competitions_seasons(db_handler,seasons_id)
 
             s_i = 1
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                #populate_teams(db_handler,s_id)
+                populate_teams(db_handler,s_id)
                 populate_players(db_handler,s_id,player_advanced_stats=True)
-                #populate_competition_season_extra_info(db_handler,s_id)
-                #populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
+                populate_competition_season_extra_info(db_handler,s_id)
+                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
