@@ -1,3 +1,7 @@
+## misc
+working_hour_threads = 1
+
+
 ## table parameters
 
 ### misc tables
@@ -46,7 +50,15 @@ player_parameters       = ['idplayer','name','short_name','passport_area','birth
 career_entry_key_parameters = ['player','team_competition_season']
 career_entry_parameters     = ['player','team_competition_season','appearances','goal','minutesPlayed',
                                'penalties','redCards','shirtNumber','substituteIn','substituteOnBench',
-                               'substituteOut','yellowCard','team','competition_season']
+                               'substituteOut','yellowCard','team','competition_season','aerial_duels_won_percent',
+                               'successful_dribbles_percent','successful_crosses_percent','successful_passes_percent',
+                               'successful_long_passes_percent','defensive_duels_won_percent','offensive_duels_won_percent',
+                               'xg_shot','shots','shots_on_target','shot_assists','progressive_run',
+                               'successful_passes','successful_crosses','successful_forward_passes',
+                               'successful_key_passes','successful_long_passes','successful_progressive_passes',
+                               'aerial_duels_won','defensive_duels_won','offensive_duels_won',
+                               'successful_dribbles','recoveries','opponent_half_recoveries','losses',
+                               'own_half_losses','interceptions','touch_in_box']
 
 player_positions_key_parameters = ['player','code','team_competition_season']
 player_positions_parameters     = ['player','percent','code','name','team_competition_season']

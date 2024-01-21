@@ -53,10 +53,11 @@ def last_update():
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
-    parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              , help="Request all info from API, according to json file provided")
-    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                         , help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
-    parser.add_argument('--log','-l'                    ,action='store_true'                                            , help="Activate logging, with optional log file path")
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                ,help='Db config json file path')
+    parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              ,help="Request all info from API, according to json file provided")
+    parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                       ,help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
+    parser.add_argument('--max_threads','-mt'           ,action='store_true'                                            ,help="Activates max threads mode. Use to overwrite working hours thread reduction.")
+    parser.add_argument('--log','-l'                    ,action='store_true'                                            ,help="Activate logging, with optional log file path")
     
     return parser.parse_args()
 
@@ -67,7 +68,7 @@ def run_threaded_for(func,iterable:list, args:list=None,log=False,threads:int=6)
 
     # limit threads during working hours
     if working_hours():
-        threads = 1
+        threads = working_hour_threads
     if log:
         start_time = time.time()
         print(f'Threaded: Running {func.__name__} to gather info from {len(iterable)} items | {threads} threads')
@@ -610,13 +611,34 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 substituteOut     = process_mssql_number(entry['substituteOut'])
                 yellowCard        = process_mssql_number(entry['yellowCard'])
 
-                values = f'''SELECT {wyId}, idteam_competition_season, {appearances},{goal},{minutesPlayed},\
-                            {penalties},{redCards},{shirtNumber},{substituteIn},{substituteOnBench},\
-                            {substituteOut},{yellowCard},{team},{season}
-                            FROM "scouting"."team_competition_season" 
-                            WHERE "team"={team} AND "competition_season"={season} '''
-                career_entry_values_file.write(values)
-                career_entry_values_file.write(file_delimiter)
+                aerial_duels_won_percent        = 0
+                successful_dribles_percent      = 0
+                succesful_crosses_percent       = 0
+                successful_passes_percent       = 0
+                successful_long_passes_percent  = 0
+                defensive_duels_won_percent     = 0
+                offensive_duels_won_percent     = 0
+                xg_shot                         = 0
+                shots                           = 0
+                shots_on_target                 = 0
+                shot_assists                    = 0
+                progressive_run                 = 0
+                successful_passes               = 0
+                successful_crosses              = 0
+                successful_forward_passes       = 0
+                successful_key_passes           = 0
+                successful_long_passes          = 0
+                successful_progressive_passes   = 0
+                aerial_duels_won                = 0
+                defensive_duels_won             = 0
+                offensive_duels_won             = 0
+                successful_dribbles             = 0
+                recoveries                      = 0
+                opponent_half_recoveries        = 0
+                losses                          = 0
+                own_half_losses                 = 0
+                interceptions                   = 0
+                touch_in_box                    = 0
 
                 advanced_stats = get_player_advanced_stats(player['wyId'],competition,season)
                 if advanced_stats:
@@ -646,6 +668,52 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                                     FROM "scouting"."team_competition_season" WHERE "team"={team} AND "competition_season"={season} '''
                         player_positions_values_file.write(values)
                         player_positions_values_file.write(file_delimiter)
+
+                    aerial_duels_won_percent        = process_mssql_number(advanced_stats['percent']['aerialDuelsWon'])
+                    successful_dribbles_percent      = process_mssql_number(advanced_stats['percent']['successfulDribbles'])
+                    successful_crosses_percent       = process_mssql_number(advanced_stats['percent']['successfulCrosses'])
+                    successful_passes_percent       = process_mssql_number(advanced_stats['percent']['successfulPasses'])
+                    successful_long_passes_percent  = process_mssql_number(advanced_stats['percent']['successfulLongPasses'])
+                    defensive_duels_won_percent     = process_mssql_number(advanced_stats['percent']['defensiveDuelsWon'])
+                    offensive_duels_won_percent     = process_mssql_number(advanced_stats['percent']['offensiveDuelsWon'])
+                    xg_shot                         = process_mssql_number(advanced_stats['total']['xgShot'])
+                    shots                           = process_mssql_number(advanced_stats['total']['shots'])
+                    shots_on_target                 = process_mssql_number(advanced_stats['total']['shotsOnTarget'])
+                    shot_assists                    = process_mssql_number(advanced_stats['total']['shotAssists'])
+                    progressive_run                 = process_mssql_number(advanced_stats['total']['progressiveRun'])
+                    successful_passes               = process_mssql_number(advanced_stats['total']['successfulPasses'])
+                    successful_crosses              = process_mssql_number(advanced_stats['total']['successfulCrosses'])
+                    successful_forward_passes       = process_mssql_number(advanced_stats['total']['successfulForwardPasses'])
+                    successful_key_passes           = process_mssql_number(advanced_stats['total']['successfulKeyPasses'])
+                    successful_long_passes          = process_mssql_number(advanced_stats['total']['successfulLongPasses'])
+                    successful_progressive_passes   = process_mssql_number(advanced_stats['total']['successfulProgressivePasses'])
+                    aerial_duels_won                = process_mssql_number(advanced_stats['total']['aerialDuelsWon'])
+                    defensive_duels_won             = process_mssql_number(advanced_stats['total']['defensiveDuelsWon'])
+                    offensive_duels_won             = process_mssql_number(advanced_stats['total']['offensiveDuelsWon'])
+                    successful_dribbles             = process_mssql_number(advanced_stats['total']['successfulDribbles'])
+                    recoveries                      = process_mssql_number(advanced_stats['total']['recoveries'])
+                    opponent_half_recoveries        = process_mssql_number(advanced_stats['total']['opponentHalfRecoveries'])
+                    losses                          = process_mssql_number(advanced_stats['total']['losses'])
+                    own_half_losses                 = process_mssql_number(advanced_stats['total']['ownHalfLosses'])
+                    interceptions                   = process_mssql_number(advanced_stats['total']['interceptions'])
+                    touch_in_box                    = process_mssql_number(advanced_stats['total']['touchInBox'])
+
+                values = f'''SELECT {wyId}, idteam_competition_season, {appearances},{goal},{minutesPlayed},\
+                            {penalties},{redCards},{shirtNumber},{substituteIn},{substituteOnBench},\
+                            {substituteOut},{yellowCard},{team},{season},{aerial_duels_won_percent},\
+                            {successful_dribbles_percent},{successful_crosses_percent},{successful_passes_percent},\
+                            {successful_long_passes_percent},{defensive_duels_won_percent},\
+                            {offensive_duels_won_percent},{xg_shot},{shots},{shots_on_target},{shot_assists},\
+                            {progressive_run},{successful_passes},{successful_crosses},{successful_forward_passes},\
+                            {successful_key_passes},{successful_long_passes},{successful_progressive_passes},\
+                            {aerial_duels_won},{defensive_duels_won},{offensive_duels_won},{successful_dribbles},\
+                            {recoveries},{opponent_half_recoveries},{losses},{own_half_losses},{interceptions},\
+                            {touch_in_box}
+                            FROM "scouting"."team_competition_season" 
+                            WHERE "team"={team} AND "competition_season"={season} '''
+                career_entry_values_file.write(values)
+                career_entry_values_file.write(file_delimiter)
+
 
         pbar_players.update(1)
     player_values_file.close()
@@ -1459,16 +1527,16 @@ def get_full_info(db_handler:Db_handler):
 
             # populate seasons
             seasons_id = [s for c in competitions_info for s in c['seasons']]
-            populate_competitions_seasons(db_handler,seasons_id)
+            #populate_competitions_seasons(db_handler,seasons_id)
 
             s_i = 1
             # populate teams, players, matches and stats
             for s_id in seasons_id:
                 print(f'Extracting info from season {s_id} | {s_i}/{len(seasons_id)}')
-                populate_teams(db_handler,s_id)
+                #populate_teams(db_handler,s_id)
                 populate_players(db_handler,s_id,player_advanced_stats=True)
-                populate_competition_season_extra_info(db_handler,s_id)
-                populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
+                #populate_competition_season_extra_info(db_handler,s_id)
+                #populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
 
     else:
@@ -1477,7 +1545,11 @@ def get_full_info(db_handler:Db_handler):
 
 def main(args,db_handler:Db_handler):
     '''Main function'''
+    global working_hour_threads
 
+    # overwrite working hour threads reduction
+    if args.max_threads:
+        working_hour_threads = 10
 
     # get full info
     if args.update:
