@@ -639,6 +639,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                 own_half_losses                 = 0
                 interceptions                   = 0
                 touch_in_box                    = 0
+                received_pass                   = 0
 
                 advanced_stats = get_player_advanced_stats(player['wyId'],competition,season)
                 if advanced_stats:
@@ -697,6 +698,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                     own_half_losses                 = process_mssql_number(advanced_stats['total']['ownHalfLosses'])
                     interceptions                   = process_mssql_number(advanced_stats['total']['interceptions'])
                     touch_in_box                    = process_mssql_number(advanced_stats['total']['touchInBox'])
+                    received_pass                   = process_mssql_number(advanced_stats['total']['receivedPass'])
 
                 values = f'''SELECT {wyId}, idteam_competition_season, {appearances},{goal},{minutesPlayed},\
                             {penalties},{redCards},{shirtNumber},{substituteIn},{substituteOnBench},\
@@ -708,7 +710,7 @@ def prepare_players_insert(players,season_id,player_advanced_stats:bool=False):
                             {successful_key_passes},{successful_long_passes},{successful_progressive_passes},\
                             {aerial_duels_won},{defensive_duels_won},{offensive_duels_won},{successful_dribbles},\
                             {recoveries},{opponent_half_recoveries},{losses},{own_half_losses},{interceptions},\
-                            {touch_in_box}
+                            {touch_in_box},{received_pass}
                             FROM "scouting"."team_competition_season" 
                             WHERE "team"={team} AND "competition_season"={season} '''
                 career_entry_values_file.write(values)

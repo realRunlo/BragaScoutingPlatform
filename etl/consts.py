@@ -58,7 +58,7 @@ career_entry_parameters     = ['player','team_competition_season','appearances',
                                'successful_key_passes','successful_long_passes','successful_progressive_passes',
                                'aerial_duels_won','defensive_duels_won','offensive_duels_won',
                                'successful_dribbles','recoveries','opponent_half_recoveries','losses',
-                               'own_half_losses','interceptions','touch_in_box']
+                               'own_half_losses','interceptions','touch_in_box','received_pass']
 
 player_positions_key_parameters = ['player','code','team_competition_season']
 player_positions_parameters     = ['player','percent','code','name','team_competition_season']
