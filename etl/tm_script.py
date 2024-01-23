@@ -13,6 +13,7 @@ from datetime import date
 import time
 from requests.exceptions import ChunkedEncodingError
 import sys
+import consts
 
 
 max_retries = 30
@@ -128,32 +129,35 @@ def scrap_official_name(tm_id):
 
 def scrap_players(tm_id,season):
     players = {}
-    url = f"https://www.transfermarkt.com/club/kader/verein/{tm_id}/saison_id/{season}"
-    pageTree = requests.get(url, headers=headers)
-    pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
-    #Scrapping all team names
-    table = pageSoup.find("table", {"class" : "items"})
-    tbody = table.find("tbody")
-    trs_odd = tbody.find_all("tr", {"class" : "odd"})
-    trs_even = tbody.find_all("tr", {"class" : "even"})
-    for tr in trs_odd + trs_even:
-        number = tr.find("div",{"class" : "rn_nummer"}).text
-        table_inline = tr.find("table",{"class":"inline-table"})
-        td_name = table_inline.find("td",{"class":"hauptlink"})
-        name = td_name.text.strip()
-        p_tm_id = extract_p_tm_id(td_name.find("a")['href'])
-        marketvalue = tr.find("td",{"class" : "rechts hauptlink"}).text.strip()
-        
-        tds = tr.find_all("td",{"class" : "zentriert"})[1:3]
-        age = tds[0].text
-        nat = tds[1].find("img")['title']
-        players[name] = {
-            "number" :number,
-            "market_value" : treat_market_value(marketvalue),
-            "age" : age,
-            "nat" : nat,
-            "tm_id" : p_tm_id,
-        }
+    try:
+        url = f"https://www.transfermarkt.com/club/kader/verein/{tm_id}/saison_id/{season}"
+        pageTree = requests.get(url, headers=headers)
+        pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
+        #Scrapping all team names
+        table = pageSoup.find("table", {"class" : "items"})
+        tbody = table.find("tbody")
+        trs_odd = tbody.find_all("tr", {"class" : "odd"})
+        trs_even = tbody.find_all("tr", {"class" : "even"})
+        for tr in trs_odd + trs_even:
+            number = tr.find("div",{"class" : "rn_nummer"}).text
+            table_inline = tr.find("table",{"class":"inline-table"})
+            td_name = table_inline.find("td",{"class":"hauptlink"})
+            name = td_name.text.strip()
+            p_tm_id = extract_p_tm_id(td_name.find("a")['href'])
+            marketvalue = tr.find("td",{"class" : "rechts hauptlink"}).text.strip()
+            
+            tds = tr.find_all("td",{"class" : "zentriert"})[1:3]
+            age = tds[0].text
+            nat = tds[1].find("img")['title']
+            players[name] = {
+                "number" :number,
+                "market_value" : treat_market_value(marketvalue),
+                "age" : age,
+                "nat" : nat,
+                "tm_id" : p_tm_id,
+            }
+    except:
+        print("Error scraping players")
     return players
 
 def scrap_teams_info(teams, season):
@@ -254,16 +258,19 @@ def test_players_selected(players_selected : list, assigned_players : list, play
         if id in assigned_players or player_age != get_age(birth_date):
             players_selected.remove(player_select)
 
-def db_update_tmvalue(player_market_value, player_id):
-    db_handler.update("player", ["tm_market_value","tm_market_value_currency","tm_scrap"], [player_market_value,"'EUR'","'1'"], f"WHERE idplayer = {player_id}", log=False)
+def create_update_tmvalue(player_market_value, player_id):
+    '''Create insert query to update market value'''
+    return (player_id,f"({player_id},{player_market_value},'{'EUR'}','{'1'}')")
 
 def update_market_value(players_selected : list, assigned_players : list, player_market_value : int, player_name : str):
+    '''Update market value based on similarity between target player and candidate players''' 
+    update_player = None
     if(len(players_selected) == 1):
         #Dar update do valor de mercado
         assigned_players.append(players_selected[0][0])
-        db_update_tmvalue(player_market_value,players_selected[0][0])
+        update_player = create_update_tmvalue(player_market_value,players_selected[0][0])
         print(f"{player_name} updated!")
-        return True
+        return update_player
     elif(len(players_selected) > 0):
         #Comparar e ver qual deles é o real
         max_similarity = 0
@@ -275,7 +282,7 @@ def update_market_value(players_selected : list, assigned_players : list, player
                 found = True
                 #Dar update do valor de mercado
                 assigned_players.append(id)
-                db_update_tmvalue(player_market_value,id)
+                update_player = create_update_tmvalue(player_market_value,id)
                 print(f"{player_name} updated!")
                 break
             elif actual_similarity > max_similarity:
@@ -284,22 +291,24 @@ def update_market_value(players_selected : list, assigned_players : list, player
             #Escolher o com maior similiradidade de short name
             #Dar update do valor de mercado
             assigned_players.append(actual_id)
-            db_update_tmvalue(player_market_value,actual_id)
+            update_player = create_update_tmvalue(player_market_value,actual_id)
             print(f"{player_name} updated!")
-        return True
+        return update_player
     else:
-        return False
+        return update_player
 
-def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
+def main(db_handler: Db_handler, cn : bool, n_seasons : int, log_file : str = None):
     start_time = time.time()
     #geting tm code of all competitions in bd
     comp_codes = db_handler.select("competition","idcompetitions,custom_name", log=False)
     #print(comp_codes)
     if log_file:
         not_found_players_file = open(log_file,"w+")
-
-
+    i = 0
     for (comp_id,comp_code) in comp_codes:
+        i += 1
+        print(f'Scrapping {comp_code} - {i}/{len(comp_codes)}')
+
         select_competitions_seasons = db_handler.select("competition_season","*", f'where "competition" = {comp_id} order by "competition_season"."startDate" desc limit {n_seasons}',log=False)
         competitions_seasons  = [(id, startDate.year) for (id,comp,startDate,endDate,name) in select_competitions_seasons] if select_competitions_seasons else None
         if not competitions_seasons:
@@ -313,17 +322,6 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
         if len(teams) == 0:
             continue
         comp_info = scrap_teams_info(teams,season)
-
-        #Loading from json
-        #comp_info = json.load(open(f"test_{comp_code}.json"))
-
-
-        #Serializing json   
-        #json_object = json.dumps(comp_info, indent = 4)  
-        #f = open(f"test_{comp_code}.json", "w")
-        #f.write(json_object)
-        #f.close()
-        #return
 
         if comp_info is None:
             continue
@@ -438,7 +436,9 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
                             comp_info[actual_match]["bd_name"] = bd_team_name
                             queue.remove(team_id)
                 next_queue = list(queue)
-                
+            
+            update_values = []
+            checked_players = {}
             for tm_team_name,tm_team_info in comp_info.items():
                 players = tm_team_info['players']
                 if('id' not in tm_team_info):
@@ -452,17 +452,28 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
                     #try to find player by short_name
                     players_selected = find_player_by_short_name(player_name,current_team)
                     test_players_selected(players_selected, assigned_players, player_age)
-                    if not update_market_value(players_selected, assigned_players, player_market_value, player_name):
+                    update_value = update_market_value(players_selected, assigned_players, player_market_value, player_name)
+                    if not update_value:
                         #Se nao encontrou então procurar pelo nome completo
                         players_selected = find_player_by_name(player_name,current_team)
                         test_players_selected(players_selected, assigned_players, player_age)
-                        if not update_market_value(players_selected, assigned_players, player_market_value, player_name):
+                        update_value = update_market_value(players_selected, assigned_players, player_market_value, player_name)
+                        if not update_value:
                             if cn:
                                 players_selected = find_player_by_complete_name(player_info['tm_id'],current_team)
-                                if not update_market_value(players_selected, assigned_players, player_market_value, player_name) and log_file:
+                                update_value = update_market_value(players_selected, assigned_players, player_market_value, player_name)
+                                if not update_value and log_file:
                                     not_found_players_file.write(f"{player_name} not found with club {tm_team_name}\n")
                             elif log_file:
                                     not_found_players_file.write(f"{player_name} not found with club {tm_team_name}\n")
+
+                    if update_value and update_value[0] not in checked_players:
+                        update_values.append(update_value[1])
+                        checked_players[update_value[0]] = True
+            # insert values
+            db_handler.insert_or_update_many('player',update_values,key_parameters=consts.player_key_parameters,
+                                             parameters=['idplayer',"tm_market_value","tm_market_value_currency","tm_scrap"],update=True)
+
     print(f'Finished in {time.time()-start_time} seconds')
 
 if __name__ == '__main__':
