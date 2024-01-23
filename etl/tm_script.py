@@ -22,10 +22,10 @@ other_error_time_sleep = 60
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs=1,required=True                                , help='Db config json file path')
-    parser.add_argument('--complete_name','-cn'         ,action='store_true'                                            , help='Request complete name of player' )
-    parser.add_argument('--last_seasons','-ls'          ,type=int, nargs=1                                              , help='Request how many seasons')
-    parser.add_argument('--log_not_found_players','-lnfp',type=str, nargs=1                                             , help='Log to file not found players')
+    parser.add_argument('--db_config','-dbc'             ,type=str, nargs="?",const='config/db_cred.json',required=True  , help='Db config json file path')
+    parser.add_argument('--complete_name','-cn'          ,action='store_true'                                            , help='Request complete name of player' )
+    parser.add_argument('--last_seasons','-ls'           ,type=int, nargs=1                                              , help='Request how many seasons')
+    parser.add_argument('--log_not_found_players','-lnfp',type=str, nargs=1                                              , help='Log to file not found players')
     return parser.parse_args()
 
 today = date.today()
@@ -295,7 +295,6 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
     #geting tm code of all competitions in bd
     comp_codes = db_handler.select("competition","idcompetitions,custom_name", log=False)
     #print(comp_codes)
-    comp_codes = [(705, 'PO2')]
     if log_file:
         not_found_players_file = open(log_file,"w+")
 
@@ -303,6 +302,8 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
     for (comp_id,comp_code) in comp_codes:
         select_competitions_seasons = db_handler.select("competition_season","*", f'where "competition" = {comp_id} order by "competition_season"."startDate" desc limit {n_seasons}',log=False)
         competitions_seasons  = [(id, startDate.year) for (id,comp,startDate,endDate,name) in select_competitions_seasons] if select_competitions_seasons else None
+        if not competitions_seasons:
+            continue
         #Scrapping comp_info
         teams = []
         for _,season in competitions_seasons:
@@ -466,9 +467,9 @@ def main(db_handler, cn : bool, n_seasons : int, log_file : str = None):
 
 if __name__ == '__main__':
     args = parse_arguments()
-    if args.db_config[0].endswith('.json'):
+    if args.db_config.endswith('.json'):
         current_folder = os.path.dirname(__file__)
-        db_config_path = f'{current_folder}/{args.db_config[0]}'
+        db_config_path = f'{current_folder}/{args.db_config}'
         logging.basicConfig(level=logging.INFO)
         db_logger = logging.getLogger('db_logger')
         db_handler = Db_handler(config_json=db_config_path,logger=db_logger)

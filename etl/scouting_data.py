@@ -30,24 +30,25 @@ pbar_matches.desc = 'Matches'
 
             
 def last_update():
+    '''Get last update date'''
     format = '%Y-%m-%d %H:%M:%S'
     today_time = datetime.now()
     today = datetime.strftime(today_time, format)
-    last_update = None
+    last_update = 'full'
     if os.path.exists("last_update.txt"):
         file = open("last_update.txt","r")
         last_update = file.readline()
         file.close()
     
-    if last_update != None:
+    # check amount of days between last update and today
+    ## if more than 3 days, force full update
+    if last_update != 'full':
         last_update = datetime.strptime(last_update, format)
-        if today_time - last_update > timedelta(5):
-            last_update = None
+        if today_time - last_update > timedelta(3):
+            last_update = 'full'
 
     file = open("last_update.txt","w+")
     file.write(today)
-    #yesterday = datetime.now() - timedelta(1)
-    #yesterday = datetime.strftime(yesterday, format)
     return last_update
 
 def parse_arguments():
@@ -1496,20 +1497,25 @@ def populate_competition_season_extra_info(db_handler:Db_handler,season_id:int):
 
 def get_update_info(db_handler:Db_handler):
     date = args.update
+    print('Updating data...')
+    if date != 'full':
+        print('Getting since date:',date)
+    else:
+        print('Getting all data')
     
     #get current seasons
     seasons = db_handler.select('current_seasons','*',log=True)
-    seasons = [season for (season,) in seasons] if seasons and len(seasons) > 0 else []
+    seasons = [season[0] for season in seasons] if seasons and len(seasons) > 0 else []
 
     for season in seasons:
         populate_teams(db_handler,season)
         populate_players(db_handler,season,player_advanced_stats=True)
         populate_competition_season_extra_info(db_handler,season)
-        if date == None:
+        if date == 'full':
             populate_matches(db_handler,season_id=season,player_advanced_stats=True)
 
     #update matches by date
-    if date != None:
+    if date != 'full':
         populate_matches(db_handler,date=date,player_advanced_stats=True)
 
 
