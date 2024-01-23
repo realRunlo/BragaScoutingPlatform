@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="UTF-8"?><Diagram version="1.0" type="POSTGRES" versionMajor="12" versionMinor="16" groupSchema="false" hide_inv="false">
+    <Table id="0" name="area" schema="scouting" database="scouting" background="16777165">
+        <Column id="1" name="idareas" type="integer" length="0" nulls="false"/>
+        <Column id="2" name="name" type="text" length="0" nulls="true"/>
+        <Column id="3" name="alpha3code" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="4" name="career_entry" schema="scouting" database="scouting" background="16777165">
+        <Column id="5" name="player" type="integer" length="0" nulls="false"/>
+        <Column id="6" name="team_competition_season" type="integer" length="0" nulls="false"/>
+        <Column id="7" name="appearances" type="integer" length="0" nulls="true"/>
+        <Column id="8" name="goal" type="integer" length="0" nulls="true"/>
+        <Column id="9" name="minutesPlayed" type="integer" length="0" nulls="true"/>
+        <Column id="10" name="penalties" type="integer" length="0" nulls="true"/>
+        <Column id="11" name="redCards" type="integer" length="0" nulls="true"/>
+        <Column id="12" name="shirtNumber" type="integer" length="0" nulls="true"/>
+        <Column id="13" name="substituteIn" type="integer" length="0" nulls="true"/>
+        <Column id="14" name="substituteOnBench" type="integer" length="0" nulls="true"/>
+        <Column id="15" name="substituteOut" type="integer" length="0" nulls="true"/>
+        <Column id="16" name="yellowCard" type="integer" length="0" nulls="true"/>
+        <Column id="17" name="team" type="integer" length="0" nulls="true"/>
+        <Column id="18" name="competition_season" type="integer" length="0" nulls="true"/>
+        <Column id="19" name="position_name" type="text" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">'undefined'::text</CP>
+        </Column>
+        <Column id="20" name="position_code" type="text" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">'-'::text</CP>
+        </Column>
+        <Column id="21" name="position_percent" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="22" name="competition" schema="scouting" database="scouting" background="16777165">
+        <Column id="23" name="idcompetitions" type="integer" length="0" nulls="false"/>
+        <Column id="24" name="name" type="text" length="0" nulls="true"/>
+        <Column id="25" name="area" type="integer" length="0" nulls="true"/>
+        <Column id="26" name="gender" type="text" length="0" nulls="true"/>
+        <Column id="27" name="type" type="text" length="0" nulls="true"/>
+        <Column id="28" name="format" type="text" length="0" nulls="true"/>
+        <Column id="29" name="divisionLevel" type="integer" length="0" nulls="true"/>
+        <Column id="30" name="category" type="text" length="0" nulls="true"/>
+        <Column id="31" name="custom_name" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="32" name="competition_season" schema="scouting" database="scouting" background="16777165">
+        <Column id="33" name="idcompetition_season" type="integer" length="0" nulls="false"/>
+        <Column id="34" name="competition" type="integer" length="0" nulls="true"/>
+        <Column id="35" name="startDate" type="date" length="0" nulls="true"/>
+        <Column id="36" name="endDate" type="date" length="0" nulls="true"/>
+        <Column id="37" name="name" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="38" name="competition_season_assistman" schema="scouting" database="scouting" background="16777165">
+        <Column id="39" name="competition_season" type="integer" length="0" nulls="false"/>
+        <Column id="40" name="player" type="integer" length="0" nulls="false"/>
+        <Column id="41" name="team" type="integer" length="0" nulls="false"/>
+        <Column id="42" name="assists" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="43" name="competition_season_round" schema="scouting" database="scouting" background="16777165">
+        <Column id="44" name="idcompetition_season_round" type="integer" length="0" nulls="false"/>
+        <Column id="45" name="competition_season" type="integer" length="0" nulls="true"/>
+        <Column id="46" name="startDate" type="date" length="0" nulls="true"/>
+        <Column id="47" name="endDate" type="date" length="0" nulls="true"/>
+        <Column id="48" name="name" type="text" length="0" nulls="true"/>
+        <Column id="49" name="type" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="50" name="competition_season_round_group" schema="scouting" database="scouting" background="16777165">
+        <Column id="51" name="idgroup" type="integer" length="0" nulls="false"/>
+        <Column id="52" name="competition_season_round" type="integer" length="0" nulls="true"/>
+        <Column id="53" name="group_name" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="54" name="competition_season_scorer" schema="scouting" database="scouting" background="16777165">
+        <Column id="55" name="competition_season" type="integer" length="0" nulls="false"/>
+        <Column id="56" name="player" type="integer" length="0" nulls="false"/>
+        <Column id="57" name="team" type="integer" length="0" nulls="false"/>
+        <Column id="58" name="goals" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="59" name="match" schema="scouting" database="scouting" background="16777165">
+        <Column id="60" name="idmatch" type="integer" length="0" nulls="false"/>
+        <Column id="61" name="competition_season" type="integer" length="0" nulls="true"/>
+        <Column id="62" name="home_team" type="integer" length="0" nulls="true"/>
+        <Column id="63" name="away_team" type="integer" length="0" nulls="true"/>
+        <Column id="64" name="date" type="date" length="0" nulls="true"/>
+        <Column id="65" name="home_score" type="integer" length="0" nulls="true"/>
+        <Column id="66" name="away_score" type="integer" length="0" nulls="true"/>
+        <Column id="67" name="winner" type="integer" length="0" nulls="true"/>
+        <Column id="68" name="round" type="integer" length="0" nulls="true"/>
+        <Column id="69" name="group" type="integer" length="0" nulls="true"/>
+        <Column id="70" name="duration" type="text" length="0" nulls="true"/>
+        <Column id="71" name="home_score_et" type="integer" length="0" nulls="true"/>
+        <Column id="72" name="home_score_ht" type="integer" length="0" nulls="true"/>
+        <Column id="73" name="home_score_p" type="integer" length="0" nulls="true"/>
+        <Column id="74" name="away_score_et" type="integer" length="0" nulls="true"/>
+        <Column id="75" name="away_score_ht" type="integer" length="0" nulls="true"/>
+        <Column id="76" name="away_score_p" type="integer" length="0" nulls="true"/>
+        <Column id="77" name="home_shots" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="78" name="away_shots" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="79" name="home_shotsOnTarget" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="80" name="away_shotsOnTarget" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="81" name="home_xg" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="82" name="away_xg" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="83" name="home_attacks_total" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="84" name="away_attacks_total" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="85" name="home_corners" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="86" name="away_corners" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="87" name="home_possessionPercent" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="88" name="away_possessionPercent" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="89" name="home_fouls" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="90" name="away_fouls" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="91" name="home_pass_successful_percent" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="92" name="away_pass_successful_percent" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="93" name="home_vertical_pass_successful_percent" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="94" name="away_vertical_pass_successful_percent" type="real" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="95" name="home_offsides" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="96" name="away_offsides" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="97" name="home_clearances" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="98" name="away_clearances" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="99" name="home_interceptions" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="100" name="away_interceptions" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="101" name="home_tackles" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="102" name="away_tackles" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="103" name="away_clean_sheet" type="bit" length="1" nulls="true"/>
+        <Column id="104" name="home_clean_sheet" type="bit" length="1" nulls="true"/>
+        <Column id="105" name="1st_period_end" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">45</CP>
+        </Column>
+        <Column id="106" name="2nd_period_end" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">90</CP>
+        </Column>
+        <Column id="107" name="ex_period_end" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">120</CP>
+        </Column>
+    </Table>
+    <Table id="108" name="match_event_carry" schema="scouting" database="scouting" background="16777165">
+        <Column id="109" name="idmatch_event" type="integer" length="0" nulls="false"/>
+        <Column id="110" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="111" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="112" name="matchPeriod" type="text" length="0" nulls="true"/>
+        <Column id="113" name="location_x" type="integer" length="0" nulls="true"/>
+        <Column id="114" name="location_y" type="integer" length="0" nulls="true"/>
+        <Column id="115" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="116" name="second" type="integer" length="0" nulls="true"/>
+        <Column id="117" name="endlocation_x" type="integer" length="0" nulls="true"/>
+        <Column id="118" name="endlocation_y" type="integer" length="0" nulls="true"/>
+        <Column id="119" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="120" name="match_event_infraction" schema="scouting" database="scouting" background="16777165">
+        <Column id="121" name="idmatch_event" type="integer" length="0" nulls="false"/>
+        <Column id="122" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="123" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="124" name="matchPeriod" type="text" length="0" nulls="true"/>
+        <Column id="125" name="location_x" type="integer" length="0" nulls="true"/>
+        <Column id="126" name="location_y" type="integer" length="0" nulls="true"/>
+        <Column id="127" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="128" name="second" type="integer" length="0" nulls="true"/>
+        <Column id="129" name="yellowCard" type="integer" length="0" nulls="true"/>
+        <Column id="130" name="redCard" type="integer" length="0" nulls="true"/>
+        <Column id="131" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="132" name="match_event_other" schema="scouting" database="scouting" background="16777165">
+        <Column id="133" name="idmatch_event" type="integer" length="0" nulls="false"/>
+        <Column id="134" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="135" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="136" name="matchPeriod" type="text" length="0" nulls="true"/>
+        <Column id="137" name="location_x" type="integer" length="0" nulls="true"/>
+        <Column id="138" name="location_y" type="integer" length="0" nulls="true"/>
+        <Column id="139" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="140" name="second" type="integer" length="0" nulls="true"/>
+        <Column id="141" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="142" name="match_event_pass" schema="scouting" database="scouting" background="16777165">
+        <Column id="143" name="idmatch_event" type="integer" length="0" nulls="false"/>
+        <Column id="144" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="145" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="146" name="matchPeriod" type="text" length="0" nulls="true"/>
+        <Column id="147" name="location_x" type="integer" length="0" nulls="true"/>
+        <Column id="148" name="location_y" type="integer" length="0" nulls="true"/>
+        <Column id="149" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="150" name="second" type="integer" length="0" nulls="true"/>
+        <Column id="151" name="accurate" type="integer" length="0" nulls="true"/>
+        <Column id="152" name="recipient" type="integer" length="0" nulls="true"/>
+        <Column id="153" name="endlocation_x" type="integer" length="0" nulls="true"/>
+        <Column id="154" name="endlocation_y" type="integer" length="0" nulls="true"/>
+        <Column id="155" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="156" name="match_event_shot" schema="scouting" database="scouting" background="16777165">
+        <Column id="157" name="idmatch_event" type="integer" length="0" nulls="false"/>
+        <Column id="158" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="159" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="160" name="matchPeriod" type="text" length="0" nulls="true"/>
+        <Column id="161" name="location_x" type="integer" length="0" nulls="true"/>
+        <Column id="162" name="location_y" type="integer" length="0" nulls="true"/>
+        <Column id="163" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="164" name="second" type="integer" length="0" nulls="true"/>
+        <Column id="165" name="xg" type="real" length="0" nulls="true"/>
+        <Column id="166" name="postShotXg" type="real" length="0" nulls="true"/>
+        <Column id="167" name="isGoal" type="smallint" length="0" nulls="true"/>
+        <Column id="168" name="onTarget" type="smallint" length="0" nulls="true"/>
+        <Column id="169" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="170" name="match_formation" schema="scouting" database="scouting" background="16777165">
+        <Column id="171" name="match" type="integer" length="0" nulls="false"/>
+        <Column id="172" name="player" type="integer" length="0" nulls="false"/>
+        <Column id="173" name="team" type="integer" length="0" nulls="true"/>
+        <Column id="174" name="assists" type="integer" length="0" nulls="true"/>
+        <Column id="175" name="goals" type="integer" length="0" nulls="true"/>
+        <Column id="176" name="ownGoals" type="integer" length="0" nulls="true"/>
+        <Column id="177" name="redCards" type="integer" length="0" nulls="true"/>
+        <Column id="178" name="yellowCards" type="integer" length="0" nulls="true"/>
+        <Column id="179" name="type" type="text" length="0" nulls="true"/>
+        <Column id="180" name="shirtNumber" type="integer" length="0" nulls="true"/>
+        <Column id="181" name="competition_season" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="182" name="match_goals" schema="scouting" database="scouting" background="16777165">
+        <Column id="183" name="match" type="integer" length="0" nulls="false"/>
+        <Column id="184" name="scorer" type="integer" length="0" nulls="false"/>
+        <Column id="185" name="minute" type="integer" length="0" nulls="false"/>
+        <Column id="186" name="second" type="integer" length="0" nulls="false"/>
+        <Column id="187" name="assistant" type="integer" length="0" nulls="true"/>
+        <Column id="188" name="assist_minute" type="integer" length="0" nulls="true"/>
+        <Column id="189" name="assist_second" type="integer" length="0" nulls="true"/>
+        <Column id="190" name="team" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="191" name="match_lineup" schema="scouting" database="scouting" background="16777165">
+        <Column id="192" name="match" type="integer" length="0" nulls="false"/>
+        <Column id="193" name="team" type="integer" length="0" nulls="false"/>
+        <Column id="194" name="period" type="text" length="0" nulls="false"/>
+        <Column id="195" name="match_lineup_id" type="integer" length="0" nulls="false"/>
+        <Column id="196" name="lineup" type="text" length="0" nulls="true"/>
+        <Column id="197" name="second" type="integer" length="0" nulls="false"/>
+    </Table>
+    <Table id="198" name="match_lineup_player_position" schema="scouting" database="scouting" background="16777165">
+        <Column id="199" name="match_lineup_id" type="integer" length="0" nulls="false"/>
+        <Column id="200" name="player" type="integer" length="0" nulls="false"/>
+        <Column id="201" name="position" type="text" length="0" nulls="false"/>
+    </Table>
+    <Table id="202" name="match_substitution" schema="scouting" database="scouting" background="16777165">
+        <Column id="203" name="match" type="integer" length="0" nulls="false"/>
+        <Column id="204" name="playerIn" type="integer" length="0" nulls="false"/>
+        <Column id="205" name="playerOut" type="integer" length="0" nulls="false"/>
+        <Column id="206" name="team" type="integer" length="0" nulls="true"/>
+        <Column id="207" name="minute" type="integer" length="0" nulls="true"/>
+        <Column id="208" name="playerInImage" type="text" length="0" nulls="true"/>
+        <Column id="209" name="playerOutImage" type="text" length="0" nulls="true"/>
+        <Column id="210" name="teamImage" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="211" name="player" schema="scouting" database="scouting" background="16777165">
+        <Column id="212" name="idplayer" type="integer" length="0" nulls="false"/>
+        <Column id="213" name="name" type="text" length="0" nulls="true"/>
+        <Column id="214" name="short_name" type="text" length="0" nulls="true"/>
+        <Column id="215" name="birth_area" type="integer" length="0" nulls="true"/>
+        <Column id="216" name="birth_date" type="date" length="0" nulls="true"/>
+        <Column id="217" name="passport_area" type="integer" length="0" nulls="true"/>
+        <Column id="218" name="image" type="text" length="0" nulls="true"/>
+        <Column id="219" name="current_team" type="integer" length="0" nulls="true"/>
+        <Column id="220" name="foot" type="text" length="0" nulls="true"/>
+        <Column id="221" name="height" type="integer" length="0" nulls="true"/>
+        <Column id="222" name="weight" type="integer" length="0" nulls="true"/>
+        <Column id="223" name="status" type="text" length="0" nulls="true"/>
+        <Column id="224" name="gender" type="text" length="0" nulls="true"/>
+        <Column id="225" name="role_code2" type="text" length="0" nulls="true"/>
+        <Column id="226" name="role_code3" type="text" length="0" nulls="true"/>
+        <Column id="227" name="role_name" type="text" length="0" nulls="true"/>
+        <Column id="228" name="market_value" type="integer" length="0" nulls="true"/>
+        <Column id="229" name="contract_expiration" type="date" length="0" nulls="true"/>
+        <Column id="230" name="contract_agency" type="text" length="0" nulls="true"/>
+        <Column id="231" name="currency" type="text" length="0" nulls="true"/>
+        <Column id="232" name="tm_scrap" type="bit" length="1" nulls="true">
+            <CP name="DEFAULT_VALUE">'0'::"bit"</CP>
+        </Column>
+        <Column id="233" name="tm_market_value" type="integer" length="0" nulls="true"/>
+        <Column id="234" name="tm_market_value_currency" type="text" length="0" nulls="true"/>
+    </Table>
+    <Table id="235" name="player_match_stats" schema="scouting" database="scouting" background="16777165">
+        <Column id="236" name="idplayer_match_stats" type="integer" length="0" nulls="false"/>
+        <Column id="237" name="match" type="integer" length="0" nulls="true"/>
+        <Column id="238" name="player" type="integer" length="0" nulls="true"/>
+        <Column id="239" name="offensiveDuels" type="integer" length="0" nulls="true"/>
+        <Column id="240" name="progressivePasses" type="integer" length="0" nulls="true"/>
+        <Column id="241" name="forwardPasses" type="integer" length="0" nulls="true"/>
+        <Column id="242" name="crosses" type="integer" length="0" nulls="true"/>
+        <Column id="243" name="keyPasses" type="integer" length="0" nulls="true"/>
+        <Column id="244" name="defensiveDuels" type="integer" length="0" nulls="true"/>
+        <Column id="245" name="interceptions" type="integer" length="0" nulls="true"/>
+        <Column id="246" name="recoveries" type="integer" length="0" nulls="true"/>
+        <Column id="247" name="percent_successfulPasses" type="real" length="0" nulls="true"/>
+        <Column id="248" name="longPasses" type="integer" length="0" nulls="true"/>
+        <Column id="249" name="aerialDuels" type="integer" length="0" nulls="true"/>
+        <Column id="250" name="losses" type="integer" length="0" nulls="true"/>
+        <Column id="251" name="ownHalfLosses" type="integer" length="0" nulls="true"/>
+        <Column id="252" name="opponentHalfRecoveries" type="integer" length="0" nulls="true"/>
+        <Column id="253" name="goalKicks" type="integer" length="0" nulls="true"/>
+        <Column id="254" name="receivedPass" type="integer" length="0" nulls="true"/>
+        <Column id="255" name="dribbles" type="integer" length="0" nulls="true"/>
+        <Column id="256" name="touchInBox" type="integer" length="0" nulls="true"/>
+        <Column id="257" name="position" type="text" length="0" nulls="true"/>
+        <Column id="258" name="rating" type="double precision" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">6.0</CP>
+        </Column>
+        <Column id="259" name="team" type="integer" length="0" nulls="true"/>
+        <Column id="260" name="minutes_played" type="integer" length="0" nulls="true">
+            <CP name="DEFAULT_VALUE">0</CP>
+        </Column>
+        <Column id="261" name="passes" type="integer" length="0" nulls="true"/>
+        <Column id="262" name="successfulPasses" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="263" name="player_positions" schema="scouting" database="scouting" background="16777165">
+        <Column id="264" name="percent" type="integer" length="0" nulls="true"/>
+        <Column id="265" name="code" type="text" length="0" nulls="false"/>
+        <Column id="266" name="name" type="text" length="0" nulls="true"/>
+        <Column id="267" name="team_competition_season" type="integer" length="0" nulls="false"/>
+        <Column id="268" name="player" type="integer" length="0" nulls="false"/>
+    </Table>
+    <Table id="269" name="team" schema="scouting" database="scouting" background="16777165">
+        <Column id="270" name="idteam" type="integer" length="0" nulls="false"/>
+        <Column id="271" name="name" type="text" length="0" nulls="true"/>
+        <Column id="272" name="official_name" type="text" length="0" nulls="true"/>
+        <Column id="273" name="icon" type="text" length="0" nulls="true"/>
+        <Column id="274" name="gender" type="text" length="0" nulls="true"/>
+        <Column id="275" name="type" type="text" length="0" nulls="true"/>
+        <Column id="276" name="city" type="text" length="0" nulls="true"/>
+        <Column id="277" name="category" type="text" length="0" nulls="true"/>
+        <Column id="278" name="area" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Table id="279" name="team_competition_season" schema="scouting" database="scouting" background="16777165">
+        <Column id="280" name="idteam_competition_season" type="integer" length="0" nulls="false"/>
+        <Column id="281" name="team" type="integer" length="0" nulls="true"/>
+        <Column id="282" name="competition_season" type="integer" length="0" nulls="true"/>
+        <Column id="283" name="average_passes" type="double precision" length="0" nulls="true"/>
+        <Column id="284" name="total_goals" type="integer" length="0" nulls="true"/>
+        <Column id="285" name="total_conceded_goals" type="integer" length="0" nulls="true"/>
+        <Column id="286" name="total_clean_sheets" type="integer" length="0" nulls="true"/>
+        <Column id="287" name="total_matches" type="integer" length="0" nulls="true"/>
+        <Column id="288" name="xg_shot" type="double precision" length="0" nulls="true"/>
+        <Column id="289" name="xg_shot_against" type="double precision" length="0" nulls="true"/>
+        <Column id="290" name="total_crosses" type="integer" length="0" nulls="true"/>
+        <Column id="291" name="total_through_passes" type="integer" length="0" nulls="true"/>
+        <Column id="292" name="total_fouls" type="integer" length="0" nulls="true"/>
+        <Column id="293" name="total_red_cards" type="integer" length="0" nulls="true"/>
+        <Column id="294" name="total_shots" type="integer" length="0" nulls="true"/>
+        <Column id="295" name="total_shots_against" type="integer" length="0" nulls="true"/>
+        <Column id="296" name="total_yellow_cards" type="integer" length="0" nulls="true"/>
+        <Column id="297" name="total_progressive_run" type="integer" length="0" nulls="true"/>
+        <Column id="298" name="percent_shots_on_target" type="double precision" length="0" nulls="true"/>
+    </Table>
+    <Table id="299" name="team_competition_season_round" schema="scouting" database="scouting" background="16777165">
+        <Column id="300" name="idteam_competition_season_round" type="integer" length="0" nulls="false"/>
+        <Column id="301" name="competition_season_round" type="integer" length="0" nulls="false"/>
+        <Column id="302" name="team" type="integer" length="0" nulls="false"/>
+        <Column id="303" name="group_id" type="integer" length="0" nulls="true"/>
+        <Column id="304" name="totalDraws" type="integer" length="0" nulls="true"/>
+        <Column id="305" name="totalGoalsAgainst" type="integer" length="0" nulls="true"/>
+        <Column id="306" name="totalGoalsFor" type="integer" length="0" nulls="true"/>
+        <Column id="307" name="totalLosses" type="integer" length="0" nulls="true"/>
+        <Column id="308" name="totalPlayed" type="integer" length="0" nulls="true"/>
+        <Column id="309" name="totalPoints" type="integer" length="0" nulls="true"/>
+        <Column id="310" name="totalWins" type="integer" length="0" nulls="true"/>
+        <Column id="311" name="rank" type="integer" length="0" nulls="true"/>
+    </Table>
+    <Relation id="312" name="team_competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>280</FK>
+        <PK>6</PK>
+    </Relation>
+    <Relation id="313" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>5</PK>
+    </Relation>
+    <Relation id="314" name="area" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>1</FK>
+        <PK>25</PK>
+    </Relation>
+    <Relation id="315" name="competition" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>23</FK>
+        <PK>34</PK>
+    </Relation>
+    <Relation id="316" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>41</PK>
+    </Relation>
+    <Relation id="317" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>40</PK>
+    </Relation>
+    <Relation id="318" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>39</PK>
+    </Relation>
+    <Relation id="319" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>45</PK>
+    </Relation>
+    <Relation id="320" name="competition_season_round" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>44</FK>
+        <PK>52</PK>
+    </Relation>
+    <Relation id="321" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>57</PK>
+    </Relation>
+    <Relation id="322" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>56</PK>
+    </Relation>
+    <Relation id="323" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>55</PK>
+    </Relation>
+    <Relation id="324" name="round" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>44</FK>
+        <PK>68</PK>
+    </Relation>
+    <Relation id="325" name="home_team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>62</PK>
+    </Relation>
+    <Relation id="326" name="group" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>51</FK>
+        <PK>69</PK>
+    </Relation>
+    <Relation id="327" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>61</PK>
+    </Relation>
+    <Relation id="328" name="away_team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>63</PK>
+    </Relation>
+    <Relation id="329" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>119</PK>
+    </Relation>
+    <Relation id="330" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>110</PK>
+    </Relation>
+    <Relation id="331" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>131</PK>
+    </Relation>
+    <Relation id="332" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>122</PK>
+    </Relation>
+    <Relation id="333" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>141</PK>
+    </Relation>
+    <Relation id="334" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>134</PK>
+    </Relation>
+    <Relation id="335" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>155</PK>
+    </Relation>
+    <Relation id="336" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>144</PK>
+    </Relation>
+    <Relation id="337" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>169</PK>
+    </Relation>
+    <Relation id="338" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>158</PK>
+    </Relation>
+    <Relation id="339" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>173</PK>
+    </Relation>
+    <Relation id="340" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>172</PK>
+    </Relation>
+    <Relation id="341" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>171</PK>
+    </Relation>
+    <Relation id="342" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>181</PK>
+    </Relation>
+    <Relation id="343" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>190</PK>
+    </Relation>
+    <Relation id="344" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>183</PK>
+    </Relation>
+    <Relation id="345" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>193</PK>
+    </Relation>
+    <Relation id="346" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>192</PK>
+    </Relation>
+    <Relation id="347" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>200</PK>
+    </Relation>
+    <Relation id="348" name="match_lineup" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>195</FK>
+        <PK>199</PK>
+    </Relation>
+    <Relation id="349" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>206</PK>
+    </Relation>
+    <Relation id="350" name="playerOut" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>205</PK>
+    </Relation>
+    <Relation id="351" name="playerIn" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>204</PK>
+    </Relation>
+    <Relation id="352" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>203</PK>
+    </Relation>
+    <Relation id="353" name="passport_area" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>1</FK>
+        <PK>217</PK>
+    </Relation>
+    <Relation id="354" name="birth_area" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>1</FK>
+        <PK>215</PK>
+    </Relation>
+    <Relation id="355" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>259</PK>
+    </Relation>
+    <Relation id="356" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>238</PK>
+    </Relation>
+    <Relation id="357" name="match" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>60</FK>
+        <PK>237</PK>
+    </Relation>
+    <Relation id="358" name="team_competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>280</FK>
+        <PK>267</PK>
+    </Relation>
+    <Relation id="359" name="player" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>212</FK>
+        <PK>268</PK>
+    </Relation>
+    <Relation id="360" name="area" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>1</FK>
+        <PK>278</PK>
+    </Relation>
+    <Relation id="361" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>281</PK>
+    </Relation>
+    <Relation id="362" name="competition_season" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>33</FK>
+        <PK>282</PK>
+    </Relation>
+    <Relation id="363" name="team" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>270</FK>
+        <PK>302</PK>
+    </Relation>
+    <Relation id="364" name="group_id" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>51</FK>
+        <PK>303</PK>
+    </Relation>
+    <Relation id="365" name="competition_season_round" cardinality="-2" identifying="false" nulls="false">
+        <Option name="onDelete" class="String" value="NO ACTION"/>
+        <Option name="deferrable" class="Boolean" value="false"/>
+        <Option name="match" class="String" value="SIMPLE"/>
+        <Option name="initially" class="String" value="IMMEDIATE"/>
+        <Option name="onUpdate" class="String" value="NO ACTION"/>
+        <FK>44</FK>
+        <PK>301</PK>
+    </Relation>
+    <Index table="191" name="match_lineup_id" schema="scouting" database="scouting">
+        <Option name="unique" class="Boolean" value="true"/>
+        <IndexColumn id="195" sequence="0" ascending="true"/>
+    </Index>
+    <Index table="235" name="player_match" schema="scouting" database="scouting">
+        <Option name="unique" class="Boolean" value="true"/>
+        <IndexColumn id="238" sequence="0" ascending="true"/>
+        <IndexColumn id="237" sequence="1" ascending="true"/>
+    </Index>
+    <Index table="279" name="team_competition_season_unique" schema="scouting" database="scouting">
+        <Option name="unique" class="Boolean" value="true"/>
+        <IndexColumn id="281" sequence="0" ascending="true"/>
+        <IndexColumn id="282" sequence="1" ascending="true"/>
+    </Index>
+    <Constraint table="0" name="area_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="1"/>
+    </Constraint>
+    <Constraint table="4" name="career_entry_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="5"/>
+        <ConstraintColumn id="6"/>
+    </Constraint>
+    <Constraint table="22" name="competition_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="23"/>
+    </Constraint>
+    <Constraint table="32" name="competition_season_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="33"/>
+    </Constraint>
+    <Constraint table="38" name="competition_season_assistman_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="39"/>
+        <ConstraintColumn id="40"/>
+        <ConstraintColumn id="41"/>
+    </Constraint>
+    <Constraint table="43" name="competition_season_round_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="44"/>
+    </Constraint>
+    <Constraint table="50" name="competition_season_round_group_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="51"/>
+    </Constraint>
+    <Constraint table="54" name="competition_season_scorer_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="55"/>
+        <ConstraintColumn id="56"/>
+        <ConstraintColumn id="57"/>
+    </Constraint>
+    <Constraint table="59" name="match_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="60"/>
+    </Constraint>
+    <Constraint table="108" name="match_event_carry_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="109"/>
+    </Constraint>
+    <Constraint table="120" name="match_event_infraction_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="121"/>
+    </Constraint>
+    <Constraint table="132" name="match_event_other_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="133"/>
+    </Constraint>
+    <Constraint table="142" name="match_event_pass_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="143"/>
+    </Constraint>
+    <Constraint table="156" name="match_event_shot_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="157"/>
+    </Constraint>
+    <Constraint table="170" name="match_formation_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="171"/>
+        <ConstraintColumn id="172"/>
+    </Constraint>
+    <Constraint table="182" name="match_goals_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="183"/>
+        <ConstraintColumn id="184"/>
+        <ConstraintColumn id="185"/>
+        <ConstraintColumn id="186"/>
+    </Constraint>
+    <Constraint table="191" name="match_lineup_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="192"/>
+        <ConstraintColumn id="193"/>
+        <ConstraintColumn id="194"/>
+        <ConstraintColumn id="197"/>
+    </Constraint>
+    <Constraint table="191" name="match_lineup_id" type="Unique">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="195"/>
+    </Constraint>
+    <Constraint table="198" name="match_lineup_player_position_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="199"/>
+        <ConstraintColumn id="200"/>
+    </Constraint>
+    <Constraint table="202" name="match_substitution_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="203"/>
+        <ConstraintColumn id="204"/>
+        <ConstraintColumn id="205"/>
+    </Constraint>
+    <Constraint table="211" name="player_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="212"/>
+    </Constraint>
+    <Constraint table="235" name="player_match_stats_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="236"/>
+    </Constraint>
+    <Constraint table="235" name="player_match" type="Unique">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="238"/>
+        <ConstraintColumn id="237"/>
+    </Constraint>
+    <Constraint table="263" name="player_positions_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="265"/>
+        <ConstraintColumn id="268"/>
+        <ConstraintColumn id="267"/>
+    </Constraint>
+    <Constraint table="269" name="team_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="270"/>
+    </Constraint>
+    <Constraint table="279" name="team_competition_season_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="280"/>
+    </Constraint>
+    <Constraint table="279" name="team_competition_season_unique" type="Unique">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="281"/>
+        <ConstraintColumn id="282"/>
+    </Constraint>
+    <Constraint table="299" name="team_competition_season_round_pkey" type="PrimKey">
+        <Option name="tablespace" class="String" value="&lt;PADRÃO&gt;"/>
+        <ConstraintColumn id="301"/>
+        <ConstraintColumn id="302"/>
+    </Constraint>
+    <Sheet name="braga scouting" id="366" disp_at="true" disp_co="true">
+        <Place id="263" visible="true">1768,605,210,110</Place>
+        <Place id="324" visible="true">500,0,0,0</Place>
+        <Place id="355" visible="true">500,0,0,0</Place>
+        <Place id="54" visible="true">1748,333,180,90</Place>
+        <Place id="313" visible="true">500,0,0,0</Place>
+        <Place id="43" visible="true">2158,189,220,130</Place>
+        <Place id="331" visible="true">500,0,0,0</Place>
+        <Place id="314" visible="true">500,0,0,0</Place>
+        <Place id="318" visible="true">500,0,0,0</Place>
+        <Place id="317" visible="true">500,0,0,0</Place>
+        <Place id="321" visible="true">500,0,0,0</Place>
+        <Place id="347" visible="true">500,0,0,0</Place>
+        <Place id="357" visible="true">500,0,0,0</Place>
+        <Place id="235" visible="true">1030,789,200,480</Place>
+        <Place id="322" visible="true">500,0,0,0</Place>
+        <Place id="364" visible="true">500,0,0,0</Place>
+        <Place id="352" visible="true">500,0,0,0</Place>
+        <Place id="191" visible="true">850,880,160,130</Place>
+        <Place id="338" visible="true">500,0,0,0</Place>
+        <Place id="339" visible="true">500,0,0,0</Place>
+        <Place id="4" visible="true">1767,744,210,310</Place>
+        <Place id="360" visible="true">500,0,0,0</Place>
+        <Place id="350" visible="true">500,0,0,0</Place>
+        <Place id="354" visible="true">500,0,0,0</Place>
+        <Place id="349" visible="true" options="2529.1502974873238,537.9757677938311,130.0,180.0,849.2275429370532,698.7066617535311,140.0,160.0,6,2529.1502974873238,630.0,1967.0,630.0,1967.0,649.0,1500.0,650.0,1500.0,780.0,989.2275429370532,780.0">500,0,0,0</Place>
+        <Place id="312" visible="true" options="2699.78391919126,550.0809973871635,250.0,350.0,1767.9579678814955,744.0295596283396,210.0,310.0,5,2820.0,900.0809973871635,2820.0,1769.0,2228.06862546612,1770.0,2228.06862546612,930.0,1977.9579678814955,930.0">500,0,0,0</Place>
+        <Place id="142" visible="true">849,1025,150,240</Place>
+        <Place id="108" visible="true">670,1050,150,210</Place>
+        <Place id="325" visible="true">500,0,0,0</Place>
+        <Place id="120" visible="true">669,830,150,210</Place>
+        <Place id="22" visible="true">1755,129,150,180</Place>
+        <Place id="334" visible="true">500,0,0,0</Place>
+        <Place id="315" visible="true">500,0,0,0</Place>
+        <Place id="299" visible="true">2416,734,250,230</Place>
+        <Place id="361" visible="true">500,0,0,0</Place>
+        <Place id="335" visible="true" options="2529.1502974873238,537.9757677938311,130.0,180.0,849.6367058655435,1025.8744094841777,150.0,240.0,5,2590.0,717.9757677938311,2590.0,2319.0,1744.9497474683058,2319.0,1744.9497474683058,1150.0,999.6367058655435,1150.0">500,0,0,0</Place>
+        <Place id="32" visible="true">1953,201,180,110</Place>
+        <Place id="326" visible="true" options="2176.162697096763,345.373449553808,220.0,70.0,1263.4709960243658,428.8515882531102,260.0,840.0,12,2310.0,415.373449553808,2310.0,702.6867247769039,2697.5,702.6867247769039,2697.5,1350.3084310015702,4055.5,1350.3084310015702,4055.5,2828.3333333333335,965.2698908139404,2828.3333333333335,966.0,1510.0,1632.0,1510.0,1631.7366430758002,2265.0,1360.0,2265.0,1360.0,1268.85158825311">500,0,0,0</Place>
+        <Place id="330" visible="true">500,0,0,0</Place>
+        <Place id="198" visible="true">1035,704,190,70</Place>
+        <Place id="211" visible="true">2052,640,200,410</Place>
+        <Place id="333" visible="true">500,0,0,0</Place>
+        <Place id="365" visible="true" options="2158.8418459228433,189.06688372975904,220.0,130.0,2416.5871374956837,734.7925207395728,250.0,230.0,6,2220.0,319.06688372975907,2220.0,899.0,1717.0,899.0,1443.0453813665608,900.0,1443.0453813665608,850.0,2416.5871374956837,850.0">500,0,0,0</Place>
+        <Place id="156" visible="true">669,575,150,240</Place>
+        <Place id="332" visible="true">500,0,0,0</Place>
+        <Place id="342" visible="true">500,0,0,0</Place>
+        <Place id="351" visible="true">500,0,0,0</Place>
+        <Place id="341" visible="true">500,0,0,0</Place>
+        <Place id="345" visible="true">500,0,0,0</Place>
+        <Place id="202" visible="true">849,698,140,160</Place>
+        <Place id="362" visible="true">500,0,0,0</Place>
+        <Place id="50" visible="true">2176,345,220,70</Place>
+        <Place id="356" visible="true">500,0,0,0</Place>
+        <Place id="343" visible="true">500,0,0,0</Place>
+        <Place id="323" visible="true">500,0,0,0</Place>
+        <Place id="316" visible="true">500,0,0,0</Place>
+        <Place id="344" visible="true">500,0,0,0</Place>
+        <Place id="348" visible="true">500,0,0,0</Place>
+        <Place id="0" visible="true">1980,50,120,70</Place>
+        <Place id="170" visible="true">1035,486,180,210</Place>
+        <Place id="340" visible="true" options="2052.098565186755,640.1130661365083,200.0,410.0,1035.129075763134,486.50094089016727,180.0,210.0,7,2052.098565186755,860.0,1500.0,860.0,1500.0,2090.0,375.59693372592017,2090.0,375.59693372592017,1752.6652967520945,1110.0,1752.6652967520945,1110.0,696.5009408901673">500,0,0,0</Place>
+        <Place id="358" visible="true">500,0,0,0</Place>
+        <Place id="132" visible="true">849,494,150,180</Place>
+        <Place id="329" visible="true">500,0,0,0</Place>
+        <Place id="336" visible="true">500,0,0,0</Place>
+        <Place id="38" visible="true">1945,334,200,90</Place>
+        <Place id="346" visible="true">500,0,0,0</Place>
+        <Place id="337" visible="true">500,0,0,0</Place>
+        <Place id="279" visible="true">2699,550,250,350</Place>
+        <Place id="59" visible="true">1263,428,260,840</Place>
+        <Place id="327" visible="true">500,0,0,0</Place>
+        <Place id="320" visible="true">500,0,0,0</Place>
+        <Place id="359" visible="true">500,0,0,0</Place>
+        <Place id="319" visible="true">500,0,0,0</Place>
+        <Place id="353" visible="true">500,0,0,0</Place>
+        <Place id="328" visible="true">500,0,0,0</Place>
+        <Place id="182" visible="true">670,406,150,160</Place>
+        <Place id="269" visible="true">2529,537,130,180</Place>
+        <Place id="363" visible="true">500,0,0,0</Place>
+        <Region background="16763080" foreground="0" text="MATCH">610,320,1000,1011</Region>
+        <Region background="13172680" foreground="0" text="PLAYER">1690,519,621,591</Region>
+        <Region background="13172735" foreground="0" text="TEAM">2349,500,641,521</Region>
+        <Region background="16119285" foreground="0" text="COMPETITION">1670,20,801,431</Region>
+    </Sheet>
+    <Settings sheet="366" zoom="0.5946035575013608"/>
+</Diagram>

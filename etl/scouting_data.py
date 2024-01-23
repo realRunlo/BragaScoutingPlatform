@@ -53,7 +53,7 @@ def last_update():
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const=['config/db_cred.json'],required=True,help='Db config json file path')
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const='config/db_cred.json',required=True  ,help='Db config json file path')
     parser.add_argument('--full_info','-fi'             ,type=str, nargs=1                                              ,help="Request all info from API, according to json file provided")
     parser.add_argument('--update'   ,'-u'              ,type=str, nargs="?", const=last_update()                       ,help="Request by updateobjects from API, requeres a date (STR like '2023-11-16 16:00:00')")
     parser.add_argument('--max_threads','-mt'           ,action='store_true'                                            ,help="Activates max threads mode. Use to overwrite working hours thread reduction.")
@@ -1540,6 +1540,7 @@ def get_full_info(db_handler:Db_handler):
                 populate_competition_season_extra_info(db_handler,s_id)
                 populate_matches(db_handler,season_id=s_id,player_advanced_stats=True)
                 s_i += 1
+                
 
     else:
         print('Invalid request file. Please provide a valid .json file.')
@@ -1566,7 +1567,7 @@ def main(args,db_handler:Db_handler):
 if __name__ == '__main__':
     args = parse_arguments()
 
-    if args.db_config[0].endswith('.json'):
+    if args.db_config.endswith('.json'):
         tmp_folder  = f'{current_folder}/tmp'
         file_delimiter = '|;|'
         # data insert tmp folder
@@ -1577,7 +1578,7 @@ if __name__ == '__main__':
             for file in os.listdir(tmp_folder):
                 os.remove(f'{tmp_folder}/{file}')
 
-        db_config_path = f'{current_folder}/{args.db_config[0]}'
+        db_config_path = f'{current_folder}/{args.db_config}'
         db_logger   = None
         main_logger = None
         if args.log:

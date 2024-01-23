@@ -19,16 +19,16 @@ competitions_requests_folder = f'{current_folder}/competitions'
 def parse_arguments():
     '''Define and parse arguments using argparse'''
     parser = argparse.ArgumentParser(description='wyscout API request')
-    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const=['config/db_cred.json'],required=True                , help='Db config json file path')
-    parser.add_argument('--archive_db_config','-adbc'   ,type=str, nargs="?",const=['config/archive_db_config.json']                    , help='Old db config json file path')
-    parser.add_argument('--update_request_files','-urf' ,action='store_true'                                                            , help='Updates the requests files (for the db populating)')
+    parser.add_argument('--db_config','-dbc'            ,type=str, nargs="?",const='config/db_cred.json',required=True                  , help='Db config json file path')
+    parser.add_argument('--archive_db_config','-adbc'   ,type=str, nargs="?",const='config/archive_db_config.json'                      , help='Old db config json file path')
+    parser.add_argument('--update_request_files','-urf' ,action='store_true'                                                            , help='Updates the requests files (for the db populating)\n Files are in the competitions folder inside the etl directory.')
     parser.add_argument('--remove_old_seasons','-ros'   ,action='store_true'                                                            , help='Removes from db deprecated data, making a backup of it in the specified path')
     parser.add_argument('--fast_remove','-fr'           ,action='store_true'                                                            , help='Removes from db deprecated data, disabling temporarily the foreign key checks (risky)')
     parser.add_argument('--log','-l'                    ,action='store_true'                                                            , help='Activate logging, with optional log file path')
     return parser.parse_args()
 
 
-def update_requests_files(db_handler:Db_handler):
+def update_requests_files():
     '''Update competitions requests files 
 
     * for each competition in file, check using api for the latest `3` seasons;
@@ -74,6 +74,11 @@ def update_requests_files(db_handler:Db_handler):
                     # save new file data
                     json.dump(new_file_data,open(f'{competitions_requests_folder}/{request_file}','w'),indent=4)
 
+            # remove last update log
+            ## will force complete populating of these new seasons
+            if os.path.exists(f'{current_folder}/last_update.txt'):
+                os.remove(f'{current_folder}/last_update.txt')
+
         else:
             print(f'No requests files found in {competitions_requests_folder}')
     else:
@@ -115,17 +120,18 @@ def migrate_data_to_archive_db(args:argparse.Namespace,db_handler:Db_handler,sea
         print('Migrating data to archive database')
 
         archive_logger = None
+        archive_db_config_path = f'{current_folder}/{args.archive_db_config}'
         if args.log:
             logging.basicConfig(level=logging.INFO)
             archive_logger = logging.getLogger('archive_logger')
-        archive_db_handler = Db_handler(config_json=args.archive_db_config[0],logger=archive_logger)
+        archive_db_handler = Db_handler(config_json=archive_db_config_path,logger=archive_logger)
         archive_db_handler.create_connection()
 
         # migrate areas (in case they are not in the archive db)
         areas = db_handler.select('area','*',log=True)
         insert_values(archive_db_handler,'area',areas)
 
-        seasons_str = '(' + ','.join([str(s) for s in seasons_to_remove]) + ')' 
+        seasons_str = ','.join([str(s) for s in seasons_to_remove]) 
 
 
         ## get essential data 
@@ -155,6 +161,7 @@ def migrate_data_to_archive_db(args:argparse.Namespace,db_handler:Db_handler,sea
         archive_db_handler.close_connection()
     else:
         print('No archive db config file path specified')
+    sys.exit(1)
 
     
 
@@ -207,13 +214,14 @@ def remove_old_seasons(args:argparse.Namespace,db_handler:Db_handler,fast_remove
 
 
 
+
 def main(args,db_handler:Db_handler):
     '''Main function'''
 
     
     if args.update_request_files:
         print('Updating requests files')
-        update_requests_files(db_handler)
+        update_requests_files()
 
     if args.remove_old_seasons:
         print('Removing old seasons from db')
@@ -225,8 +233,8 @@ def main(args,db_handler:Db_handler):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    if args.db_config[0].endswith('.json'):
-        db_config_path = args.db_config[0]
+    if args.db_config.endswith('.json'):
+        db_config_path = f'{current_folder}/{args.db_config}'
         db_logger = None
         if args.log:
             logging.basicConfig(level=logging.INFO)
