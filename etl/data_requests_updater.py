@@ -23,6 +23,8 @@ def parse_arguments():
     parser.add_argument('--archive_db_config','-adbc'   ,type=str, nargs="?",const='config/archive_db_config.json'                      , help='Old db config json file path')
     parser.add_argument('--update_request_files','-urf' ,action='store_true'                                                            , help='Updates the requests files (for the db populating)\n Files are in the competitions folder inside the etl directory.')
     parser.add_argument('--remove_old_seasons','-ros'   ,action='store_true'                                                            , help='Removes from db deprecated data, making a backup of it in the specified path')
+    parser.add_argument('--remove_season','-rs'         ,type=str, nargs='+'                                                            , help='Removes sepecfific seasons from db')
+    parser.add_argument('--remove_competition','-rc'    ,type=str, nargs='+'                                                            , help='Removes sepecfific competitions from db')
     parser.add_argument('--fast_remove','-fr'           ,action='store_true'                                                            , help='Removes from db deprecated data, disabling temporarily the foreign key checks (risky)')
     parser.add_argument('--log','-l'                    ,action='store_true'                                                            , help='Activate logging, with optional log file path')
     return parser.parse_args()
@@ -85,14 +87,14 @@ def update_requests_files():
         print(f'No competitions folder found in {current_folder}')
 
 
-def insert_values(db_handler:Db_handler,table:str,values:list):
+def insert_values(db_handler:Db_handler,table:str,values:list,batch_size:int=1000):
     '''Insert values in table
     
     * for each value, insert it in table;'''
 
     if values:
-        for batch in range(0,len(values),500):
-            batch_values = values[batch:batch+500]
+        for batch in range(0,len(values),batch_size):
+            batch_values = values[batch:batch+batch_size]
             values_str = ''
             for value in batch_values:
                 # remove generated columns
@@ -130,6 +132,7 @@ def migrate_data_to_archive_db(args:argparse.Namespace,db_handler:Db_handler,sea
         # migrate areas (in case they are not in the archive db)
         areas = db_handler.select('area','*',log=True)
         insert_values(archive_db_handler,'area',areas)
+        
 
         seasons_str = ','.join([str(s) for s in seasons_to_remove]) 
 
@@ -142,7 +145,6 @@ def migrate_data_to_archive_db(args:argparse.Namespace,db_handler:Db_handler,sea
             query = getattr(consts,table + '_data_query').format(replace=seasons_str)
             data = db_handler.execute(query,fetch=True,log=True)
             insert_values(archive_db_handler,table,data)
-
         ## get all other data
         tables = ['competition_season_scorer','competition_season_assistman',
             'team_competition_season','team_competition_season_round',
@@ -156,12 +158,11 @@ def migrate_data_to_archive_db(args:argparse.Namespace,db_handler:Db_handler,sea
             print(f'Processing {table}')
             query = getattr(consts,table + '_data_query').format(replace=seasons_str)
             data = db_handler.execute(query,fetch=True,log=True)
-            insert_values(archive_db_handler,table,data)
+            insert_values(archive_db_handler,table,data,batch_size=2000)
 
         archive_db_handler.close_connection()
     else:
         print('No archive db config file path specified')
-    sys.exit(1)
 
     
 
@@ -190,6 +191,7 @@ def remove_old_seasons(args:argparse.Namespace,db_handler:Db_handler,fast_remove
             seasons_to_remove += [season[0] for season in seasons if season[0] not in [s[0] for s in seasons_sorted]]
     
     print(f'Removing {len(seasons_to_remove)} seasons')
+    seasons_to_remove = [188653]
     print(seasons_to_remove)
     if seasons_to_remove:
         # migrate data to archive database
@@ -213,6 +215,46 @@ def remove_old_seasons(args:argparse.Namespace,db_handler:Db_handler,fast_remove
 
 
 
+def remove_seasons(args:argparse.Namespace,db_handler:Db_handler,seasons:list):
+    '''Remove from db specified seasons'''
+
+    # get query to remove seasons
+    replace_str = ','.join([str(s) for s in seasons])
+    query = open(f'{current_folder}/querys/delete_competition_season.sql','r',encoding='utf-8-sig').read()
+    query = query.replace(r'%replace%',replace_str)
+
+    # if fast remove, disable foreign key checks
+    if args.fast_remove:
+        print('Fast remove - Disabling foreign key checks')
+        query = f'''
+        SET session_replication_role = 'replica';
+        {query}
+        SET session_replication_role = 'origin';
+'''
+    
+    # remove seasons
+    db_handler.execute(query,log=True)
+
+def remove_competitions(args:argparse.Namespace,db_handler:Db_handler):
+    '''Remove from db specified competitions'''
+
+    # get competitions
+    competitions = args.remove_competition
+
+    # get seasons
+    competitions = ','.join([str(c) for c in competitions])
+    seasons = db_handler.select('competition_season','"idcompetition_season"',where=f'where "competition" IN ({competitions})',log=True)
+    seasons = [season[0] for season in seasons]
+    if seasons:
+        # remove seasons
+        print(f'Removing {len(seasons)} seasons')
+        remove_seasons(args,db_handler,seasons)
+
+    # remove competitions
+    print(f'Removing competitions')
+    db_handler.execute(f'DELETE FROM scouting.competition WHERE idcompetitions IN ({competitions})',log=True)
+
+
 
 
 def main(args,db_handler:Db_handler):
@@ -226,6 +268,14 @@ def main(args,db_handler:Db_handler):
     if args.remove_old_seasons:
         print('Removing old seasons from db')
         remove_old_seasons(args,db_handler,args.fast_remove)
+
+    if args.remove_season:
+        print(f'Removing seasons {args.remove_season}')
+        remove_seasons(args,db_handler,args.remove_season)
+
+    if args.remove_competition:
+        print(f'Removing competition {args.remove_competition}')
+        remove_competitions(args,db_handler)
         
 
         
