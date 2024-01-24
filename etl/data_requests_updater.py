@@ -10,11 +10,13 @@ import os
 from db import *
 from api_handler import *
 import consts
+from scouting_data import prepare_competitions_seasons_insert
 
 
 current_folder = os.path.dirname(os.path.abspath(__file__))
 competitions_requests_folder = f'{current_folder}/competitions'
-
+tmp_folder  = f'{current_folder}/tmp'
+file_delimiter = '|;|'
 
 def parse_arguments():
     '''Define and parse arguments using argparse'''
@@ -30,7 +32,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def update_requests_files():
+def update_requests_files(db_handler:Db_handler):
     '''Update competitions requests files 
 
     * for each competition in file, check using api for the latest `3` seasons;
@@ -41,6 +43,7 @@ def update_requests_files():
         requests_files = os.listdir(competitions_requests_folder)
         if requests_files:
             # process each request file
+            added_seasons = []
             for request_file in requests_files:
                 print(f'Processing {request_file}')
                 if request_file.endswith('.json'):
@@ -70,11 +73,21 @@ def update_requests_files():
                                         'start':season[1]['startDate'],
                                         'end':season[1]['endDate']
                                     }
+                                    added_seasons.append(season_data['wyId'])
                                     comeptition_data['seasons'].append(season_data)
                         # add competition to new file data
                         new_file_data['competitions'].append(comeptition_data)
                     # save new file data
                     json.dump(new_file_data,open(f'{competitions_requests_folder}/{request_file}','w'),indent=4)
+
+            print(f'Inserting {len(added_seasons)} seasons into db')
+            # get seasons data
+            result_file = prepare_competitions_seasons_insert(added_seasons)
+            values = open(f'{result_file}','r', encoding="utf-8").read().split(file_delimiter)
+            values = [f'{value}' for value in values if value != '']
+            # insert values
+            db_handler.insert_or_update_many('competition_season',values,consts.competition_season_key_parameters,
+                                             consts.competition_season_parameters,update=True)
 
             # remove last update log
             ## will force complete populating of these new seasons
@@ -263,7 +276,7 @@ def main(args,db_handler:Db_handler):
     
     if args.update_request_files:
         print('Updating requests files')
-        update_requests_files()
+        update_requests_files(db_handler)
 
     if args.remove_old_seasons:
         print('Removing old seasons from db')
@@ -289,6 +302,14 @@ if __name__ == "__main__":
         if args.log:
             logging.basicConfig(level=logging.INFO)
             db_logger = logging.getLogger('db_logger')
+
+        # data insert tmp folder
+        if not os.path.exists(tmp_folder):
+            os.mkdir(tmp_folder)
+        # clean folder
+        else:
+            for file in os.listdir(tmp_folder):
+                os.remove(f'{tmp_folder}/{file}')
 
         print('Connecting to db')
         db_request_handler = Db_handler(config_json=db_config_path,logger=db_logger)

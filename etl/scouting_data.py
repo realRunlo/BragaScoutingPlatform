@@ -28,6 +28,9 @@ pbar_players.desc = 'Players'
 pbar_matches = tqdm()
 pbar_matches.desc = 'Matches'
 
+tmp_folder  = f'{current_folder}/tmp'
+file_delimiter = '|;|'
+
             
 def last_update():
     '''Get last update date'''
@@ -1574,8 +1577,6 @@ if __name__ == '__main__':
     args = parse_arguments()
 
     if args.db_config.endswith('.json'):
-        tmp_folder  = f'{current_folder}/tmp'
-        file_delimiter = '|;|'
         # data insert tmp folder
         if not os.path.exists(tmp_folder):
             os.mkdir(tmp_folder)
