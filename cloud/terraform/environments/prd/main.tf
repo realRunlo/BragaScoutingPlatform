@@ -16,7 +16,7 @@ module "postgreSQL"{
     storage_size = 32768  # 32 gb
     database_name = "scouting"
     admin_user = "adminScouter"
-    admin_password = "2023scouter!Braga10"
+    admin_password = ""
 }
 
 module "virtual_machine" {
