@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Vars
-USER="azureuser"
-VM_ADDRESS="20.56.21.25"
-PRIVATE_KEY="~/.ssh/vm1"
+USER=""
+VM_ADDRESS=""
+PRIVATE_KEY=""
 
 # Set up commands
 ssh -i $PRIVATE_KEY "$USER@$VM_ADDRESS" <<'ENDSSH'
